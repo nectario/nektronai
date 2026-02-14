@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 32" role="img" aria-label="NektronAI">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="120" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7aa2f7" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <rect x="0.5" y="0.5" width="31" height="31" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)"/>
+    <path d="M9 23V9h4l9 10V9h4v14h-4L13 13v10z" fill="url(#g)"/>
+    <text x="40" y="22" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" font-size="16" font-weight="650" fill="currentColor">NektronAI</text>
+  </g>
+</svg>
