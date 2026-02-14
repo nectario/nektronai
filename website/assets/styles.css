@@ -170,11 +170,11 @@ header{
   width:auto;
   max-width: min(220px, 42vw);
 }
-.brand-wordmark-dark{ display:none; }
-.brand-wordmark-light{ display:block; }
+.brand-wordmark-dark{ display:block; }
+.brand-wordmark-light{ display:none; }
 
-.theme-light .brand-wordmark-dark{ display:block; }
-.theme-light .brand-wordmark-light{ display:none; }
+.theme-light .brand-wordmark-dark{ display:none; }
+.theme-light .brand-wordmark-light{ display:block; }
 .brand-name{ display:none; }
 
 @media (max-width: 600px){
