@@ -162,17 +162,24 @@ header{
   align-items:center;
   justify-content:center;
   width:auto;
-  height: 30px;
+  height: 34px;
 }
-.brand-mark img{
+.brand-wordmark{
   display:block;
   height:100%;
   width:auto;
+  max-width: min(220px, 42vw);
 }
+.brand-wordmark-dark{ display:none; }
+.brand-wordmark-light{ display:block; }
+
+.theme-light .brand-wordmark-dark{ display:block; }
+.theme-light .brand-wordmark-light{ display:none; }
 .brand-name{ display:none; }
 
 @media (max-width: 600px){
-  .brand-mark{ height: 26px; }
+  .brand-mark{ height: 28px; }
+  .brand-wordmark{ max-width: 170px; }
 }
 
 nav{
@@ -219,9 +226,19 @@ nav a:hover{
   background: var(--panel);
 }
 .icon-btn svg{ width: 16px; height:16px; opacity:.9; }
+.icon-btn-label{ font-size:.95rem; }
 
 .nav-toggle{
   display:none;
+}
+
+@media (max-width: 1080px){
+  .icon-btn{
+    padding:.55rem;
+  }
+  .icon-btn-label{
+    display:none;
+  }
 }
 
 @media (max-width: 860px){
@@ -242,6 +259,10 @@ main{ padding: var(--space-7) 0 var(--space-8); }
 
 .hero{
   padding: var(--space-7) 0 var(--space-7);
+}
+
+.hero-compact{
+  padding-bottom: var(--space-5);
 }
 
 .kicker{
@@ -325,6 +346,10 @@ h1{
 .section{
   padding: var(--space-7) 0;
   border-top: 1px solid var(--border2);
+}
+
+.section-tight-top{
+  padding-top: var(--space-5);
 }
 
 .section h2{
@@ -501,6 +526,11 @@ h1{
   border-top: 1px solid var(--border2);
   padding: var(--space-6) 0;
   color: var(--muted);
+}
+.footer-brand{ margin-bottom:.6rem; }
+.footer-links{
+  display:grid;
+  gap:.4rem;
 }
 .footer-grid{
   display:grid;

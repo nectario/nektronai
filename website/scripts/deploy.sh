@@ -16,6 +16,17 @@ echo "== Deploy NektronAI site =="
 echo "Bucket: ${BUCKET_NAME}"
 echo "Site dir: ${SITE_DIR}"
 
+pick_first_existing() {
+  local candidate
+  for candidate in "$@"; do
+    if [[ -f "${candidate}" ]]; then
+      printf "%s" "${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Optional: if a brand/logo folder exists next to the site repo, copy assets in.
 # This lets you drop new logo files without editing the site code.
 BRAND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../logo" 2>/dev/null && pwd || true)"
@@ -23,25 +34,81 @@ if [[ -n "${BRAND_DIR}" && -d "${BRAND_DIR}" ]]; then
   BRAND_OUT_DIR="${SITE_DIR}/assets/brand"
   mkdir -p "${BRAND_OUT_DIR}"
 
-  # Keep deploy deterministic and avoid accidentally publishing docs/PDFs.
-  rm -f "${BRAND_OUT_DIR}"/* 2>/dev/null || true
+  # Support both old and new logo folder layouts.
+  # Dark logo is used on light theme; light logo is used on dark theme.
+  WORDMARK_DARK_SRC="$(
+    pick_first_existing \
+      "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Dark.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_dark.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_dark.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_2048w_dark.png" \
+      "${BRAND_DIR}/Original Logo/Icon & Social Media/Black.png" \
+      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Black.png" \
+      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
+      || true
+  )"
+  WORDMARK_LIGHT_SRC="$(
+    pick_first_existing \
+      "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Light.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_light.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_light.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_2048w_light.png" \
+      "${BRAND_DIR}/Original Logo/Icon & Social Media/White.png" \
+      "${BRAND_DIR}/Original Logo/JPGs & PNGs/White.png" \
+      "${BRAND_DIR}/Original Logo/Artwork Files/1x/Artboard 1.png" \
+      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
+      || true
+  )"
+  ICON_SRC="$(
+    pick_first_existing \
+      "${BRAND_DIR}/Icon & Social Media/Icon.png" \
+      "${BRAND_DIR}/Original Logo/Icon & Social Media/Icon.png" \
+      "${BRAND_DIR}/Original Logo/Artwork Files/NektronAI_Icon_1024.png" \
+      || true
+  )"
+  FAVICON_SRC="$(
+    pick_first_existing \
+      "${BRAND_DIR}/Favicon.png" \
+      "${BRAND_DIR}/Original Logo/Favicon.png" \
+      || true
+  )"
+  SVG_SRC="$(
+    pick_first_existing \
+      "${BRAND_DIR}/logo.svg" \
+      "${BRAND_DIR}/Original Logo/logo.svg" \
+      "${BRAND_DIR}/Old Logo/NektronAI_Logo_Lockup.svg" \
+      || true
+  )"
 
-  WORDMARK_SRC="${BRAND_DIR}/JPGs & PNGs/Logo.png"
-  ICON_SRC="${BRAND_DIR}/Icon & Social Media/Icon.png"
-  FAVICON_SRC="${BRAND_DIR}/Favicon.png"
-  SVG_SRC="${BRAND_DIR}/logo.svg"
-
-  if [[ -f "${WORDMARK_SRC}" ]]; then
-    cp -f "${WORDMARK_SRC}" "${BRAND_OUT_DIR}/wordmark.png"
+  if [[ -z "${WORDMARK_DARK_SRC}" && -n "${WORDMARK_LIGHT_SRC}" ]]; then
+    WORDMARK_DARK_SRC="${WORDMARK_LIGHT_SRC}"
   fi
-  if [[ -f "${ICON_SRC}" ]]; then
+  if [[ -z "${WORDMARK_LIGHT_SRC}" && -n "${WORDMARK_DARK_SRC}" ]]; then
+    WORDMARK_LIGHT_SRC="${WORDMARK_DARK_SRC}"
+  fi
+
+  if [[ -n "${WORDMARK_DARK_SRC}" ]]; then
+    cp -f "${WORDMARK_DARK_SRC}" "${BRAND_OUT_DIR}/wordmark-dark.png"
+  fi
+  if [[ -n "${WORDMARK_LIGHT_SRC}" ]]; then
+    cp -f "${WORDMARK_LIGHT_SRC}" "${BRAND_OUT_DIR}/wordmark-light.png"
+    # Backward-compatible fallback path used by older templates.
+    cp -f "${WORDMARK_LIGHT_SRC}" "${BRAND_OUT_DIR}/wordmark.png"
+  elif [[ -n "${WORDMARK_DARK_SRC}" ]]; then
+    cp -f "${WORDMARK_DARK_SRC}" "${BRAND_OUT_DIR}/wordmark.png"
+  fi
+  if [[ -n "${ICON_SRC}" ]]; then
     cp -f "${ICON_SRC}" "${BRAND_OUT_DIR}/icon.png"
   fi
-  if [[ -f "${FAVICON_SRC}" ]]; then
+  if [[ -n "${FAVICON_SRC}" ]]; then
     cp -f "${FAVICON_SRC}" "${SITE_DIR}/assets/favicon.png"
   fi
-  if [[ -f "${SVG_SRC}" ]]; then
+  if [[ -n "${SVG_SRC}" ]]; then
     cp -f "${SVG_SRC}" "${BRAND_OUT_DIR}/logo.svg"
+  fi
+
+  if [[ -z "${WORDMARK_DARK_SRC}" && -z "${WORDMARK_LIGHT_SRC}" && -z "${ICON_SRC}" && -z "${FAVICON_SRC}" && -z "${SVG_SRC}" ]]; then
+    echo "WARN: No matching brand assets found in ${BRAND_DIR}; keeping existing site assets."
   fi
 
 fi
