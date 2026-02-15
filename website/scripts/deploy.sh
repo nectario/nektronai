@@ -35,9 +35,9 @@ if [[ -n "${BRAND_DIR}" && -d "${BRAND_DIR}" ]]; then
   mkdir -p "${BRAND_OUT_DIR}"
 
   # Support both old and new logo folder layouts.
-  # Dark logo is used on light theme; light logo is used on dark theme.
-  WORDMARK_DARK_SRC="$(
+  WORDMARK_DARK_320_SRC="$(
     pick_first_existing \
+      "${BRAND_DIR}/final/320w/NektronAI_Dark_320.png" \
       "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Dark.png" \
       "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_dark.png" \
       "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_dark.png" \
@@ -47,8 +47,36 @@ if [[ -n "${BRAND_DIR}" && -d "${BRAND_DIR}" ]]; then
       "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
       || true
   )"
-  WORDMARK_LIGHT_SRC="$(
+  WORDMARK_LIGHT_320_SRC="$(
     pick_first_existing \
+      "${BRAND_DIR}/final/320w/NektronAI_Light_320.png" \
+      "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Light.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_light.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_light.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_2048w_light.png" \
+      "${BRAND_DIR}/Original Logo/Icon & Social Media/White.png" \
+      "${BRAND_DIR}/Original Logo/JPGs & PNGs/White.png" \
+      "${BRAND_DIR}/Original Logo/Artwork Files/1x/Artboard 1.png" \
+      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
+      || true
+  )"
+  WORDMARK_DARK_280_SRC="$(
+    pick_first_existing \
+      "${BRAND_DIR}/final/280w/NektronAI_Dark_280.png" \
+      "${BRAND_DIR}/final/320w/NektronAI_Dark_320.png" \
+      "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Dark.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_dark.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_dark.png" \
+      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_2048w_dark.png" \
+      "${BRAND_DIR}/Original Logo/Icon & Social Media/Black.png" \
+      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Black.png" \
+      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
+      || true
+  )"
+  WORDMARK_LIGHT_280_SRC="$(
+    pick_first_existing \
+      "${BRAND_DIR}/final/280w/NektronAI_Light_280.png" \
+      "${BRAND_DIR}/final/320w/NektronAI_Light_320.png" \
       "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Light.png" \
       "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_light.png" \
       "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_light.png" \
@@ -80,22 +108,44 @@ if [[ -n "${BRAND_DIR}" && -d "${BRAND_DIR}" ]]; then
       || true
   )"
 
-  if [[ -z "${WORDMARK_DARK_SRC}" && -n "${WORDMARK_LIGHT_SRC}" ]]; then
-    WORDMARK_DARK_SRC="${WORDMARK_LIGHT_SRC}"
+  if [[ -z "${WORDMARK_DARK_320_SRC}" && -n "${WORDMARK_LIGHT_320_SRC}" ]]; then
+    WORDMARK_DARK_320_SRC="${WORDMARK_LIGHT_320_SRC}"
   fi
-  if [[ -z "${WORDMARK_LIGHT_SRC}" && -n "${WORDMARK_DARK_SRC}" ]]; then
-    WORDMARK_LIGHT_SRC="${WORDMARK_DARK_SRC}"
+  if [[ -z "${WORDMARK_LIGHT_320_SRC}" && -n "${WORDMARK_DARK_320_SRC}" ]]; then
+    WORDMARK_LIGHT_320_SRC="${WORDMARK_DARK_320_SRC}"
   fi
 
-  if [[ -n "${WORDMARK_DARK_SRC}" ]]; then
-    cp -f "${WORDMARK_DARK_SRC}" "${BRAND_OUT_DIR}/wordmark-dark.png"
+  if [[ -z "${WORDMARK_DARK_280_SRC}" && -n "${WORDMARK_DARK_320_SRC}" ]]; then
+    WORDMARK_DARK_280_SRC="${WORDMARK_DARK_320_SRC}"
   fi
-  if [[ -n "${WORDMARK_LIGHT_SRC}" ]]; then
-    cp -f "${WORDMARK_LIGHT_SRC}" "${BRAND_OUT_DIR}/wordmark-light.png"
+  if [[ -z "${WORDMARK_LIGHT_280_SRC}" && -n "${WORDMARK_LIGHT_320_SRC}" ]]; then
+    WORDMARK_LIGHT_280_SRC="${WORDMARK_LIGHT_320_SRC}"
+  fi
+
+  if [[ -z "${WORDMARK_DARK_280_SRC}" && -n "${WORDMARK_LIGHT_280_SRC}" ]]; then
+    WORDMARK_DARK_280_SRC="${WORDMARK_LIGHT_280_SRC}"
+  fi
+  if [[ -z "${WORDMARK_LIGHT_280_SRC}" && -n "${WORDMARK_DARK_280_SRC}" ]]; then
+    WORDMARK_LIGHT_280_SRC="${WORDMARK_DARK_280_SRC}"
+  fi
+
+  if [[ -n "${WORDMARK_DARK_320_SRC}" ]]; then
+    cp -f "${WORDMARK_DARK_320_SRC}" "${BRAND_OUT_DIR}/wordmark-dark-320.png"
+    cp -f "${WORDMARK_DARK_320_SRC}" "${BRAND_OUT_DIR}/wordmark-dark.png"
+  fi
+  if [[ -n "${WORDMARK_LIGHT_320_SRC}" ]]; then
+    cp -f "${WORDMARK_LIGHT_320_SRC}" "${BRAND_OUT_DIR}/wordmark-light-320.png"
+    cp -f "${WORDMARK_LIGHT_320_SRC}" "${BRAND_OUT_DIR}/wordmark-light.png"
     # Backward-compatible fallback path used by older templates.
-    cp -f "${WORDMARK_LIGHT_SRC}" "${BRAND_OUT_DIR}/wordmark.png"
-  elif [[ -n "${WORDMARK_DARK_SRC}" ]]; then
-    cp -f "${WORDMARK_DARK_SRC}" "${BRAND_OUT_DIR}/wordmark.png"
+    cp -f "${WORDMARK_LIGHT_320_SRC}" "${BRAND_OUT_DIR}/wordmark.png"
+  elif [[ -n "${WORDMARK_DARK_320_SRC}" ]]; then
+    cp -f "${WORDMARK_DARK_320_SRC}" "${BRAND_OUT_DIR}/wordmark.png"
+  fi
+  if [[ -n "${WORDMARK_DARK_280_SRC}" ]]; then
+    cp -f "${WORDMARK_DARK_280_SRC}" "${BRAND_OUT_DIR}/wordmark-dark-280.png"
+  fi
+  if [[ -n "${WORDMARK_LIGHT_280_SRC}" ]]; then
+    cp -f "${WORDMARK_LIGHT_280_SRC}" "${BRAND_OUT_DIR}/wordmark-light-280.png"
   fi
   if [[ -n "${ICON_SRC}" ]]; then
     cp -f "${ICON_SRC}" "${BRAND_OUT_DIR}/icon.png"
@@ -107,7 +157,7 @@ if [[ -n "${BRAND_DIR}" && -d "${BRAND_DIR}" ]]; then
     cp -f "${SVG_SRC}" "${BRAND_OUT_DIR}/logo.svg"
   fi
 
-  if [[ -z "${WORDMARK_DARK_SRC}" && -z "${WORDMARK_LIGHT_SRC}" && -z "${ICON_SRC}" && -z "${FAVICON_SRC}" && -z "${SVG_SRC}" ]]; then
+  if [[ -z "${WORDMARK_DARK_320_SRC}" && -z "${WORDMARK_LIGHT_320_SRC}" && -z "${WORDMARK_DARK_280_SRC}" && -z "${WORDMARK_LIGHT_280_SRC}" && -z "${ICON_SRC}" && -z "${FAVICON_SRC}" && -z "${SVG_SRC}" ]]; then
     echo "WARN: No matching brand assets found in ${BRAND_DIR}; keeping existing site assets."
   fi
 
