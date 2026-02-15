@@ -22,7 +22,7 @@
   --good:#9ece6a;
   --warn:#e0af68;
 
-  --header-bg: rgba(5, 9, 16, .72);
+  --header-bg: rgba(5, 9, 16, .56);
   --callout-border: rgba(255, 183, 115, .34);
   --callout-bg: linear-gradient(180deg, rgba(255, 183, 115, .12), rgba(255, 183, 115, .05));
   --primary-grad: linear-gradient(135deg, rgba(94,200,255,.28), rgba(255,154,52,.16));
@@ -74,7 +74,7 @@
 
   --shadow: 0 18px 40px rgba(0,0,0,.12);
 
-  --header-bg: rgba(251, 251, 253, .78);
+  --header-bg: rgba(251, 251, 253, .66);
   --callout-border: rgba(180, 83, 9, .22);
   --callout-bg: linear-gradient(180deg, rgba(180, 83, 9, .10), rgba(180, 83, 9, .04));
 
@@ -140,10 +140,10 @@ header{
   position: sticky;
   top:0;
   z-index:100;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  background: transparent;
-  border-bottom: 1px solid transparent;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border2);
 }
 
 .header-inner{
