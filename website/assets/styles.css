@@ -92,9 +92,10 @@ body{
   font-family: var(--font-sans);
   color: var(--text);
   background:
+    linear-gradient(180deg, rgba(5,9,16,.82), rgba(6,18,26,.90)),
     radial-gradient(1200px 700px at 15% -10%, rgba(94,200,255,.20), transparent 55%),
     radial-gradient(900px 600px at 85% 0%, rgba(255,154,52,.12), transparent 60%),
-    linear-gradient(180deg, var(--bg), var(--bg2));
+    url("background_dark.jpg") center top / cover no-repeat;
   line-height:1.55;
 }
 
@@ -271,7 +272,7 @@ header.nav-open .nav-toggle{
   .nav-actions{ margin-left:auto; }
 }
 
-main{ padding: var(--space-7) 0 var(--space-8); }
+main{ padding: var(--space-5) 0 var(--space-8); }
 
 /* Sticky-header anchor offset */
 section[id]{ scroll-margin-top: 96px; }
