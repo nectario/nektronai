@@ -93,7 +93,7 @@ body{
   color: var(--text);
   background:
     linear-gradient(180deg, rgba(5,9,16,.24), rgba(6,18,26,.36)),
-    url("background_dark.jpg") left top / 1800px auto repeat-x,
+    url("background_dark.jpg") left top / 2200px auto repeat,
     linear-gradient(180deg, var(--bg), var(--bg2));
   line-height:1.55;
 }
