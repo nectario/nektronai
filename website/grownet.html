@@ -3,14 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050910" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
   <title>GrowNet | NektronAI Research</title>
   <meta name="description" content="GrowNet is NektronAI's neuron-centric AI research program exploring local, event-driven learning, interpretable slot memory, and controlled growth.">
   <link rel="canonical" href="https://nektron.ai/grownet.html">
   <meta property="og:title" content="GrowNet | NektronAI Research">
   <meta property="og:description" content="GrowNet is NektronAI's neuron-centric AI research program exploring local, event-driven learning, interpretable slot memory, and controlled growth.">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:site_name" content="NektronAI">
+  <meta property="og:url" content="https://nektron.ai/grownet.html">
+  <meta property="og:image" content="https://nektron.ai/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:image" content="https://nektron.ai/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/brand/icon.png">
   <link rel="stylesheet" href="assets/styles.css">
   <script src="assets/site.js" defer></script>
 </head>
@@ -21,17 +31,17 @@
 <header>
   <div class="container header-inner">
     <a class="brand" href="index.html">
-      <span class="brand-mark"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark.png" alt="NektronAI"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light.png" alt="NektronAI"></span>
+      <span class="brand-mark"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark.png" alt="NektronAI" width="442" height="104" decoding="async"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light.png" alt="NektronAI" width="443" height="104" decoding="async"></span>
     </a>
 
     <div class="nav-actions">
-      <button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-label="Open navigation">
+      <button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-controls="primary-nav" aria-expanded="false" aria-label="Open navigation">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
   <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
 </svg>
         <span class="icon-btn-label">Menu</span>
       </button>
-      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
   <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.6"/>
   <path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3 4.9 19.1M19.1 19.1l-1.8-1.8M6.7 6.7 4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
@@ -40,10 +50,10 @@
       </button>
     </div>
 
-    <nav aria-label="Primary navigation">
+    <nav id="primary-nav" aria-label="Primary navigation">
       <a href="about.html">About</a>
       <a href="index.html#products">Products</a>
-      <a href="grownet.html">GrowNet</a>
+      <a href="grownet.html" class="active" aria-current="page">GrowNet</a>
       <a href="index.html#services">Services</a>
       <a href="index.html#contact">Contact</a>
     </nav>
@@ -169,7 +179,7 @@
           <h2>Research direction and ambition</h2>
           <p>
             GrowNet is positioned as a serious research program with explicit benchmark goals for accuracy, robustness, and efficiency.
-            The ambition is publishable, evidence-backed work, including alignment with top-tier venues such as NeurIPS.
+            The ambition is publishable, evidence-backed work, targeting peer-reviewed venues once results are mature.
           </p>
         </div>
       </div>
@@ -208,9 +218,9 @@
         <div class="card">
           <h3>Current applications</h3>
           <p>
-            <a href="https://www.deeptrading.ai" target="_blank" rel="noreferrer">DeepTrading.ai</a>,
-            <a href="https://www.interviewhelper.ai" target="_blank" rel="noreferrer">InterviewHelperAI</a>,
-            and <a href="https://tagmyspend.com" target="_blank" rel="noreferrer">TagMySpend.com</a> act as real-world proving grounds.
+            <a href="https://www.deeptrading.ai" target="_blank" rel="noopener noreferrer">DeepTrading.ai</a>,
+            <a href="https://www.interviewhelper.ai" target="_blank" rel="noopener noreferrer">InterviewHelperAI</a>,
+            and <a href="https://tagmyspend.com" target="_blank" rel="noopener noreferrer">TagMySpend.com</a> act as real-world proving grounds.
           </p>
           <div class="tag">Each product has its own roadmap</div>
         </div>
@@ -257,9 +267,9 @@
   <div class="container footer-grid">
     <div>
       <div class="brand footer-brand">
-        <span class="brand-mark"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark.png" alt="NektronAI"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light.png" alt="NektronAI"></span>
+        <span class="brand-mark"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark.png" alt="NektronAI" width="442" height="104" decoding="async"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light.png" alt="NektronAI" width="443" height="104" decoding="async"></span>
       </div>
-      <small>NektronAI is an umbrella AI startup spanning GrowNet research, applied products, and selective AI services.</small>
+      <small>NektronAI is an applied AI + research studio spanning GrowNet R&amp;D, products, and selective engineering services.</small>
       <hr class="soft">
       <small>© 2026 Nektron, Inc.</small>
     </div>
@@ -268,7 +278,7 @@
       <div class="footer-links">
         <a href="about.html">About</a>
         <a href="index.html#products">Products</a>
-        <a href="grownet.html">GrowNet</a>
+        <a href="grownet.html" class="active" aria-current="page">GrowNet</a>
         <a href="index.html#services">Services</a>
         <a href="index.html#contact">Contact</a>
       </div>

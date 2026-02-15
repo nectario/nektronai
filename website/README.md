@@ -31,3 +31,7 @@ Upload the folder contents to your static host (S3/Cloudflare Pages/GitHub Pages
 - Replace logo assets in `assets/brand/` and `assets/favicon.png` once your logo is finalized.
 - Update product descriptions in `index.html` if you want different positioning.
 - Update the GrowNet page copy as research milestones become public.
+
+## Social previews
+- `assets/og.png` – Open Graph / Twitter preview image (1200×630)
+
