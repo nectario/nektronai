@@ -92,7 +92,7 @@ body{
   font-family: var(--font-sans);
   color: var(--text);
   background:
-    linear-gradient(180deg, rgba(5,9,16,.40), rgba(5,9,16,.40)),
+    linear-gradient(180deg, rgba(5,9,16,.46), rgba(5,9,16,.46)),
     url("background_dark.jpg") left top / 2500px auto repeat,
     linear-gradient(180deg, var(--bg), var(--bg2));
   line-height:1.55;
@@ -100,7 +100,7 @@ body{
 
 .theme-light body{
   background:
-    linear-gradient(180deg, rgba(251,251,253,.56), rgba(251,251,253,.56)),
+    linear-gradient(180deg, rgba(251,251,253,.62), rgba(251,251,253,.62)),
     url("background_light.jpg") left top / 2500px auto repeat,
     linear-gradient(180deg, var(--bg), var(--bg2));
 }
