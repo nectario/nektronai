@@ -1,0 +1,23 @@
+:root{
+  --accent:#4bbad6;
+  --accent2:#1f98c5;
+  --accent-border: rgba(75,186,214,.34);
+}
+
+body{
+  background:
+    linear-gradient(180deg, rgba(4,10,14,.54), rgba(4,10,14,.54)),
+    url("/assets/background_dark.jpg") left top / 2600px auto repeat,
+    linear-gradient(180deg, var(--bg), var(--bg2));
+}
+
+.theme-light body{
+  background:
+    linear-gradient(180deg, rgba(252,253,255,.68), rgba(252,253,255,.68)),
+    url("/assets/background_light.jpg") left top / 2600px auto repeat,
+    linear-gradient(180deg, var(--bg), var(--bg2));
+}
+
+.card{
+  border-color: rgba(75,186,214,.16);
+}
