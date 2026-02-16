@@ -12,6 +12,10 @@ This is a lightweight, no-build-step site refresh intended to feel:
 - `assets/styles.css` – theme + layout
 - `assets/site.js` – theme toggle + mobile nav
 - `assets/favicon.png` – simple favicon
+- `ai_lab_sophisticated/` – full site variant in its own subfolder
+- `mysterious_sophisticated/` – full site variant in its own subfolder
+- `assets/variants/*.css` – variant-specific style overrides
+- `variants/index.html` – variant landing page with links
 
 ## Local preview
 1. Install dependencies:
@@ -24,6 +28,12 @@ This is a lightweight, no-build-step site refresh intended to feel:
    ```
 3. Open the local URL shown in the terminal (typically `http://localhost:5173`).
 
+### Variant URLs (local)
+- `http://localhost:5173/` (main site)
+- `http://localhost:5173/variants/` (variant index)
+- `http://localhost:5173/ai_lab_sophisticated/`
+- `http://localhost:5173/mysterious_sophisticated/`
+
 ## Deploy
 Upload the folder contents to your static host (S3/Cloudflare Pages/GitHub Pages/etc.).
 
@@ -34,4 +44,3 @@ Upload the folder contents to your static host (S3/Cloudflare Pages/GitHub Pages
 
 ## Social previews
 - `assets/og.png` – Open Graph / Twitter preview image (1200×630)
-

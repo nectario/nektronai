@@ -1,0 +1,32 @@
+:root{
+  --bg:#03040a;
+  --bg2:#05070f;
+  --accent:#9ec2ff;
+  --accent2:#8fa4ff;
+  --accent-border: rgba(158,194,255,.36);
+  --header-bg: rgba(3,5,10,.66);
+}
+
+body{
+  background:
+    linear-gradient(180deg, rgba(2,4,9,.56), rgba(2,4,9,.56)),
+    url("/assets/background_dark.jpg") left top / 2800px auto repeat,
+    linear-gradient(180deg, var(--bg), var(--bg2));
+}
+
+.theme-light{
+  --bg:#f6f8ff;
+  --bg2:#eef2ff;
+  --header-bg: rgba(246,248,255,.72);
+}
+
+.theme-light body{
+  background:
+    linear-gradient(180deg, rgba(247,249,255,.72), rgba(247,249,255,.72)),
+    url("/assets/background_light.jpg") left top / 2800px auto repeat,
+    linear-gradient(180deg, var(--bg), var(--bg2));
+}
+
+.card{
+  border-color: rgba(158,194,255,.18);
+}
