@@ -95,6 +95,7 @@ body{
     linear-gradient(180deg, rgba(5,9,16,.46), rgba(5,9,16,.46)),
     url("background_dark.jpg") left top / 2500px auto repeat,
     linear-gradient(180deg, var(--bg), var(--bg2));
+  background-attachment: fixed, fixed, fixed;
   line-height:1.55;
 }
 
