@@ -99,42 +99,6 @@ body{
   line-height:1.55;
 }
 
-.coming-soon-body{
-  margin:0;
-}
-
-.coming-soon{
-  min-height: 100dvh;
-  display:grid;
-  place-items:center;
-  padding: clamp(1.6rem, 4vw, 3rem);
-  text-align:center;
-}
-
-.coming-soon-inner{
-  width: min(680px, 100%);
-}
-
-.coming-soon-wordmark{
-  display:block;
-  width: min(320px, 72vw);
-  height:auto;
-  margin: 0 auto 1.2rem;
-}
-
-.coming-soon-title{
-  margin:0 0 .75rem;
-  font-size: clamp(2rem, 1.6rem + 2vw, 3rem);
-  line-height:1.08;
-  letter-spacing:-0.02em;
-}
-
-.coming-soon-copy{
-  margin:0;
-  color: var(--muted);
-  font-size: var(--step-0);
-}
-
 .theme-light body{
   background:
     linear-gradient(180deg, rgba(251,251,253,.62), rgba(251,251,253,.62)),

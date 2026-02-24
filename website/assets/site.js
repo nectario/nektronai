@@ -4,25 +4,6 @@
 (() => {
   const storageKey = "nektron-theme";
   const root = document.documentElement;
-  const host = (window.location.hostname || "").toLowerCase();
-  const productionHosts = new Set(["nektron.ai", "www.nektron.ai"]);
-
-  // Show a simple maintenance screen only on production hostname.
-  if (productionHosts.has(host)) {
-    root.classList.remove("theme-light");
-    document.title = "NektronAI | Coming Soon";
-    document.body.className = "coming-soon-body";
-    document.body.innerHTML = `
-      <main class="coming-soon" id="content">
-        <div class="coming-soon-inner">
-          <img class="coming-soon-wordmark" src="/assets/brand/wordmark-dark-320.png" alt="NektronAI" width="320" height="74" decoding="async">
-          <h1 class="coming-soon-title">Coming Soon</h1>
-          <p class="coming-soon-copy">NektronAI is preparing the next version of our website.</p>
-        </div>
-      </main>
-    `;
-    return;
-  }
 
   const header = document.querySelector("header");
   const themeBtn = document.querySelector("[data-theme-toggle]");
