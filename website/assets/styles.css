@@ -104,6 +104,7 @@ body{
     linear-gradient(180deg, rgba(251,251,253,.62), rgba(251,251,253,.62)),
     url("background_light.jpg") left top / 2500px auto repeat,
     linear-gradient(180deg, var(--bg), var(--bg2));
+  background-attachment: fixed, fixed, fixed;
 }
 
 
