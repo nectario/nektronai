@@ -4,6 +4,13 @@
 (() => {
   const storageKey = "nektron-theme";
   const root = document.documentElement;
+  const sunIconMarkup = `
+  <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3 4.9 19.1M19.1 19.1l-1.8-1.8M6.7 6.7 4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  `;
+  const moonIconMarkup = `
+  <path d="M14.5 3.5a8.5 8.5 0 1 0 6 14.5 8 8 0 0 1-6-14.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  `;
 
   const header = document.querySelector("header");
   const themeBtn = document.querySelector("[data-theme-toggle]");
@@ -23,6 +30,11 @@
     if (themeBtn) {
       themeBtn.setAttribute("aria-label", useLight ? "Switch to dark theme" : "Switch to light theme");
       themeBtn.setAttribute("aria-pressed", useLight ? "true" : "false");
+      const icon = themeBtn.querySelector("svg");
+      if (icon) {
+        icon.setAttribute("viewBox", "0 0 24 24");
+        icon.innerHTML = useLight ? sunIconMarkup : moonIconMarkup;
+      }
     }
   }
 
