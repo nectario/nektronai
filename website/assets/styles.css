@@ -366,7 +366,7 @@ h1{
 .meta-pill code{ font-size: .88rem; color: var(--text); }
 
 .section{
-  padding: var(--space-7) 0;
+  padding: var(--space-6) 0 var(--space-7);
   border-top: 1px solid var(--border2);
 }
 
