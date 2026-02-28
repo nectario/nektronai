@@ -305,7 +305,7 @@ h1{
 .hero p{
   font-size: var(--step-1);
   color: var(--muted);
-  max-width: 60ch;
+  max-width: 74ch;
 }
 
 .hero-cta{
