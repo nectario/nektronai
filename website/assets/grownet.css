@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap');
+
 .grownet-page {
   padding-top: var(--space-4);
 }
@@ -45,10 +47,12 @@
 
 .grownet-title {
   margin: 0;
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-family: "Fraunces", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 800;
   font-size: clamp(3rem, 7vw, 5.6rem);
   line-height: 0.94;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.045em;
 }
 
 .grownet-subtitle {
