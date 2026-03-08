@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap');
+
 /* NektronAI — Minimal Research/Engineering Theme
    Drop-in static site styling (no build step).
    Designed for a technical audience: calm, high-contrast, and readable.
@@ -540,6 +542,523 @@ h1{
 }
 .quote p{ margin:0; color: var(--text); font-size: var(--step-0); }
 .quote footer{ margin-top: var(--space-2); color: var(--muted2); font-family: var(--font-mono); font-size: .88rem; }
+
+.home-page .hero{
+  display:grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(320px, .82fr);
+  gap: clamp(1.6rem, 3vw, 2.8rem);
+  align-items: stretch;
+  padding: clamp(3.2rem, 7vw, 5.4rem) 0 clamp(2.6rem, 5vw, 4rem);
+}
+
+.home-page .hero-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.home-page h1,
+.home-page .section h2,
+.home-page .card h3,
+.home-page .ribbon-card h3,
+.home-page .hero-panel h2,
+.home-page .contact-card strong,
+.home-page .step-card strong{
+  font-family: "Sora", var(--font-sans);
+}
+
+.home-page h1{
+  max-width: 11ch;
+  font-size: clamp(3rem, 5.8vw, 5.2rem);
+  line-height: .98;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+
+.home-page .hero-lede{
+  max-width: 62ch;
+  font-size: clamp(1.16rem, 1.03rem + .45vw, 1.42rem);
+  line-height: 1.72;
+}
+
+.home-meta-row{
+  margin-top: var(--space-5);
+  max-width: 64rem;
+}
+
+.home-page .meta-pill{
+  padding: .62rem .9rem;
+  background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.028));
+}
+
+.home-thesis-panel{
+  position:relative;
+  overflow:hidden;
+  padding: clamp(1.45rem, 2.4vw, 2rem);
+  border-radius: 24px;
+  border: 1px solid rgba(94,200,255,.18);
+  background:
+    radial-gradient(720px 320px at 100% 0%, rgba(255,154,52,.14), transparent 56%),
+    radial-gradient(620px 280px at 0% 0%, rgba(94,200,255,.18), transparent 54%),
+    linear-gradient(180deg, rgba(7,12,21,.96), rgba(8,14,24,.86));
+  box-shadow: 0 28px 70px rgba(0,0,0,.36);
+}
+
+.theme-light .home-thesis-panel{
+  border-color: rgba(0,106,138,.18);
+  background:
+    radial-gradient(720px 320px at 100% 0%, rgba(180,83,9,.1), transparent 56%),
+    radial-gradient(620px 280px at 0% 0%, rgba(0,106,138,.1), transparent 54%),
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(246,247,251,.92));
+  box-shadow: 0 22px 48px rgba(0,0,0,.12);
+}
+
+.home-thesis-panel::after{
+  content:"";
+  position:absolute;
+  inset:auto -14% -18% auto;
+  width: 240px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(94,200,255,.22), transparent 66%);
+  pointer-events:none;
+}
+
+.panel-kicker,
+.section-kicker,
+.card-eyebrow,
+.product-label,
+.contact-label{
+  display:block;
+  margin:0 0 .7rem;
+  color: var(--muted2);
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.home-thesis-panel h2{
+  margin:0 0 .8rem;
+  font-size: clamp(1.55rem, 1.25rem + 1vw, 2.2rem);
+  letter-spacing: -.03em;
+}
+
+.home-thesis-panel p{
+  max-width: 38ch;
+}
+
+.hero-signal-grid{
+  display:grid;
+  gap: .8rem;
+  margin-top: 1.35rem;
+}
+
+.signal-item{
+  padding: .95rem 1rem;
+  border-radius: 16px;
+  border: 1px solid var(--border2);
+  background: rgba(255,255,255,.04);
+}
+
+.theme-light .signal-item{
+  background: rgba(255,255,255,.62);
+}
+
+.signal-item span{
+  display:block;
+  margin-bottom: .35rem;
+  color: var(--muted2);
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.signal-item strong{
+  display:block;
+  color: var(--text);
+  font-size: .98rem;
+  line-height: 1.5;
+}
+
+.research-loop{
+  display:grid;
+  gap: .9rem;
+  margin-top: 1.45rem;
+}
+
+.loop-step{
+  position:relative;
+  display:grid;
+  grid-template-columns: auto 1fr;
+  gap: .85rem;
+  align-items:flex-start;
+}
+
+.loop-step:not(:last-child)::after{
+  content:"";
+  position:absolute;
+  left: .95rem;
+  top: 2.3rem;
+  bottom: -.85rem;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(94,200,255,.34), rgba(255,154,52,.16));
+}
+
+.loop-index{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width: 1.95rem;
+  height: 1.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(94,200,255,.32);
+  background: rgba(94,200,255,.1);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: .76rem;
+}
+
+.loop-step strong{
+  display:block;
+  margin-bottom: .28rem;
+  color: var(--text);
+  font-family: "Sora", var(--font-sans);
+  font-size: 1rem;
+}
+
+.loop-step p{
+  margin:0;
+  font-size: .98rem;
+}
+
+.home-ribbon{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: calc(var(--space-5) * -1);
+  position:relative;
+  z-index: 3;
+}
+
+.ribbon-card{
+  padding: 1.1rem 1.15rem 1.2rem;
+  border-radius: 18px;
+  border: 1px solid var(--border2);
+  background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.028));
+  box-shadow: var(--shadow);
+}
+
+.theme-light .ribbon-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));
+}
+
+.ribbon-card h3{
+  margin: 0 0 .45rem;
+  font-size: 1.08rem;
+}
+
+.ribbon-card p:last-child{
+  margin:0;
+}
+
+.home-section{
+  padding-top: clamp(3rem, 6vw, 4.4rem);
+}
+
+.home-page .section:first-of-type{
+  border-top: none;
+}
+
+.home-section-head{
+  margin-bottom: var(--space-5);
+}
+
+.home-page .section h2{
+  margin-bottom: .8rem;
+  font-size: clamp(2rem, 1.58rem + 1.35vw, 3rem);
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+
+.home-section-head p{
+  max-width: 64ch;
+  line-height: 1.68;
+}
+
+.focus-card{
+  position:relative;
+  overflow:hidden;
+  padding: clamp(1.45rem, 2.2vw, 1.85rem);
+  border-radius: 22px;
+}
+
+.focus-card::before,
+.product-card::before,
+.research-feature::before,
+.status-card::before{
+  content:"";
+  position:absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(94,200,255,.5), rgba(255,154,52,.22), transparent);
+}
+
+.focus-card-research{
+  background: linear-gradient(180deg, rgba(94,200,255,.09), rgba(255,255,255,.03));
+}
+
+.focus-card-products{
+  background: linear-gradient(180deg, rgba(255,154,52,.08), rgba(255,255,255,.03));
+}
+
+.home-list{
+  margin-top: var(--space-3);
+}
+
+.home-research-layout{
+  display:grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, .82fr);
+  gap: var(--space-4);
+  align-items:start;
+}
+
+.research-feature,
+.status-card{
+  position:relative;
+  border-radius: 22px;
+}
+
+.research-feature{
+  padding: clamp(1.45rem, 2.2vw, 2rem);
+  background:
+    radial-gradient(820px 280px at 100% 0%, rgba(94,200,255,.08), transparent 52%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.026));
+}
+
+.research-feature h3,
+.status-card h3,
+.contact-copy h2{
+  margin: 0 0 .65rem;
+  font-size: clamp(1.3rem, 1.05rem + .6vw, 1.85rem);
+  line-height: 1.16;
+  letter-spacing: -.03em;
+}
+
+.research-side{
+  display:grid;
+  gap: var(--space-4);
+}
+
+.status-card{
+  background: linear-gradient(180deg, rgba(255,154,52,.08), rgba(255,255,255,.025));
+}
+
+.research-steps{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.step-card{
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid var(--border2);
+  background: rgba(255,255,255,.035);
+}
+
+.theme-light .step-card{
+  background: rgba(255,255,255,.68);
+}
+
+.step-card span{
+  display:block;
+  margin-bottom: .28rem;
+  color: var(--muted2);
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.step-card strong{
+  display:block;
+  margin-bottom: .35rem;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.step-card p{
+  margin:0;
+  font-size: .96rem;
+}
+
+.home-quote{
+  padding: 1.35rem 1.4rem;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+}
+
+.theme-light .home-quote{
+  background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.72));
+}
+
+.home-product-grid{
+  align-items: stretch;
+}
+
+.product-card{
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  gap: .9rem;
+  min-height: 100%;
+  padding: 1.35rem;
+  border-radius: 22px;
+}
+
+.product-card:nth-child(1){
+  background: linear-gradient(180deg, rgba(94,200,255,.1), rgba(255,255,255,.025));
+}
+
+.product-card:nth-child(2){
+  background: linear-gradient(180deg, rgba(255,154,52,.09), rgba(255,255,255,.025));
+}
+
+.product-card:nth-child(3){
+  background: linear-gradient(180deg, rgba(94,200,255,.055), rgba(255,154,52,.04));
+}
+
+.product-card h3{
+  margin:0;
+  font-size: 1.26rem;
+}
+
+.product-card h3 a{
+  color: var(--text);
+}
+
+.product-card h3 a:hover{
+  color: var(--accent);
+}
+
+.product-meta{
+  margin-top: auto;
+  padding-top: .95rem;
+  border-top: 1px solid var(--border2);
+  color: var(--muted2);
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  letter-spacing: .03em;
+}
+
+.home-product-note{
+  margin-top: var(--space-4);
+}
+
+.contact-band{
+  position:relative;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+  gap: var(--space-4);
+  padding: clamp(1.5rem, 2.7vw, 2.15rem);
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(820px 280px at 100% 0%, rgba(255,154,52,.1), transparent 52%),
+    radial-gradient(620px 240px at 0% 0%, rgba(94,200,255,.12), transparent 54%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+  box-shadow: var(--shadow);
+}
+
+.theme-light .contact-band{
+  background:
+    radial-gradient(820px 280px at 100% 0%, rgba(180,83,9,.08), transparent 52%),
+    radial-gradient(620px 240px at 0% 0%, rgba(0,106,138,.08), transparent 54%),
+    linear-gradient(180deg, rgba(255,255,255,.94), rgba(246,247,251,.84));
+}
+
+.contact-copy{
+  position:relative;
+  z-index: 1;
+}
+
+.contact-copy p{
+  max-width: 58ch;
+}
+
+.contact-cards{
+  display:grid;
+  gap: var(--space-3);
+  align-content:start;
+}
+
+.contact-card{
+  display:block;
+  padding: 1.2rem 1.25rem;
+  border-radius: 18px;
+}
+
+.contact-card strong{
+  display:block;
+  margin-bottom: .35rem;
+  color: var(--text);
+  font-size: 1.15rem;
+  letter-spacing: -.02em;
+}
+
+.contact-card span:last-child{
+  display:block;
+  color: var(--muted);
+  font-size: .98rem;
+  line-height: 1.55;
+}
+
+a.contact-card{
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+
+a.contact-card:hover{
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1100px){
+  .home-page .hero,
+  .home-research-layout,
+  .contact-band{
+    grid-template-columns: 1fr;
+  }
+
+  .home-ribbon{
+    grid-template-columns: 1fr;
+    margin-top: var(--space-3);
+  }
+
+  .research-steps{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px){
+  .home-page .hero{
+    padding-top: var(--space-6);
+  }
+
+  .home-thesis-panel,
+  .contact-band,
+  .focus-card,
+  .product-card,
+  .research-feature,
+  .status-card,
+  .home-quote{
+    border-radius: 20px;
+  }
+}
 
 .footer{
   border-top: 1px solid var(--border2);

@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="assets/styles.css">
   <script src="assets/site.js" defer></script>
 </head>
-<body>
+<body class="home-page">
   <a class="skip-link" href="#content">Skip to content</a>
 
 <div id="top"></div>
@@ -62,67 +62,147 @@
 
 <main id="content">
   <div class="container">
-    <section class="hero">
-      <div class="kicker">Research-first • AGI ambition • Product-funded R&amp;D</div>
-      <h1>Pursue bold AI foundations. <br>Build toward AGI with new learning ideas.</h1>
-      <p>
-        NektronAI started with one core thesis: current AI approaches may not be enough.
-        Our research explores, through <strong>GrowNet</strong>, a <strong>biologically inspired</strong> direction where learning is local, event-driven,
-        and growth-aware, while staying pragmatic instead of copying biology end-to-end. Our products exist to generate revenue
-        and real-world pressure that sustains this long-horizon research.
-      </p>
+    <section class="hero home-hero">
+      <div class="hero-copy">
+        <div class="kicker">Research-first • AGI ambition • Product-funded R&amp;D</div>
+        <h1>Pursue bold AI foundations. Build toward AGI with new learning ideas.</h1>
+        <p class="hero-lede">
+          NektronAI started with one core thesis: current AI approaches may not be enough. Our research explores, through
+          <strong>GrowNet</strong>, a <strong>biologically inspired</strong> direction where learning is local, event-driven, and growth-aware,
+          while staying pragmatic instead of copying biology end-to-end. Our products generate revenue and real-world pressure
+          that sustains this long-horizon research.
+        </p>
 
-      <div class="hero-cta">
-        <a class="button primary" href="grownet.html">
-          Open the GrowNet journal <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <div class="hero-cta">
+          <a class="button primary" href="grownet.html">
+            Open the GrowNet journal <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
   <path d="M7 17 17 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
   <path d="M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-        </a>
-        <a class="button secondary" href="#products">View products</a>
-        <a class="button secondary" href="#contact">Contact</a>
+          </a>
+          <a class="button secondary" href="#products">View products</a>
+          <a class="button secondary" href="#contact">Contact</a>
+        </div>
+
+        <div class="meta-row home-meta-row" aria-label="Quick facts">
+          <span class="meta-pill"><span>Centerpiece research:</span> <code>GrowNet</code></span>
+          <span class="meta-pill"><span>Products:</span> <code>DeepTrading.ai</code>, <code>InterviewHelperAI</code>, <code>TagMySpend.com</code></span>
+          <span class="meta-pill"><span>Company:</span> <code>Nektron, Inc.</code></span>
+        </div>
       </div>
 
-      <div class="meta-row" aria-label="Quick facts">
-        <span class="meta-pill"><span>Centerpiece research:</span> <code>GrowNet</code></span>
-        <span class="meta-pill"><span>Products:</span> <code>DeepTrading.ai</code>, <code>InterviewHelperAI</code>, <code>TagMySpend.com</code></span>
-        <span class="meta-pill"><span>Company:</span> <code>Nektron, Inc.</code></span>
-      </div>
+      <aside class="hero-panel home-thesis-panel" aria-label="Research thesis">
+        <p class="panel-kicker">Research thesis</p>
+        <h2>GrowNet is the flagship bet.</h2>
+        <p>
+          The company is organized around one loop: invent new learning primitives, pressure-test them through products,
+          and feed those constraints back into the research.
+        </p>
+
+        <div class="hero-signal-grid">
+          <article class="signal-item">
+            <span>Local learning</span>
+            <strong>Adapt per event instead of relying on one global training loop.</strong>
+          </article>
+          <article class="signal-item">
+            <span>Controlled growth</span>
+            <strong>Expand only when novelty and saturation make new capacity necessary.</strong>
+          </article>
+          <article class="signal-item">
+            <span>Product pressure</span>
+            <strong>Use revenue and real usage as discipline, not as a distraction from the thesis.</strong>
+          </article>
+        </div>
+
+        <div class="research-loop" aria-label="Research loop">
+          <div class="loop-step">
+            <div class="loop-index">01</div>
+            <div>
+              <strong>Invent</strong>
+              <p>Develop new learning ideas through the GrowNet research program.</p>
+            </div>
+          </div>
+          <div class="loop-step">
+            <div class="loop-index">02</div>
+            <div>
+              <strong>Pressure-test</strong>
+              <p>Ship products that force contact with latency, UX, and distribution shift.</p>
+            </div>
+          </div>
+          <div class="loop-step">
+            <div class="loop-index">03</div>
+            <div>
+              <strong>Refine</strong>
+              <p>Feed evidence back into the architecture so research stays grounded.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
     </section>
 
-    <section class="section" aria-label="Focus areas">
-      <div class="section-head">
+    <section class="home-ribbon" aria-label="Positioning highlights">
+      <article class="ribbon-card">
+        <p class="card-eyebrow">Long-horizon R&amp;D</p>
+        <h3>Research first</h3>
+        <p>NektronAI exists to pursue learning architectures that may require a different foundation from current AI norms.</p>
+      </article>
+      <article class="ribbon-card">
+        <p class="card-eyebrow">Funding model</p>
+        <h3>Products sustain the work</h3>
+        <p>Applications are not side quests. They create revenue and real-world pressure that keep the thesis honest.</p>
+      </article>
+      <article class="ribbon-card">
+        <p class="card-eyebrow">Execution style</p>
+        <h3>Measured ambition</h3>
+        <p>The stance is bold on direction but disciplined on claims, benchmarks, and deployment readiness.</p>
+      </article>
+    </section>
+
+    <section class="section home-section" aria-label="Operating model">
+      <div class="section-head home-section-head">
         <div>
-          <h2>Two pillars</h2>
+          <p class="section-kicker">Operating model</p>
+          <h2>Research and products pull on each other.</h2>
           <p>
-            NektronAI is organized as a research-product loop: research develops bold new learning primitives, and products stress-test
+            NektronAI is organized as a research-product loop: research develops new learning primitives, and products stress-test
             them against changing distributions, latency constraints, and real user behavior.
           </p>
         </div>
       </div>
 
-      <div class="grid cols-2">
-        <div class="card">
+      <div class="grid cols-2 home-focus-grid">
+        <article class="card focus-card focus-card-research">
+          <p class="card-eyebrow">01 · Research</p>
           <h3>AI Research</h3>
-          <p>Our research explores local, event-driven learning and controlled growth through GrowNet as a biologically inspired but engineering-grounded alternative to heavyweight global training pipelines.</p>
-          <div class="tag">Centerpiece: GrowNet</div>
-        </div>
-        <div class="card">
+          <p>GrowNet explores local, event-driven learning and controlled growth as a biologically inspired but engineering-grounded alternative to heavyweight global training pipelines.</p>
+          <ul class="list home-list">
+            <li>Local updates instead of one monolithic training story</li>
+            <li>Inspectable slot memory and growth-aware adaptation</li>
+            <li>Long-term aim: a stronger shared future foundation</li>
+          </ul>
+        </article>
+
+        <article class="card focus-card focus-card-products">
+          <p class="card-eyebrow">02 · Applications</p>
           <h3>AI Applications</h3>
-          <p>DeepTrading.ai, InterviewHelperAI, and TagMySpend.com are practical proving grounds and revenue engines that keep long-horizon research active.</p>
-          <div class="tag">Focus: utility • speed • measurable outcomes</div>
-        </div>
+          <p>DeepTrading.ai, InterviewHelperAI, and TagMySpend.com are proving grounds and revenue engines that keep long-horizon research active and reality-checked.</p>
+          <ul class="list home-list">
+            <li>Live user pressure and changing operational constraints</li>
+            <li>Utility, speed, and measurable outcomes over vague novelty</li>
+            <li>Commercial feedback loops that sharpen technical judgment</li>
+          </ul>
+        </article>
       </div>
     </section>
 
-    <section id="research" class="section" aria-label="Research">
-      <div class="section-head">
+    <section id="research" class="section home-section" aria-label="Research">
+      <div class="section-head home-section-head">
         <div>
-          <h2>Research: GrowNet</h2>
+          <p class="section-kicker">Centerpiece R&amp;D</p>
+          <h2>GrowNet explores a different learning substrate.</h2>
           <p>
             GrowNet is the centerpiece R&amp;D effort: a neuron-centric architecture where each neuron maintains inspectable memory slots,
             updates locally per event, and expands capacity from slots to larger structures only when novelty requires it.
-            The direction is biologically inspired, but intentionally not biologically dogmatic.
           </p>
         </div>
         <div>
@@ -130,103 +210,116 @@
         </div>
       </div>
 
-      <div class="grid cols-2">
-        <div class="card">
-          <h3>What it is</h3>
+      <div class="home-research-layout">
+        <article class="card research-feature">
+          <p class="card-eyebrow">How it is framed</p>
+          <h3>Local learning, inspectable memory, and growth only when novelty earns it.</h3>
           <p>
-            A research architecture where neurons keep small slot tables and learn event-by-event with local updates, not one global backprop-style loop.
+            The direction is biologically inspired, but intentionally not biologically dogmatic. The goal is not to imitate nature literally.
+            It is to build a system that learns more locally, grows more deliberately, and remains more inspectable than static heavyweight architectures.
           </p>
-          <ul class="list">
-            <li>Local learning per neuron</li>
-            <li>Inspectable slot memory that records recurring patterns</li>
-            <li>Tick-driven execution for continuous adaptation</li>
-            <li>Growth mechanics: slots → neurons → layers → regions</li>
-            <li>Cross-language parity (Python, Java, C++, Mojo)</li>
-          </ul>
-        </div>
 
-        <div class="card">
-          <h3>Status</h3>
-          <p>
-            GrowNet is under active development and is <strong>not yet integrated</strong> into NektronAI’s products.
-            It is being built as a research claim with benchmark targets, with the long-term aim of becoming a shared future foundation.
-          </p>
-          <div class="callout" role="note" aria-label="Research disclaimer">
-            <strong>Research in progress.</strong>
+          <div class="research-steps">
+            <article class="step-card">
+              <span>Observe</span>
+              <strong>Per event</strong>
+              <p>Each input updates local structure directly instead of waiting for one global sweep.</p>
+            </article>
+            <article class="step-card">
+              <span>Store</span>
+              <strong>Inspectable slots</strong>
+              <p>Neurons keep compact memory tables that can be examined as recurring patterns form.</p>
+            </article>
+            <article class="step-card">
+              <span>Expand</span>
+              <strong>Only when needed</strong>
+              <p>Capacity grows from slots to neurons to larger structures only when novelty justifies it.</p>
+            </article>
+          </div>
+        </article>
+
+        <div class="research-side">
+          <article class="card status-card">
+            <p class="card-eyebrow">Current status</p>
+            <h3>Research in progress</h3>
             <p>
-              The architecture, claims, and benchmark goals are evolving. We prefer measured evidence over broad promises.
+              GrowNet is under active development and is <strong>not yet integrated</strong> into NektronAI's products. It is being built as a research claim with benchmark targets and long-term foundation potential.
             </p>
+            <ul class="list home-list">
+              <li>Architecture and claims are still evolving</li>
+              <li>Benchmarks matter more than broad promises</li>
+              <li>Cross-language parity remains part of the plan</li>
+            </ul>
+          </article>
+
+          <div class="quote home-quote" aria-label="GrowNet guiding principle">
+            <p>
+              “When something truly new shows up, make room. If it isn't truly new, improve what you already have.”
+            </p>
+            <footer>GrowNet's “Golden Rule”</footer>
           </div>
         </div>
       </div>
-
-      <div class="quote" aria-label="GrowNet guiding principle">
-        <p>
-          “When something truly new shows up, make room. If it isn’t truly new, improve what you already have.”
-        </p>
-        <footer>GrowNet’s “Golden Rule”</footer>
-      </div>
     </section>
 
-    <section id="products" class="section" aria-label="Products">
-      <div class="section-head">
+    <section id="products" class="section home-section" aria-label="Products">
+      <div class="section-head home-section-head">
         <div>
-          <h2>Products</h2>
+          <p class="section-kicker">Products</p>
+          <h2>Live products keep the research honest.</h2>
           <p>Each product is a proving ground where ideas meet changing user needs, latency constraints, and measurable outcomes.</p>
         </div>
       </div>
 
-      <div class="grid cols-3">
-        <div class="card">
+      <div class="grid cols-3 home-product-grid">
+        <article class="card product-card">
+          <p class="product-label">Market-facing product</p>
           <h3><a href="https://www.deeptrading.ai" target="_blank" rel="noopener noreferrer">DeepTrading.ai</a></h3>
           <p>Stock research platform focused on forecasts, backtesting, and transparent performance tracking.</p>
-          <div class="tag">Link: deeptrading.ai <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-  <path d="M7 17 17 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-</svg></div>
-        </div>
-        <div class="card">
+          <div class="product-meta">Forecasting • Backtesting • Performance visibility</div>
+        </article>
+
+        <article class="card product-card">
+          <p class="product-label">Practice and prep</p>
           <h3><a href="https://www.interviewhelper.ai" target="_blank" rel="noopener noreferrer">InterviewHelperAI</a></h3>
           <p>AI-powered interview practice and preparation workflows designed for clarity and fast iteration.</p>
-          <div class="tag">Link: interviewhelper.ai <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-  <path d="M7 17 17 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-</svg></div>
-        </div>
-        <div class="card">
+          <div class="product-meta">Fast iteration • Clear workflows • User feedback</div>
+        </article>
+
+        <article class="card product-card">
+          <p class="product-label">Automation utility</p>
           <h3><a href="https://tagmyspend.com" target="_blank" rel="noopener noreferrer">TagMySpend.com</a></h3>
           <p>Spending organization with automation-first categorization and audit-friendly outputs.</p>
-          <div class="tag">Link: tagmyspend.com <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-  <path d="M7 17 17 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-</svg></div>
-        </div>
+          <div class="product-meta">Categorization • Reliability • Audit-friendly output</div>
+        </article>
       </div>
 
-      <div class="callout" role="note" aria-label="Product note">
+      <div class="callout home-product-note" role="note" aria-label="Product note">
         <strong>Note on GrowNet.</strong>
-        <p>Current products do not yet use GrowNet. GrowNet is being developed as a future research foundation.</p>
+        <p>Current products do not yet use GrowNet. They serve as commercial pressure and practical feedback while GrowNet develops as a future research foundation.</p>
       </div>
     </section>
 
-    <section id="contact" class="section" aria-label="Contact">
-      <div class="section-head">
-        <div>
-          <h2>Contact</h2>
-          <p>For collaborations, product partnerships, or research discussions:</p>
+    <section id="contact" class="section home-section" aria-label="Contact">
+      <div class="contact-band">
+        <div class="contact-copy">
+          <p class="section-kicker">Contact</p>
+          <h2>Talk research, partnerships, or product opportunities.</h2>
+          <p>For collaborations, product partnerships, or serious discussion around the GrowNet direction, get in touch and include enough context for a useful reply.</p>
         </div>
-      </div>
 
-      <div class="grid cols-2">
-        <div class="card">
-          <h3>Email</h3>
-          <p><a href="mailto:info@nektron.ai">info@nektron.ai</a></p>
-          <div class="tag">Response time varies • Please include context</div>
-        </div>
-        <div class="card">
-          <h3>Company</h3>
-          <p>Nektron, Inc.</p>
-          <div class="tag">Authorized Signatory: Nektarios Kalogridis</div>
+        <div class="contact-cards">
+          <a class="card contact-card" href="mailto:info@nektron.ai">
+            <span class="contact-label">Email</span>
+            <strong>info@nektron.ai</strong>
+            <span>For collaborations, product partnerships, or research discussions.</span>
+          </a>
+
+          <div class="card contact-card">
+            <span class="contact-label">Company</span>
+            <strong>Nektron, Inc.</strong>
+            <span>Authorized signatory: Nektarios Kalogridis</span>
+          </div>
         </div>
       </div>
     </section>
