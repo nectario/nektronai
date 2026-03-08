@@ -343,11 +343,27 @@
   letter-spacing: 0.08em;
   text-align: left;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.075);
 }
 
 .theme-light .grownet-prose th {
-  background: rgba(0, 0, 0, 0.025);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.grownet-prose tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.grownet-prose tbody tr:nth-child(even) {
+  background: rgba(94, 200, 255, 0.045);
+}
+
+.theme-light .grownet-prose tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.theme-light .grownet-prose tbody tr:nth-child(even) {
+  background: rgba(0, 106, 138, 0.05);
 }
 
 .grownet-prose td {
