@@ -49,7 +49,7 @@
   margin: 0;
   font-family: "Sora", var(--font-sans);
   font-weight: 600;
-  font-size: clamp(3rem, 7vw, 5.6rem);
+  font-size: clamp(2.85rem, 6.55vw, 5.2rem);
   line-height: 0.94;
   letter-spacing: -0.045em;
 }
@@ -351,19 +351,19 @@
 }
 
 .grownet-prose tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.012);
 }
 
 .grownet-prose tbody tr:nth-child(even) {
-  background: rgba(94, 200, 255, 0.045);
+  background: rgba(94, 200, 255, 0.028);
 }
 
 .theme-light .grownet-prose tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.56);
 }
 
 .theme-light .grownet-prose tbody tr:nth-child(even) {
-  background: rgba(0, 106, 138, 0.05);
+  background: rgba(0, 106, 138, 0.03);
 }
 
 .grownet-prose td {
