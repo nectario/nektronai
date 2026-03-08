@@ -645,7 +645,7 @@ h1{
 
 .home-thesis-panel h2{
   margin:0 0 .8rem;
-  font-size: clamp(1.3rem, 1.08rem + .72vw, 1.82rem);
+  font-size: clamp(1.38rem, 1.14rem + .78vw, 1.94rem);
   letter-spacing: -.03em;
 }
 
