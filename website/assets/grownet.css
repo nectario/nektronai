@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600&display=swap');
 
 .grownet-page {
   padding-top: var(--space-4);
@@ -47,8 +47,8 @@
 
 .grownet-title {
   margin: 0;
-  font-family: "Playfair Display", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  font-weight: 700;
+  font-family: "Sora", var(--font-sans);
+  font-weight: 600;
   font-size: clamp(3rem, 7vw, 5.6rem);
   line-height: 0.94;
   letter-spacing: -0.045em;
