@@ -1,0 +1,280 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #0b1020;
+  --bg2: #121933;
+  --text: #e9efff;
+  --muted: #9fb0d9;
+  --line: rgba(112, 145, 221, 0.32);
+  --panel: rgba(15, 24, 48, 0.75);
+  --accent: #74b6ff;
+}
+
+.theme-light {
+  --bg: #f3f6fd;
+  --bg2: #eaf0fb;
+  --text: #14203b;
+  --muted: #586c95;
+  --line: rgba(88, 116, 173, 0.34);
+  --panel: rgba(255, 255, 255, 0.82);
+  --accent: #1c5ac6;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    linear-gradient(90deg, rgba(116, 182, 255, 0.08) 1px, transparent 1px) 0 0 / 42px 42px,
+    linear-gradient(0deg, rgba(116, 182, 255, 0.08) 1px, transparent 1px) 0 0 / 42px 42px,
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  line-height: 1.5;
+}
+
+.shell { width: min(1160px, 92vw); margin: 0 auto; }
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+}
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+  background: #fff;
+  color: #000;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--bg) 76%, transparent);
+  backdrop-filter: blur(9px);
+}
+.header-grid {
+  min-height: 80px;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.9rem;
+}
+.brand-wordmark { display: block; max-width: 100%; height: auto; }
+.brand-wordmark-light { display: none; }
+.theme-light .brand-wordmark-dark { display: none; }
+.theme-light .brand-wordmark-light { display: block; }
+
+#primary-nav {
+  justify-self: end;
+  display: flex;
+  gap: 1.1rem;
+  align-items: center;
+}
+#primary-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.93rem;
+}
+#primary-nav a:hover { color: var(--text); }
+
+.header-actions { display: flex; gap: 0.5rem; }
+.icon-btn {
+  min-height: 39px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  padding: 0 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.icon-btn svg { width: 17px; height: 17px; }
+.nav-toggle span {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+}
+
+.hero {
+  padding: 3.2rem 0 1.6rem;
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 1rem;
+}
+.eyebrow {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  font-size: 0.77rem;
+}
+.hero h1 {
+  margin: 0.8rem 0 0;
+  font-size: clamp(2.05rem, 4vw, 3.2rem);
+  line-height: 1.1;
+}
+.lede {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  max-width: 62ch;
+}
+.hero-cta {
+  margin-top: 1.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.62rem 0.9rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #001024;
+  border: 0;
+  font-weight: 700;
+}
+.btn-ghost { color: var(--text); }
+
+.hero-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.hero-stat-grid article {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.75rem;
+  background: var(--panel);
+  min-height: 110px;
+  display: grid;
+  align-content: space-between;
+}
+.hero-stat-grid span {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.hero-stat-grid strong {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  margin: 1rem 0;
+  padding: 1rem;
+}
+.panel.compact { padding: 1rem; }
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+.panel-head h2 { margin: 0; font-size: 1.34rem; }
+.panel-head a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+
+.console-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+.console-grid article,
+.matrix a,
+.service-columns article {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.8rem;
+  background: color-mix(in oklab, var(--panel) 90%, transparent);
+}
+.console-grid h3,
+.matrix h3,
+.service-columns h3 { margin: 0; font-size: 1rem; }
+.console-grid p,
+.matrix p,
+.service-columns p { margin: 0.5rem 0 0; color: var(--muted); }
+
+.matrix {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+.matrix a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.service-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+#contact p { margin: 0.35rem 0; color: var(--muted); }
+#contact a { color: var(--accent); }
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  margin-top: 1.6rem;
+  padding: 1rem 0 2rem;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+}
+.footer-grid p { margin: 0.6rem 0 0; color: var(--muted); }
+.footer-links {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  justify-content: end;
+}
+.footer-links a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+.footer-links a:hover { color: var(--text); }
+
+@media (max-width: 980px) {
+  .hero,
+  .console-grid,
+  .matrix,
+  .service-columns,
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-grid {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  #primary-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 80px;
+    padding: 0.75rem 4vw;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    background: color-mix(in oklab, var(--bg) 90%, transparent);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-open #primary-nav { display: flex; }
+}

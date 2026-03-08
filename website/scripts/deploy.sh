@@ -165,7 +165,9 @@ fi
 
 aws s3 sync "${SITE_DIR}/" "s3://${BUCKET_NAME}/" --delete --region "${BUCKET_REGION}" \
   --exclude ".git/*" \
+  --exclude ".platform/*" \
   --exclude "node_modules/*" \
+  --exclude "ops/*" \
   --exclude "scripts/*" \
   --exclude "archive/*" \
   --exclude "dist/*" \

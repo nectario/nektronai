@@ -1,0 +1,416 @@
+.grownet-page {
+  padding-top: var(--space-4);
+}
+
+.grownet-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2rem, 4vw, 3.6rem);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(1100px 420px at 12% -10%, rgba(94, 200, 255, 0.18), transparent 58%),
+    radial-gradient(760px 360px at 100% 0%, rgba(255, 154, 52, 0.12), transparent 56%),
+    linear-gradient(180deg, rgba(8, 12, 20, 0.95), rgba(8, 14, 22, 0.84));
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.34);
+}
+
+.theme-light .grownet-hero {
+  background:
+    radial-gradient(1100px 420px at 12% -10%, rgba(0, 106, 138, 0.12), transparent 58%),
+    radial-gradient(760px 360px at 100% 0%, rgba(180, 83, 9, 0.1), transparent 56%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 246, 250, 0.92));
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.12);
+}
+
+.grownet-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -12% -22% auto;
+  width: clamp(220px, 32vw, 360px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(94, 200, 255, 0.2), transparent 68%);
+  pointer-events: none;
+}
+
+.grownet-eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--muted2);
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.grownet-title {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(3rem, 7vw, 5.6rem);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+}
+
+.grownet-subtitle {
+  max-width: 52rem;
+  margin: 1rem 0 0;
+  color: var(--text);
+  font-size: clamp(1.18rem, 1.05rem + 0.5vw, 1.5rem);
+  line-height: 1.45;
+}
+
+.grownet-prepared {
+  max-width: 48rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.grownet-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1.2rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 183, 115, 0.28);
+  background: rgba(255, 183, 115, 0.08);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.theme-light .grownet-status {
+  border-color: rgba(180, 83, 9, 0.18);
+  background: rgba(180, 83, 9, 0.07);
+}
+
+.grownet-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+
+.grownet-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.58rem 0.82rem;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.grownet-meta strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.grownet-hero .hero-cta {
+  margin-top: var(--space-4);
+}
+
+.grownet-summary {
+  margin-top: 1.55rem;
+  padding: 1.3rem 1.35rem;
+  border-radius: 22px;
+  border: 1px solid rgba(94, 200, 255, 0.26);
+  background: linear-gradient(180deg, rgba(94, 200, 255, 0.1), rgba(94, 200, 255, 0.04));
+}
+
+.theme-light .grownet-summary {
+  border-color: rgba(0, 106, 138, 0.18);
+  background: linear-gradient(180deg, rgba(0, 106, 138, 0.08), rgba(0, 106, 138, 0.03));
+}
+
+.grownet-summary-label {
+  margin: 0 0 0.6rem;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.grownet-summary p {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.03rem;
+  line-height: 1.72;
+}
+
+.grownet-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 270px) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+  margin-top: var(--space-5);
+}
+
+.grownet-toc {
+  position: sticky;
+  top: 102px;
+  padding: 1.2rem;
+  border-radius: 22px;
+  border: 1px solid var(--border2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+}
+
+.grownet-toc h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.grownet-toc p {
+  margin: 0.55rem 0 1rem;
+  color: var(--muted2);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.grownet-toc ol,
+.grownet-toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.grownet-toc ul {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border2);
+}
+
+.grownet-toc a {
+  display: block;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.grownet-toc a:hover {
+  color: var(--text);
+  background: var(--panel2);
+}
+
+.grownet-paper {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.3rem, 3vw, 2.2rem);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(9, 14, 22, 0.95), rgba(7, 11, 18, 0.84));
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
+}
+
+.theme-light .grownet-paper {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 247, 251, 0.9));
+  box-shadow: 0 24px 58px rgba(0, 0, 0, 0.12);
+}
+
+.grownet-paper::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(94, 200, 255, 0.54), rgba(255, 154, 52, 0.38));
+}
+
+.grownet-prose {
+  max-width: none;
+}
+
+.grownet-prose section + section {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border2);
+}
+
+.grownet-prose h2,
+.grownet-prose h3,
+.grownet-prose h4 {
+  font-family: "Avenir Next", "Segoe UI", "Trebuchet MS", sans-serif;
+  line-height: 1.16;
+}
+
+.grownet-prose h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.6rem, 3vw, 2.05rem);
+  letter-spacing: -0.03em;
+}
+
+.grownet-prose h3 {
+  margin: 1.8rem 0 0.8rem;
+  color: rgba(120, 210, 255, 0.95);
+  font-size: 1.08rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.theme-light .grownet-prose h3 {
+  color: #005d78;
+}
+
+.grownet-prose h4 {
+  margin: 1.2rem 0 0.6rem;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.grownet-prose p,
+.grownet-prose li,
+.grownet-prose td {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  color: var(--muted);
+  font-size: 1.03rem;
+  line-height: 1.76;
+}
+
+.grownet-prose p strong,
+.grownet-prose li strong,
+.grownet-prose td strong {
+  color: var(--text);
+}
+
+.grownet-prose ul,
+.grownet-prose ol {
+  margin: 0.9rem 0 1.2rem;
+  padding-left: 1.25rem;
+}
+
+.grownet-prose li {
+  margin: 0.45rem 0;
+}
+
+.grownet-prose blockquote {
+  margin: 1.3rem 0;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid rgba(94, 200, 255, 0.2);
+  border-left: 4px solid var(--accent);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.theme-light .grownet-prose blockquote {
+  border-color: rgba(0, 106, 138, 0.14);
+  background: rgba(0, 106, 138, 0.03);
+}
+
+.grownet-prose blockquote p {
+  margin: 0;
+  color: var(--text);
+}
+
+.grownet-table-wrap {
+  margin: 1.15rem 0 1.5rem;
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid var(--border2);
+  background: rgba(255, 255, 255, 0.028);
+}
+
+.theme-light .grownet-table-wrap {
+  background: rgba(0, 0, 0, 0.012);
+}
+
+.grownet-prose table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+}
+
+.grownet-prose th {
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted2);
+  font-family: "Avenir Next", "Segoe UI", "Trebuchet MS", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.theme-light .grownet-prose th {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+.grownet-prose td {
+  padding: 0.95rem 1rem;
+  vertical-align: top;
+  border-top: 1px solid var(--border2);
+}
+
+.grownet-highlight {
+  margin: 1.25rem 0;
+  padding: 1.2rem 1.25rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 154, 52, 0.22);
+  background: linear-gradient(180deg, rgba(255, 154, 52, 0.1), rgba(255, 154, 52, 0.03));
+}
+
+.theme-light .grownet-highlight {
+  border-color: rgba(180, 83, 9, 0.16);
+  background: linear-gradient(180deg, rgba(180, 83, 9, 0.08), rgba(180, 83, 9, 0.03));
+}
+
+.grownet-highlight p {
+  margin: 0;
+  color: var(--text);
+}
+
+.grownet-divider {
+  height: 1px;
+  margin: 1.8rem 0 0;
+  background: linear-gradient(90deg, rgba(94, 200, 255, 0.45), rgba(255, 154, 52, 0.24), transparent);
+}
+
+.grownet-toplink {
+  margin-top: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 1080px) {
+  .grownet-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .grownet-toc {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .grownet-hero,
+  .grownet-paper {
+    border-radius: 22px;
+  }
+
+  .grownet-meta {
+    gap: 0.55rem;
+  }
+
+  .grownet-meta span {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .grownet-prose table {
+    min-width: 520px;
+  }
+}
