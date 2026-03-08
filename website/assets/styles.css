@@ -569,7 +569,7 @@ h1{
 
 .home-page h1{
   max-width: 11ch;
-  font-size: clamp(3rem, 5.8vw, 5.2rem);
+  font-size: clamp(2.8rem, 5.35vw, 4.85rem);
   font-weight: 700;
   line-height: .98;
   letter-spacing: -.045em;
