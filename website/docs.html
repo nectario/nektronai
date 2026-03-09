@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#050910" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
-  <title>Support | NektronAI</title>
-  <meta name="description" content="Support and contact information for NektronAI.">
-  <link rel="canonical" href="https://nektron.ai/support.html">
-  <meta property="og:title" content="Support | NektronAI">
-  <meta property="og:description" content="Support and contact information for NektronAI.">
+  <title>Docs | NektronAI</title>
+  <meta name="description" content="Documentation, reference material, and changelog resources for NektronAI and GrowNet.">
+  <link rel="canonical" href="https://nektron.ai/docs.html">
+  <meta property="og:title" content="Docs | NektronAI">
+  <meta property="og:description" content="Documentation, reference material, and changelog resources for NektronAI and GrowNet.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="NektronAI">
-  <meta property="og:url" content="https://nektron.ai/support.html">
+  <meta property="og:url" content="https://nektron.ai/docs.html">
   <meta property="og:image" content="https://nektron.ai/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -24,9 +24,8 @@
   <link rel="stylesheet" href="assets/styles.css">
   <script src="assets/site.js" defer></script>
 </head>
-<body>
+<body class="docs-page">
   <a class="skip-link" href="#content">Skip to content</a>
-
 
 <header>
   <div class="container header-inner">
@@ -52,7 +51,7 @@
     <nav id="primary-nav" aria-label="Primary navigation">
       <a href="index.html#research">Research</a>
       <a href="grownet.html">GrowNet</a>
-      <a href="docs.html">Docs</a>
+      <a href="docs.html" class="active" aria-current="page">Docs</a>
       <a href="index.html#products">Products</a>
       <a href="about.html">About</a>
       <a href="index.html#contact">Contact</a>
@@ -63,32 +62,91 @@
 <main id="content">
   <div class="container">
     <section class="hero hero-compact">
-      <div class="kicker">Support</div>
-      <h1 class="page-title">Support</h1>
+      <div class="kicker">Docs</div>
+      <h1 class="page-title">Documentation and reference material.</h1>
       <p class="prose">
-        For support or general inquiries, email us and we will respond as soon as possible.
+        This section collects the technical reading path around GrowNet and the broader NektronAI research program: the journal-style web document,
+        the source journal reference, and a running changelog of meaningful updates.
       </p>
       <div class="hero-cta">
-        <a class="button primary" href="mailto:info@nektron.ai">Email support <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <a class="button primary" href="grownet.html">Open the GrowNet journal <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
   <path d="M7 17 17 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
   <path d="M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 </svg></a>
-        <a class="button secondary" href="index.html">Home</a>
+        <a class="button secondary" href="changelog.html">View changelog</a>
+        <a class="button secondary" href="assets/docs/grownet-journal-reference.md">Journal Reference</a>
       </div>
     </section>
 
     <section class="section section-tight-top">
+      <div class="grid cols-3">
+        <article class="card doc-card">
+          <p class="card-eyebrow">Primary document</p>
+          <h3>GrowNet journal</h3>
+          <p>The main web reading experience for GrowNet, presented as a designed journal page rather than a raw reference dump.</p>
+          <div class="docs-link-row">
+            <a class="button secondary" href="grownet.html">Open journal</a>
+          </div>
+        </article>
+
+        <article class="card doc-card">
+          <p class="card-eyebrow">Source reference</p>
+          <h3>Journal Reference</h3>
+          <p>The working source reference used to shape the web journal. Available in both markdown and Word format.</p>
+          <div class="docs-link-row">
+            <a class="button secondary" href="assets/docs/grownet-journal-reference.md">Open markdown</a>
+            <a class="button secondary" href="assets/docs/grownet-journal-reference.docx">Download .docx</a>
+          </div>
+        </article>
+
+        <article class="card doc-card">
+          <p class="card-eyebrow">Update log</p>
+          <h3>Changelog</h3>
+          <p>A running log of research-page, docs, website, and structural updates that are worth preserving in public history.</p>
+          <div class="docs-link-row">
+            <a class="button secondary" href="changelog.html">Read changelog</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">How to use this section</p>
+          <h2>Start with the journal, then move to reference material.</h2>
+          <p>
+            The web journal is the best starting point for understanding GrowNet's framing and architectural direction. The journal reference
+            is useful when you want the source material directly, while the changelog helps track how the public research and documentation surface evolves over time.
+          </p>
+        </div>
+      </div>
+
       <div class="grid cols-2">
-        <div class="card">
-          <h3>Email</h3>
-          <p><a href="mailto:info@nektron.ai">info@nektron.ai</a></p>
-          <div class="tag">Please include links, screenshots, and steps to reproduce (if applicable)</div>
-        </div>
-        <div class="card">
-          <h3>Company</h3>
-          <p>Nektron, Inc.</p>
-          <div class="tag">NektronAI • Research-first AI R&D</div>
-        </div>
+        <article class="card">
+          <p class="card-eyebrow">Current scope</p>
+          <h3>What lives here right now</h3>
+          <ul class="list">
+            <li>GrowNet journal and research page</li>
+            <li>Journal reference files in markdown and Word form</li>
+            <li>Public changelog for meaningful site and documentation updates</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <p class="card-eyebrow">Next layer</p>
+          <h3>What Docs can grow into</h3>
+          <ul class="list">
+            <li>Architecture notes and technical appendices</li>
+            <li>Benchmark notes and implementation status pages</li>
+            <li>Product documentation and selective technical service material</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="callout" role="note">
+        <strong>Important note.</strong>
+        <p>GrowNet remains under active development. The docs section should be read as a living technical surface, not as a claim that GrowNet already powers the current product portfolio.</p>
       </div>
     </section>
   </div>
@@ -110,7 +168,7 @@
         <a href="about.html">About</a>
         <a href="index.html#research">Research</a>
         <a href="grownet.html">GrowNet</a>
-        <a href="docs.html">Docs</a>
+        <a href="docs.html" class="active" aria-current="page">Docs</a>
         <a href="changelog.html">Changelog</a>
         <a href="index.html#products">Products</a>
         <a href="index.html#contact">Contact</a>

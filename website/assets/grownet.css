@@ -144,6 +144,29 @@
   line-height: 1.72;
 }
 
+.grownet-resource-note {
+  margin-top: 1rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+}
+
+.theme-light .grownet-resource-note {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 248, 251, 0.86));
+}
+
+.grownet-resource-note p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.68;
+}
+
+.grownet-resource-note .hero-cta {
+  margin-top: 1rem;
+}
+
 .grownet-layout {
   display: grid;
   grid-template-columns: minmax(220px, 270px) minmax(0, 1fr);

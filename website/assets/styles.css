@@ -1340,6 +1340,29 @@ a.contact-card:hover{
   margin-top: var(--space-3);
 }
 
+.doc-card{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.docs-link-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: auto;
+  padding-top: var(--space-4);
+}
+
+.docs-stack{
+  display: grid;
+  gap: var(--space-3);
+}
+
+.changelog-entry .list{
+  margin-top: var(--space-3);
+}
+
 @media (max-width: 1100px){
   .about-page .hero,
   .about-leader-shell{
