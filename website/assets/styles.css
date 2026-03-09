@@ -1223,7 +1223,7 @@ a.contact-card:hover{
 
 .about-leader-shell{
   display:grid;
-  grid-template-columns: minmax(260px, 315px) minmax(0, 1fr);
+  grid-template-columns: minmax(240px, 295px) minmax(0, 1fr);
   gap: var(--space-3);
   align-items:start;
 }
@@ -1282,8 +1282,13 @@ a.contact-card:hover{
 }
 
 .about-bio-card p{
-  max-width: 78ch;
+  max-width: 84ch;
   line-height: 1.72;
+  margin: 0;
+}
+
+.about-bio-card p + p{
+  margin-top: 1.2rem;
 }
 
 .about-focus-grid{
