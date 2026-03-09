@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050910" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+  <title>GrowNet Formal Specification | NektronAI</title>
+  <meta name="description" content="The GrowNet Formal Specification is the tighter architectural companion to the journal reference, covering invariants, growth rules, routing, lifecycle, and implementation-guiding language.">
+  <link rel="canonical" href="https://nektron.ai/grownet-formal-spec.html">
+  <meta property="og:title" content="GrowNet Formal Specification | NektronAI">
+  <meta property="og:description" content="A structured GrowNet companion document covering architectural thesis, invariants, growth rules, routing, lifecycle, and long-term direction.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="NektronAI">
+  <meta property="og:url" content="https://nektron.ai/grownet-formal-spec.html">
+  <meta property="og:image" content="https://nektron.ai/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:image" content="https://nektron.ai/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/brand/icon.png">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="assets/grownet.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body class="docs-page">
+  <a class="skip-link" href="#content">Skip to content</a>
+
+<div id="top"></div>
+
+<header>
+  <div class="container header-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark-320.png" alt="NektronAI" width="320" height="74" decoding="async"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light-320.png" alt="NektronAI" width="320" height="74" decoding="async"></span>
+    </a>
+
+    <div class="nav-actions">
+      <button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-controls="primary-nav" aria-expanded="false" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</svg>
+        <span class="icon-btn-label">Menu</span>
+      </button>
+      <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3 4.9 19.1M19.1 19.1l-1.8-1.8M6.7 6.7 4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+      </button>
+    </div>
+
+    <nav id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html#research">Research</a>
+      <a href="grownet.html">GrowNet</a>
+      <a href="docs.html" class="active" aria-current="page">Docs</a>
+      <a href="index.html#products">Products</a>
+      <a href="about.html">About</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="content" class="grownet-page grownet-spec-page">
+  <div class="container">
+    <section class="grownet-hero grownet-hero-spec" aria-labelledby="grownet-spec-title">
+      <p class="grownet-eyebrow">Formal Specification &bull; Living research companion</p>
+      <h1 id="grownet-spec-title" class="grownet-title grownet-title-spec">GrowNet Formal Specification</h1>
+      <p class="grownet-subtitle">A tighter architectural companion to the journal reference, focused on invariants, lifecycle, growth rules, routing, and implementation-guiding language.</p>
+      <p class="grownet-prepared">Prepared as a structured research draft for implementation guidance, architectural clarity, and long-horizon refinement.</p>
+      <p class="grownet-status"><strong>Status:</strong> <em>living internal specification - some sections are normative, some remain research hypotheses.</em></p>
+
+      <div class="grownet-meta" aria-label="Formal specification quick facts">
+        <span><strong>Document type:</strong> Research draft formal specification</span>
+        <span><strong>Purpose:</strong> Architecture and invariants reference</span>
+        <span><strong>Scope:</strong> Structure, growth, routing, and lifecycle</span>
+        <span><strong>Companion:</strong> The GrowNet journal reference</span>
+      </div>
+
+      <div class="hero-cta">
+        <a class="button primary" href="grownet.html">Open the journal reference <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <path d="M7 17 17 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></a>
+        <a class="button secondary" href="assets/docs/grownet-formal-spec.docx">Download .docx</a>
+        <a class="button secondary" href="docs.html">Back to Docs</a>
+      </div>
+
+      <div class="grownet-summary" role="note" aria-label="Working definition">
+        <p class="grownet-summary-label">Working definition</p>
+        <p>GrowNet is a growth-based neural architecture that begins with minimal structure, learns locally, interprets input through serial focus and anchoring, allocates new capacity only when novelty and saturation justify it, favors deterministic organization with proximity-biased routing, and aims toward active, continuously adapting intelligence rather than passive input-output inference.</p>
+      </div>
+
+      <div class="grownet-resource-note" role="note" aria-label="Companion reading">
+        <p class="grownet-summary-label">Companion reading</p>
+        <p>The journal reference remains the narrative companion. This page is the tighter architectural surface for invariants, growth rules, and implementation-guiding language, while the changelog tracks only GrowNet research-facing changes.</p>
+        <div class="hero-cta">
+          <a class="button secondary" href="changelog.html">View changelog</a>
+          <a class="button secondary" href="assets/docs/grownet-journal-reference.docx">Journal reference .docx</a>
+          <a class="button secondary" href="assets/docs/grownet-formal-spec.docx">Formal spec .docx</a>
+        </div>
+      </div>
+
+      <div class="grownet-language-grid" aria-label="Specification language">
+        <article class="grownet-language-card">
+          <p class="grownet-summary-label">MUST</p>
+          <p>Core architectural invariant or intended default behavior.</p>
+        </article>
+        <article class="grownet-language-card">
+          <p class="grownet-summary-label">SHOULD</p>
+          <p>Strong design preference that should be overridden only with good reason.</p>
+        </article>
+        <article class="grownet-language-card">
+          <p class="grownet-summary-label">MAY</p>
+          <p>Optional or experimental capability that can evolve with the research.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="grownet-layout">
+      <aside class="grownet-toc" aria-label="GrowNet Formal Specification table of contents">
+        <h2>On this page</h2>
+        <p>The formal spec stays close to the document structure: numbered sections, subheadings, tables, and appendices, presented in a designed reading surface.</p>
+        <ol>
+          <li><a href="#specification-posture">1. Specification posture</a></li>
+          <li><a href="#architectural-thesis">2. Architectural thesis</a></li>
+          <li><a href="#golden-rule">3. The Golden Rule</a></li>
+          <li><a href="#core-entities">4. Core entities</a></li>
+          <li><a href="#resource-economics">5. Resource economics and growth ladder</a></li>
+          <li><a href="#learning-model">6. Learning model</a></li>
+          <li><a href="#connectivity-routing">7. Connectivity and routing</a></li>
+          <li><a href="#tick-state-semantics">8. Tick and state semantics</a></li>
+          <li><a href="#formal-growth-rules">9. Formal growth rules</a></li>
+          <li><a href="#feedback-loops">10. Feedback loops and control</a></li>
+          <li><a href="#regions-specialization">11. Regions, specialization, and plasticity</a></li>
+          <li><a href="#pruning-dormancy">12. Pruning, dormancy, reuse, and late death</a></li>
+          <li><a href="#memory-access-paths">13. Memory and access paths</a></li>
+          <li><a href="#knowledge-units">14. Knowledge Units and Bad Knowledge Units</a></li>
+          <li><a href="#prototype-roadmap">15. Prototype roadmap</a></li>
+          <li><a href="#long-term-direction">16. Long-term direction</a></li>
+          <li><a href="#non-goals">17. Non-goals</a></li>
+          <li><a href="#open-questions">18. Open questions</a></li>
+          <li><a href="#concise-formal-definition">19. Concise formal definition</a></li>
+        </ol>
+        <ul>
+          <li><a href="#appendix-minimal-invariants">Appendix A. Minimal invariants</a></li>
+          <li><a href="#appendix-relationship-journal">Appendix B. Relationship to the journal</a></li>
+        </ul>
+      </aside>
+
+      <article class="grownet-paper grownet-prose">
+        <section id="specification-posture">
+          <h2>1. Specification posture</h2>
+          <p>This specification uses the following language:</p>
+          <ul>
+            <li><strong>MUST</strong> indicates a core architectural invariant or intended default behavior.</li>
+            <li><strong>SHOULD</strong> indicates a strong design preference that can be overridden only with good reason.</li>
+            <li><strong>MAY</strong> indicates an optional or experimental capability.</li>
+          </ul>
+          <p>This document is not the same thing as the cross-language contract in the repository. The repository contract defines public APIs and language parity. This document defines the higher-level architecture, growth philosophy, structural lifecycle, and research direction.</p>
+        </section>
+
+        <section id="architectural-thesis">
+          <h2>2. Architectural thesis</h2>
+          <p>GrowNet exists because the current mainstream AI paradigm leaves several foundational issues unresolved. The primary dissatisfaction, in order, is:</p>
+          <ol>
+            <li>Backprop everywhere</li>
+            <li>Fixed network size</li>
+            <li>Lack of local learning</li>
+            <li>Weak biological plausibility</li>
+            <li>Huge training cost</li>
+          </ol>
+          <p>The architecture therefore aims to satisfy the following high-level goals:</p>
+          <ul>
+            <li>Learning SHOULD be primarily local rather than globally backpropagated.</li>
+            <li>Capacity MUST begin small and grow only where justified.</li>
+            <li>Structure MUST matter as much as weights or parameters.</li>
+            <li>Growth MUST be bounded by energy, capacity, cooldown, and deterministic rules.</li>
+            <li>The long-term architecture SHOULD support active intelligence, world models, robotics, and continuous operation.</li>
+            <li>GrowNet is not required to outperform current systems at every task. It is intended to be stronger in domains where adaptation, structural development, and ongoing control matter most.</li>
+          </ul>
+        </section>
+
+        <section id="golden-rule">
+          <h2>3. The Golden Rule</h2>
+          <blockquote>
+            <p><strong>Golden Rule:</strong> When something truly new shows up, make room. If it is not truly new, improve what already exists.</p>
+          </blockquote>
+          <p>This yields the following operational rule:</p>
+          <div class="grownet-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Condition</th>
+                  <th>Preferred action</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Input matches an existing focused pattern</td>
+                  <td>Adapt</td>
+                  <td>Reinforce or refine existing structure</td>
+                </tr>
+                <tr>
+                  <td>Input is new but local capacity still exists</td>
+                  <td>Allocate slot</td>
+                  <td>Add the smallest possible new local memory cell</td>
+                </tr>
+                <tr>
+                  <td>A new slot is needed but the neuron is already saturated</td>
+                  <td>Fallback and mark pressure</td>
+                  <td>Reuse deterministically for now, but record novelty pressure</td>
+                </tr>
+                <tr>
+                  <td>Fallback persists and cooldown allows it</td>
+                  <td>Grow neuron</td>
+                  <td>Add new same-kind local capacity exactly where pressure exists</td>
+                </tr>
+                <tr>
+                  <td>Layer pressure becomes structurally meaningful</td>
+                  <td>Grow layer</td>
+                  <td>Add depth within the current region</td>
+                </tr>
+                <tr>
+                  <td>A region becomes too deep or functionally overloaded</td>
+                  <td>Create or connect to a new region</td>
+                  <td>Expand into a new organizational container</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The Golden Rule is the heart of GrowNet. The system SHOULD always attempt the cheapest valid adaptation first.</p>
+        </section>
+
+        <section id="core-entities">
+          <h2>4. Core entities</h2>
+          <p>GrowNet currently operates across four scales of structural organization.</p>
+          <div class="grownet-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entity</th>
+                  <th>Meaning</th>
+                  <th>Primary role</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Slot</td>
+                  <td>Small local memory cell inside a neuron</td>
+                  <td>Local pattern storage and routing</td>
+                </tr>
+                <tr>
+                  <td>Neuron</td>
+                  <td>Local computational unit</td>
+                  <td>Specialized local computation</td>
+                </tr>
+                <tr>
+                  <td>Layer</td>
+                  <td>Organized collection of neurons inside a region</td>
+                  <td>Feature and abstraction depth</td>
+                </tr>
+                <tr>
+                  <td>Region</td>
+                  <td>Higher-order organizational container</td>
+                  <td>Functional or modality-level domain</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>4.1 Neuron types</h3>
+          <p>GrowNet currently defines three neuron types:</p>
+          <div class="grownet-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Primary purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Excitatory</td>
+                  <td>Carry signal, support active patterns, drive downstream computation</td>
+                </tr>
+                <tr>
+                  <td>Inhibitory</td>
+                  <td>Dampen instability, suppress runaway activation, stabilize loops</td>
+                </tr>
+                <tr>
+                  <td>Modulatory</td>
+                  <td>Regulate learning, attention-like pressure, growth, and higher-level state</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>A complete GrowNet system MUST be able to support all three types, even if some experiments initially emphasize only a subset.</p>
+        </section>
+
+        <section id="resource-economics">
+          <h2>5. Resource economics and growth ladder</h2>
+          <p>Growth in GrowNet is not free. The architecture assumes increasing energy cost as structural scope increases.</p>
+          <div class="grownet-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Creation event</th>
+                  <th>Relative cost</th>
+                  <th>Intended use</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>New Slot</td>
+                  <td>Lowest</td>
+                  <td>Cheapest local accommodation of novelty</td>
+                </tr>
+                <tr>
+                  <td>New Neuron</td>
+                  <td>Low</td>
+                  <td>New local computation when slots are insufficient</td>
+                </tr>
+                <tr>
+                  <td>New Layer</td>
+                  <td>Medium</td>
+                  <td>More organized representational depth inside a region</td>
+                </tr>
+                <tr>
+                  <td>New Region</td>
+                  <td>Highest</td>
+                  <td>New domain when a region becomes too deep or functionally overloaded</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>This ordering creates a structural economy:</p>
+          <ul>
+            <li>GrowNet MUST prefer reuse before creation.</li>
+            <li>GrowNet MUST prefer smaller structural changes before larger ones.</li>
+            <li>Pre-allocation MAY be used for practical experiments.</li>
+            <li>The more regions are pre-created, the less likely new regions need to be created later.</li>
+          </ul>
+        </section>
+
+        <section id="learning-model">
+          <h2>6. Learning model</h2>
+          <p>GrowNet is novelty-first.</p>
+
+          <h3>6.1 Novelty before error</h3>
+          <p>The primary trigger for early growth is <strong>novelty in input patterns</strong>, not global prediction error. Error correction and goal-directed optimization may arrive later in development, but the first question GrowNet asks is:</p>
+          <blockquote>
+            <p>Have I seen something like this before, and do I still have room for it?</p>
+          </blockquote>
+          <p>This means GrowNet follows:</p>
+          <p><strong>novelty first -&gt; structure first -&gt; optimization later</strong></p>
+          <p>rather than:</p>
+          <p><strong>error first -&gt; global weight update -&gt; fixed structure forever</strong></p>
+
+          <h3>6.2 Local learning</h3>
+          <p>GrowNet learning SHOULD remain local whenever possible. The architecture is explicitly motivated by dissatisfaction with fully global backpropagation. This does not forbid future error-based components, but they SHOULD be layered on top of local growth and local adaptation rather than replacing them as the central principle.</p>
+
+          <h3>6.3 Focus anchor and reference anchor</h3>
+          <p>Repository materials distinguish several useful concepts:</p>
+          <ul>
+            <li><strong>Focus Anchor (conceptual):</strong> the currently active point or frame that the system is inspecting in behavioral terms.</li>
+            <li><strong>Reference Anchor (implementation):</strong> the stable anchor used to compute deltas and bin novelty deterministically.</li>
+            <li><strong>Anchor Map (working extension):</strong> a bounded remembered set of meaningful locations or frames that remains available while active focus moves serially.</li>
+          </ul>
+          <p>This separation SHOULD be maintained because it allows human-readable interpretation while preserving stable internal routing semantics.</p>
+
+          <h3>6.4 Serial focus and candidate generation</h3>
+          <p>GrowNet focus SHOULD be treated as a serial active process rather than a dense simultaneous weighting operation. At any instant, the system SHOULD have one active focus point or one active focused frame, even if multiple candidate points are available.</p>
+          <p>The system MAY maintain multiple candidate focus points at once. Candidate points MAY be generated from:</p>
+          <ul>
+            <li>energy or saliency,</li>
+            <li>novelty relative to current anchors,</li>
+            <li>familiarity or recognized usefulness,</li>
+            <li>task relevance,</li>
+            <li>bounded random choice among strong candidates,</li>
+            <li>deterministic sequential scan.</li>
+          </ul>
+          <p>The exact focus policy remains a research parameter, but the architecture SHOULD make the policy explicit.</p>
+
+          <h3>6.5 Anchoring and anchor maps</h3>
+          <p>GrowNet SHOULD distinguish between the currently active focus point and the more persistent anchor state used to interpret future input. A system MAY maintain a small anchor map of currently meaningful locations, patterns, or frames. This allows GrowNet to inspect one point at a time while preserving a remembered map of multiple important locations.</p>
+          <p>Focus SHOULD influence slot selection before local routing decisions are made. Novelty, fallback pressure, and growth decisions SHOULD therefore be interpretable relative to focus and anchor state, not only relative to raw input in isolation.</p>
+
+          <h3>6.6 Covert vs overt focus</h3>
+          <p>GrowNet SHOULD support <strong>covert / field focus</strong>, meaning a shift in processing priority without mechanical movement. Embodied or robotic GrowNet systems MAY additionally support <strong>overt / mechanical focus</strong>, meaning a physical reorientation of sensors or effectors toward a selected target.</p>
+          <p>Overt focus SHOULD be treated as more expensive than covert focus and MAY be reserved for cases where recentering perception or action is useful.</p>
+
+          <h3>6.7 Revisit and inhibition of return</h3>
+          <p>To avoid pathological fixation on one salient point, GrowNet MAY implement bounded revisit suppression or inhibition of return. This would bias the focus policy away from immediately reselecting the same point unless task relevance or persistent evidence justifies it.</p>
+        </section>
+
+        <section id="connectivity-routing">
+          <h2>7. Connectivity and routing</h2>
+
+          <h3>7.1 Default routing principle</h3>
+          <p>GrowNet currently supports <strong>proximity connections</strong>. The default rule is:</p>
+          <blockquote>
+            <p>If nearby capacity exists, connect to it first.</p>
+          </blockquote>
+          <p>This rule is important for three reasons:</p>
+          <ul>
+            <li>It reduces latency and structural sprawl.</li>
+            <li>It encourages clustered microcircuits.</li>
+            <li>It supports stable specialization.</li>
+          </ul>
+
+          <h3>7.2 Determinism vs initial exploration</h3>
+          <p>Connection routing SHOULD tend toward determinism, but the very first connection does not need to be perfectly predetermined. A practical working view is:</p>
+          <ul>
+            <li>Initial connection formation MAY involve bounded exploratory choice.</li>
+            <li>Once a usable routing pattern is established, replay and future routing SHOULD be deterministic.</li>
+          </ul>
+          <p>This mirrors the observation that biological growth looks exploratory at first but stabilizes later.</p>
+
+          <h3>7.3 Cross-region connections</h3>
+          <p>Regions MUST support internal dense structure and MAY support sparse cross-region connections. Long-range cross-region connectivity is expected to be important later, but SHOULD be introduced carefully to avoid global instability.</p>
+        </section>
+
+        <section id="tick-state-semantics">
+          <h2>8. Tick and state semantics</h2>
+          <p>Repository materials describe a two-phase tick discipline, which is useful for keeping behavior deterministic.</p>
+
+          <h3>8.1 Tick structure</h3>
+          <p>A complete tick SHOULD conceptually contain:</p>
+          <ol>
+            <li><strong>Phase A:</strong> deliver and integrate input, choose or reinforce slot, possibly fire</li>
+            <li><strong>Phase B:</strong> propagate resulting events</li>
+            <li><strong>End-of-tick checks:</strong> evaluate growth and apply bus decay / state decay</li>
+          </ol>
+
+          <h3>8.2 Growth timing</h3>
+          <p>Growth SHOULD occur at the end of a tick, not in the middle of arbitrary signal propagation.</p>
+
+          <h3>8.3 Safety invariant</h3>
+          <p>At the region level, GrowNet SHOULD enforce <strong>one growth action per region per tick</strong> unless a future design explicitly relaxes that rule under controlled conditions.</p>
+          <p>This is a major stability safeguard.</p>
+        </section>
+
+        <section id="formal-growth-rules">
+          <h2>9. Formal growth rules</h2>
+          <p>The following are the current intended rules.</p>
+
+          <h3>9.1 Slot allocation</h3>
+          <p>A neuron SHOULD allocate a new slot when:</p>
+          <ul>
+            <li>the input pattern maps to a genuinely new local bin or concept, and</li>
+            <li>strict slot capacity has not yet been reached.</li>
+          </ul>
+          <p>If the input can be handled by an existing slot, GrowNet SHOULD adapt that slot instead.</p>
+
+          <h3>9.2 Neuron growth</h3>
+          <p>A new neuron SHOULD be created when:</p>
+          <ul>
+            <li>a new slot is required,</li>
+            <li>the seed neuron is already at strict slot capacity,</li>
+            <li>fallback or overflow pressure persists, and</li>
+            <li>cooldown and energy rules allow growth.</li>
+          </ul>
+          <p>Neuron growth SHOULD create a neuron of the <strong>same kind</strong> unless a future policy explicitly states otherwise.</p>
+
+          <h3>9.3 Layer growth</h3>
+          <p>A new layer SHOULD be created when neuron-level pressure has become structurally meaningful within a region. This is expected to reflect repeated local saturation, not a single novelty event.</p>
+
+          <h3>9.4 Region growth</h3>
+          <p>A new region SHOULD be created or connected when one region has accumulated too many layers, or when a distinct input / functional domain justifies a new organizational boundary.</p>
+          <p>A newly created region SHOULD begin with a <strong>minimal scaffold</strong>, not a full mature architecture.</p>
+
+          <h3>9.5 Pre-creation</h3>
+          <p>Slots, neurons, layers, or regions MAY be pre-created if an experiment benefits from scaffolding. Pre-creation is a practical option, not a rejection of GrowNet's self-organizing philosophy.</p>
+        </section>
+
+        <section id="feedback-loops">
+          <h2>10. Feedback loops and control</h2>
+          <p>A major open design theme in GrowNet is how novelty-driven growth turns into goal-directed control.</p>
+
+          <h3>10.1 Control intuition</h3>
+          <p>Balancing a stick is the canonical example. A stable system must:</p>
+          <ul>
+            <li>sense current state,</li>
+            <li>act on the environment,</li>
+            <li>observe whether stability improved or worsened,</li>
+            <li>repeat rapidly.</li>
+          </ul>
+          <p>Humans balance through nested feedback loops. GrowNet is expected to form such loops rather than having them entirely hand-designed.</p>
+
+          <h3>10.2 Automatic loop formation</h3>
+          <p>Feedback loops are expected to emerge when three ingredients exist:</p>
+          <ol>
+            <li>Perception of state</li>
+            <li>Ability to act</li>
+            <li>Detection of stability or instability</li>
+          </ol>
+          <p>Once those exist, local sensor -&gt; action -&gt; result circuits can become specialized microcircuits.</p>
+
+          <h3>10.3 Role of neuron types in control</h3>
+          <ul>
+            <li>Excitatory neurons drive action paths.</li>
+            <li>Inhibitory neurons damp oscillation and stabilize loops.</li>
+            <li>Modulatory neurons adjust pressure, learning, and regulatory state.</li>
+          </ul>
+
+          <h3>10.4 First control benchmark</h3>
+          <p>An inverted pendulum or similar balancing problem SHOULD be treated as a primary early control benchmark for GrowNet.</p>
+        </section>
+
+        <section id="regions-specialization">
+          <h2>11. Regions, specialization, and plasticity</h2>
+          <p>A region represents something qualitatively different from just another layer stack.</p>
+
+          <h3>11.1 Why regions exist</h3>
+          <p>Regions may emerge for two reasons:</p>
+          <ul>
+            <li>Different input type or modality</li>
+            <li>Functional specialization over time</li>
+          </ul>
+          <p>So regions are both <strong>organizational</strong> and <strong>functional</strong>.</p>
+
+          <h3>11.2 Region structure</h3>
+          <p>A region SHOULD be treated as a compute domain with dense internal organization and more selective external routing.</p>
+
+          <h3>11.3 Plasticity analogy</h3>
+          <p>The observation that other brain areas can sometimes take over after damage is conceptually important for GrowNet. This suggests that functions can migrate or be re-established elsewhere when the architecture preserves reusable latent structure.</p>
+          <p>GrowNet SHOULD therefore value reorganization and takeover over immediate deletion.</p>
+        </section>
+
+        <section id="pruning-dormancy">
+          <h2>12. Pruning, dormancy, reuse, and late death</h2>
+
+          <h3>12.1 Pruning rule</h3>
+          <p>Unused connections for a long time SHOULD be pruned.</p>
+          <blockquote>
+            <p>Use it or lose it.</p>
+          </blockquote>
+          <p>Pruning applies first to <strong>connections</strong>, not directly to neurons.</p>
+
+          <h3>12.2 Neuron lifecycle</h3>
+          <div class="grownet-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>State</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Active</td>
+                  <td>Participating in live circuits</td>
+                </tr>
+                <tr>
+                  <td>Dormant</td>
+                  <td>Neuron still exists but currently lacks useful active connections</td>
+                </tr>
+                <tr>
+                  <td>Reused</td>
+                  <td>Dormant neuron is reconnected and participates again</td>
+                </tr>
+                <tr>
+                  <td>Long-idle</td>
+                  <td>Dormant for a very long time, never reclaimed</td>
+                </tr>
+                <tr>
+                  <td>Late death</td>
+                  <td>Optional later-stage removal after extreme inactivity</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>12.3 Reuse rule</h3>
+          <p>A dormant neuron MAY be reused if conditions are met. Importantly, when a neuron is reused, it keeps its <strong>previous internal state</strong> rather than being wiped clean.</p>
+          <p>This is a defining design choice.</p>
+
+          <h3>12.4 Late neuron death</h3>
+          <p>Neuron death is not the default outcome of pruning. Late death MAY occur only much later if a neuron remains dormant, never reconnects, and continued retention no longer makes structural or energy sense.</p>
+        </section>
+
+        <section id="memory-access-paths">
+          <h2>13. Memory and access paths</h2>
+          <p>One guiding intuition behind GrowNet is that memory is not just storage, but also routing.</p>
+          <blockquote>
+            <p>A system may fail to retrieve something not because the underlying memory vanished, but because the path to it degraded.</p>
+          </blockquote>
+          <p>This is used here as a systems intuition rather than a clinical claim.</p>
+          <p>GrowNet's dormant-neuron model aligns with this intuition by preserving latent substrate whenever possible. This may allow reactivation, faster relearning, or takeover by other circuits.</p>
+        </section>
+
+        <section id="knowledge-units">
+          <h2>14. Knowledge Units and Bad Knowledge Units</h2>
+          <p>The repository introduces <strong>Knowledge Units (KU)</strong> and <strong>Bad Knowledge Units (BKU)</strong> as evaluation concepts.</p>
+
+          <h3>14.1 Knowledge Units</h3>
+          <p>A Knowledge Unit measures how much <strong>correct, generalizable structure</strong> the model extracts from a training example.</p>
+          <ul>
+            <li>Approximately <strong>1.0 KU per sample</strong> corresponds to literal memorization and little else.</li>
+            <li>Greater than <strong>1.0 KU</strong> indicates that the model extracted correct implications beyond the literal sample.</li>
+          </ul>
+
+          <h3>14.2 Bad Knowledge Units</h3>
+          <p>BKU measures how much <strong>incorrect or harmful structure</strong> the model extracts from a sample, such as hallucinated facts or biased stereotypes.</p>
+
+          <h3>14.3 Desired profile</h3>
+          <p>GrowNet should aim for:</p>
+          <ul>
+            <li>high KU</li>
+            <li>low BKU</li>
+          </ul>
+          <p>A useful derived measure is knowledge precision:</p>
+          <p><strong>Knowledge Precision &asymp; <code>KU / (KU + BKU)</code></strong></p>
+
+          <h3>14.4 Why KU / BKU matter for GrowNet</h3>
+          <p>Because GrowNet literally allocates new structure when novelty appears, evaluation should not only ask whether it performs well after training. It should also ask:</p>
+          <ul>
+            <li>how much good knowledge was gained per sample,</li>
+            <li>how much bad knowledge was created per sample,</li>
+            <li>and how efficiently structural growth translated into reusable understanding.</li>
+          </ul>
+        </section>
+
+        <section id="prototype-roadmap">
+          <h2>15. Prototype roadmap</h2>
+          <p>The most realistic first successful GrowNet prototypes are expected to be in simulated 3D environments.</p>
+
+          <h3>15.1 First proving ground</h3>
+          <p>A simple 3D object moving around a 3D space, possibly in Blender, is the preferred early prototype. The environment may provide:</p>
+          <ul>
+            <li>camera or image input,</li>
+            <li>distance / collision information,</li>
+            <li>velocity and orientation,</li>
+            <li>action outputs such as movement, turning, force, or torque.</li>
+          </ul>
+
+          <h3>15.2 Target behaviors</h3>
+          <p>Early experiments SHOULD focus on:</p>
+          <ul>
+            <li>exploration,</li>
+            <li>spatial memory,</li>
+            <li>obstacle avoidance,</li>
+            <li>balancing / stabilization,</li>
+            <li>eventually manipulation and robotics-oriented control.</li>
+          </ul>
+
+          <h3>15.3 Why robotics matters</h3>
+          <p>Robotics and world models are expected to benefit the most from GrowNet because they stress:</p>
+          <ul>
+            <li>ongoing time,</li>
+            <li>novelty,</li>
+            <li>adaptation,</li>
+            <li>control,</li>
+            <li>and structural development under open-ended conditions.</li>
+          </ul>
+        </section>
+
+        <section id="long-term-direction">
+          <h2>16. Long-term direction</h2>
+          <p>GrowNet is aimed at more than passive intelligence.</p>
+
+          <h3>16.1 Active intelligence</h3>
+          <p>Active intelligence means the system remains aware of time, carries state, maintains a world model, and does not simply wake up for a single query and then disappear.</p>
+
+          <h3>16.2 Emotion-like regulation</h3>
+          <p>In GrowNet, emotions are best viewed not as human-style subjective feelings, but as repeated activation of regulatory circuits or regions that bias behavior and learning.</p>
+          <p>This is powerful and potentially dangerous. It suggests a future class of systems that are more agent-like than today's tools.</p>
+
+          <h3>16.3 Sleep and consolidation</h3>
+          <p>Future GrowNet systems MAY include sleep-like or consolidation phases during which circuits are stabilized, reorganized, or replayed.</p>
+
+          <h3>16.4 Ecosystem view</h3>
+          <p>The long-term future is not expected to be one giant AI, but many different AIs living among us with different strengths. GrowNet is one possible path toward more active, structured, and adaptive forms of artificial intelligence.</p>
+        </section>
+
+        <section id="non-goals">
+          <h2>17. Non-goals</h2>
+          <p>The following are explicitly <strong>not</strong> current requirements:</p>
+          <ul>
+            <li>GrowNet is not required to replace all deep learning.</li>
+            <li>GrowNet is not required to beat transformers at every language task.</li>
+            <li>GrowNet does not currently claim true consciousness.</li>
+            <li>GrowNet does not require that every biological mechanism be copied literally.</li>
+            <li>GrowNet is not yet a finalized architecture.</li>
+          </ul>
+        </section>
+
+        <section id="open-questions">
+          <h2>18. Open questions</h2>
+          <ol>
+            <li>How exactly should novelty-driven development transition into goal optimization?</li>
+            <li>What is the best stability or homeostasis signal for balancing-type control?</li>
+            <li>How exploratory should first-time connection formation be?</li>
+            <li>When should reuse win over fresh creation?</li>
+            <li>How should long-range cross-region routing evolve without destabilizing the system?</li>
+            <li>What should sleep / consolidation look like operationally?</li>
+            <li>Under what exact conditions should late neuron death happen?</li>
+            <li>What is the right benchmark suite to show GrowNet's advantages clearly and fairly?</li>
+            <li>How should modulatory neurons be formalized for emotion-like regulatory loops without making the system unsafe?</li>
+            <li>What focus policy should dominate when strong saliency, novelty, and familiarity all compete?</li>
+            <li>How should covert focus and overt focus interact once GrowNet is embodied?</li>
+          </ol>
+        </section>
+
+        <section id="concise-formal-definition">
+          <h2>19. Concise formal definition</h2>
+          <div class="grownet-highlight">
+            <p><strong>GrowNet, in one paragraph</strong><br>GrowNet is a novelty-driven, growth-based neural architecture in which local structure is the primary adaptive medium. It begins with minimal scaffold, allocates new capacity only when local saturation and persistent novelty justify it, organizes computation through slots, neurons, layers, and regions, interprets incoming structure through serial focus and anchoring, regulates behavior through excitatory, inhibitory, and modulatory dynamics, prunes unused connections while preserving dormant reusable substrate, and aims toward active, continuously adapting intelligence for agents, world models, and robotics.</p>
+          </div>
+        </section>
+
+        <section id="appendix-minimal-invariants">
+          <h2>Appendix A. Minimal invariants</h2>
+          <p>The following are the current minimal invariants for the architecture:</p>
+          <ul>
+            <li>Learning SHOULD be local-first.</li>
+            <li>Novelty SHOULD trigger growth before global error does.</li>
+            <li>Growth MUST prefer smaller structural changes before larger ones.</li>
+            <li>Region growth SHOULD be rate-limited.</li>
+            <li>Proximity SHOULD be the default connection bias.</li>
+            <li>Active focus SHOULD be serial even when multiple candidate points are remembered.</li>
+            <li>Covert / field focus SHOULD be supported before overt / mechanical focus is required.</li>
+            <li>Pruning SHOULD remove unused connections before removing neurons.</li>
+            <li>Neuron reuse SHOULD preserve prior internal state.</li>
+            <li>Region creation SHOULD begin from a minimal scaffold.</li>
+            <li>KU and BKU SHOULD be part of future evaluation.</li>
+            <li>Active intelligence is a long-term direction, not a present claim.</li>
+          </ul>
+        </section>
+
+        <section id="appendix-relationship-journal">
+          <h2>Appendix B. Relationship to the journal</h2>
+          <p>The journal remains the reflective source document. This formal specification is the tighter architectural companion to it.</p>
+          <ul>
+            <li>The journal captures origin, intuition, philosophical motive, and exploratory thought.</li>
+            <li>The formal spec captures structure, invariants, lifecycle, and implementation-guiding language.</li>
+          </ul>
+          <p>Both documents should evolve together.</p>
+
+          <div class="grownet-divider"></div>
+          <p class="grownet-toplink"><a href="#top">Back to top</a></p>
+        </section>
+      </article>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="brand footer-brand">
+        <span class="brand-mark"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark-280.png" alt="NektronAI" width="280" height="64" decoding="async"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light-280.png" alt="NektronAI" width="280" height="64" decoding="async"></span>
+      </div>
+      <small>NektronAI is a research-first AI company building GrowNet and revenue-generating products to fund long-horizon breakthroughs.</small>
+      <hr class="soft">
+      <small>&copy; 2026 Nektron, Inc.</small>
+    </div>
+    <div>
+      <h4>Pages</h4>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="index.html#research">Research</a>
+        <a href="grownet.html">GrowNet</a>
+        <a href="docs.html" class="active" aria-current="page">Docs</a>
+        <a href="changelog.html">Changelog</a>
+        <a href="index.html#products">Products</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+    </div>
+    <div>
+      <h4>Legal</h4>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

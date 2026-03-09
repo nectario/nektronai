@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#050910" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
   <title>Docs | NektronAI</title>
-  <meta name="description" content="Documentation, reference material, and changelog resources for NektronAI and GrowNet.">
+  <meta name="description" content="Documentation, journal reference, formal specification, and research changelog resources for GrowNet and NektronAI.">
   <link rel="canonical" href="https://nektron.ai/docs.html">
   <meta property="og:title" content="Docs | NektronAI">
-  <meta property="og:description" content="Documentation, reference material, and changelog resources for NektronAI and GrowNet.">
+  <meta property="og:description" content="Documentation, journal reference, formal specification, and research changelog resources for GrowNet and NektronAI.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="NektronAI">
   <meta property="og:url" content="https://nektron.ai/docs.html">
@@ -65,16 +65,16 @@
       <div class="kicker">Docs</div>
       <h1 class="page-title">Documentation and reference material.</h1>
       <p class="prose">
-        This section collects the technical reading path around GrowNet and the broader NektronAI research program: the journal-style web document,
-        the source journal reference, and a running changelog of meaningful updates.
+        This section collects the public reading path around GrowNet: the journal reference, the formal specification, source documents,
+        and a changelog that tracks research-facing GrowNet updates only.
       </p>
       <div class="hero-cta">
-        <a class="button primary" href="grownet.html">Open the GrowNet journal <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <a class="button primary" href="grownet.html">Open the GrowNet journal reference <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
   <path d="M7 17 17 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
   <path d="M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
 </svg></a>
+        <a class="button secondary" href="grownet-formal-spec.html">Open the formal spec</a>
         <a class="button secondary" href="changelog.html">View changelog</a>
-        <a class="button secondary" href="assets/docs/grownet-journal-reference.md">Journal Reference</a>
       </div>
     </section>
 
@@ -82,27 +82,28 @@
       <div class="grid cols-3">
         <article class="card doc-card">
           <p class="card-eyebrow">Primary document</p>
-          <h3>GrowNet journal</h3>
-          <p>The main web reading experience for GrowNet, presented as a designed journal page rather than a raw reference dump.</p>
+          <h3>GrowNet journal reference</h3>
+          <p>The main web reading experience for GrowNet, presented as a designed journal-style document that preserves the structure and tone of the working reference.</p>
           <div class="docs-link-row">
-            <a class="button secondary" href="grownet.html">Open journal</a>
-          </div>
-        </article>
-
-        <article class="card doc-card">
-          <p class="card-eyebrow">Source reference</p>
-          <h3>Journal Reference</h3>
-          <p>The working source reference used to shape the web journal. Available in both markdown and Word format.</p>
-          <div class="docs-link-row">
-            <a class="button secondary" href="assets/docs/grownet-journal-reference.md">Open markdown</a>
+            <a class="button secondary" href="grownet.html">Open journal reference</a>
             <a class="button secondary" href="assets/docs/grownet-journal-reference.docx">Download .docx</a>
           </div>
         </article>
 
         <article class="card doc-card">
-          <p class="card-eyebrow">Update log</p>
+          <p class="card-eyebrow">Formal companion</p>
+          <h3>GrowNet Formal Specification</h3>
+          <p>A tighter architectural companion focused on invariants, lifecycle, growth rules, routing, and implementation-guiding language.</p>
+          <div class="docs-link-row">
+            <a class="button secondary" href="grownet-formal-spec.html">Open formal spec</a>
+            <a class="button secondary" href="assets/docs/grownet-formal-spec.docx">Download .docx</a>
+          </div>
+        </article>
+
+        <article class="card doc-card">
+          <p class="card-eyebrow">Research history</p>
           <h3>Changelog</h3>
-          <p>A running log of research-page, docs, website, and structural updates that are worth preserving in public history.</p>
+          <p>A running public record of GrowNet research-surface changes, including journal-reference and formal-spec updates.</p>
           <div class="docs-link-row">
             <a class="button secondary" href="changelog.html">Read changelog</a>
           </div>
@@ -114,10 +115,11 @@
       <div class="section-head">
         <div>
           <p class="section-kicker">How to use this section</p>
-          <h2>Start with the journal, then move to reference material.</h2>
+          <h2>Start with the journal reference, then move to the formal spec.</h2>
           <p>
-            The web journal is the best starting point for understanding GrowNet's framing and architectural direction. The journal reference
-            is useful when you want the source material directly, while the changelog helps track how the public research and documentation surface evolves over time.
+            The journal reference is the best starting point for understanding GrowNet's origin, framing, and architectural direction. The formal
+            spec is the tighter companion when you want invariants, growth rules, lifecycle language, and implementation-guiding structure. The
+            changelog tracks only research-facing GrowNet changes.
           </p>
         </div>
       </div>
@@ -127,20 +129,21 @@
           <p class="card-eyebrow">Current scope</p>
           <h3>What lives here right now</h3>
           <ul class="list">
-            <li>GrowNet journal and research page</li>
-            <li>Journal reference files in markdown and Word form</li>
-            <li>Public changelog for meaningful site and documentation updates</li>
+            <li>GrowNet journal reference web page</li>
+            <li>GrowNet Formal Specification page and Word document</li>
+            <li>Public changelog for GrowNet research-surface updates</li>
           </ul>
         </article>
 
-        <article class="card">
-          <p class="card-eyebrow">Next layer</p>
-          <h3>What Docs can grow into</h3>
-          <ul class="list">
-            <li>Architecture notes and technical appendices</li>
-            <li>Benchmark notes and implementation status pages</li>
-            <li>Product documentation and selective technical service material</li>
-          </ul>
+        <article class="card doc-card">
+          <p class="card-eyebrow">Source downloads</p>
+          <h3>Reference files</h3>
+          <p>Download the current working documents directly in source form.</p>
+          <div class="docs-link-row">
+            <a class="button secondary" href="assets/docs/grownet-journal-reference.md">Journal .md</a>
+            <a class="button secondary" href="assets/docs/grownet-journal-reference.docx">Journal .docx</a>
+            <a class="button secondary" href="assets/docs/grownet-formal-spec.docx">Formal spec .docx</a>
+          </div>
         </article>
       </div>
 

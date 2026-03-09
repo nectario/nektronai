@@ -54,6 +54,11 @@
   letter-spacing: -0.045em;
 }
 
+.grownet-title-spec {
+  max-width: 12ch;
+  font-size: clamp(2.55rem, 5.8vw, 4.7rem);
+}
+
 .grownet-subtitle {
   max-width: 52rem;
   margin: 1rem 0 0;
@@ -165,6 +170,30 @@
 
 .grownet-resource-note .hero-cta {
   margin-top: 1rem;
+}
+
+.grownet-language-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.grownet-language-card {
+  padding: 1rem 1.05rem;
+  border-radius: 18px;
+  border: 1px solid var(--border2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.028));
+}
+
+.theme-light .grownet-language-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 247, 251, 0.86));
+}
+
+.grownet-language-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.62;
 }
 
 .grownet-layout {
@@ -309,6 +338,18 @@
   color: var(--text);
 }
 
+.grownet-prose code {
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+  font-size: 0.94em;
+}
+
+.theme-light .grownet-prose code {
+  background: rgba(0, 0, 0, 0.06);
+}
+
 .grownet-prose ul,
 .grownet-prose ol {
   margin: 0.9rem 0 1.2rem;
@@ -441,6 +482,10 @@
   .grownet-hero,
   .grownet-paper {
     border-radius: 22px;
+  }
+
+  .grownet-language-grid {
+    grid-template-columns: 1fr;
   }
 
   .grownet-meta {
