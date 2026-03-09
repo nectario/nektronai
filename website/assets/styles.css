@@ -1032,7 +1032,7 @@ a.contact-card:hover{
   transform: translateY(-1px);
 }
 
-@media (max-width: 1400px){
+@media (max-width: 1600px){
   .header-inner{
     gap: var(--space-2);
     padding: .95rem 0;
