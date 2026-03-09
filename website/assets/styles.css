@@ -573,7 +573,7 @@ h1{
 
 .home-page h1{
   max-width: 12ch;
-  font-size: clamp(2.55rem, 4.8vw, 4.35rem);
+  font-size: clamp(2.35rem, 4.35vw, 4rem);
   font-weight: 700;
   line-height: .95;
   letter-spacing: -.045em;
@@ -1085,7 +1085,7 @@ a.contact-card:hover{
 .about-page .page-title{
   margin-bottom: 1rem;
   max-width: 13ch;
-  font-size: clamp(2.5rem, 4.9vw, 4.3rem);
+  font-size: clamp(2.3rem, 4.45vw, 3.95rem);
   line-height: .98;
   letter-spacing: -.045em;
   text-wrap: balance;
