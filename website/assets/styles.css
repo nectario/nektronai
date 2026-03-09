@@ -1032,6 +1032,163 @@ a.contact-card:hover{
   transform: translateY(-1px);
 }
 
+@media (max-width: 1400px){
+  .header-inner{
+    gap: var(--space-2);
+    padding: .95rem 0;
+  }
+
+  .brand-wordmark{
+    width: min(292px, 54vw);
+  }
+
+  nav{
+    gap: .55rem;
+  }
+
+  nav a{
+    font-size: .91rem;
+    padding: .34rem .46rem;
+  }
+
+  .icon-btn{
+    padding: .58rem;
+  }
+
+  .home-page .hero{
+    grid-template-columns: minmax(0, 1.08fr) minmax(300px, .82fr);
+    gap: clamp(1.35rem, 2.2vw, 2rem);
+    padding: clamp(1.75rem, 3.4vw, 2.6rem) 0 clamp(2rem, 3.8vw, 2.95rem);
+  }
+
+  .home-page .hero-copy{
+    padding-top: clamp(.2rem, .8vw, .55rem);
+  }
+
+  .home-page h1{
+    max-width: 11.4ch;
+    font-size: clamp(2.05rem, 3.65vw, 3.45rem);
+  }
+
+  .home-page .hero-lede{
+    max-width: 50ch;
+    font-size: clamp(1.04rem, .97rem + .22vw, 1.18rem);
+    line-height: 1.62;
+  }
+
+  .home-meta-row{
+    margin-top: var(--space-4);
+    max-width: 49rem;
+  }
+
+  .home-thesis-panel{
+    padding: clamp(1.15rem, 1.8vw, 1.55rem);
+    border-radius: 22px;
+  }
+
+  .home-thesis-panel h2{
+    font-size: clamp(1.24rem, 1.08rem + .45vw, 1.58rem);
+  }
+
+  .home-thesis-panel p{
+    max-width: 34ch;
+    font-size: .96rem;
+    line-height: 1.55;
+  }
+
+  .signal-item{
+    padding: .82rem .9rem;
+  }
+
+  .signal-item strong{
+    font-size: .94rem;
+    line-height: 1.42;
+  }
+
+  .hero-signal-grid{
+    margin-top: 1.05rem;
+  }
+
+  .research-loop{
+    margin-top: 1.15rem;
+  }
+
+  .loop-step{
+    gap: .72rem;
+  }
+
+  .loop-index{
+    width: 1.8rem;
+    height: 1.8rem;
+    font-size: .72rem;
+  }
+
+  .loop-step:not(:last-child)::after{
+    left: .87rem;
+    top: 2.1rem;
+  }
+
+  .loop-step strong{
+    font-size: .95rem;
+  }
+
+  .loop-step p{
+    font-size: .92rem;
+    line-height: 1.5;
+  }
+
+  .home-ribbon{
+    gap: 1rem;
+  }
+
+  .ribbon-card{
+    padding: 1rem 1rem 1.1rem;
+  }
+
+  .ribbon-card h3{
+    font-size: 1.02rem;
+  }
+
+  .about-page .hero{
+    gap: clamp(1.35rem, 2.2vw, 2rem);
+    padding: clamp(1.85rem, 3.4vw, 2.75rem) 0 clamp(2rem, 3.8vw, 3rem);
+  }
+
+  .about-page .page-title{
+    max-width: 12.2ch;
+    font-size: clamp(2.02rem, 3.75vw, 3.3rem);
+  }
+
+  .about-lede{
+    max-width: 52ch;
+    font-size: clamp(1.02rem, .96rem + .2vw, 1.14rem);
+    line-height: 1.62;
+  }
+
+  .about-meta-row{
+    margin-top: var(--space-4);
+    max-width: 50rem;
+  }
+
+  .about-hero-panel{
+    padding: clamp(1.15rem, 1.8vw, 1.55rem);
+    border-radius: 22px;
+  }
+
+  .about-hero-panel h2{
+    font-size: clamp(1.26rem, 1.1rem + .45vw, 1.62rem);
+  }
+
+  .about-principle{
+    padding: .9rem .95rem;
+  }
+
+  .about-principle p{
+    font-size: .95rem;
+    line-height: 1.5;
+  }
+}
+
 @media (max-width: 1100px){
   .home-page .hero,
   .home-research-layout,
