@@ -176,7 +176,8 @@ aws s3 sync "${SITE_DIR}/" "s3://${BUCKET_NAME}/" --delete --region "${BUCKET_RE
   --exclude "package.json" \
   --exclude "package-lock.json" \
   --exclude "codex.txt" \
-  --exclude "*.zip"
+  --exclude "NektronAI.zip" \
+  --exclude "NektronAI_production_ready.zip"
 echo "S3 sync complete."
 
 # Find CloudFront distribution by alias
