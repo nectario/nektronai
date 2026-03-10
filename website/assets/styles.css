@@ -1516,6 +1516,92 @@ a.contact-card:hover{
   gap: var(--space-3);
 }
 
+.downloads-page .page-title,
+.downloads-page .section h2,
+.downloads-page .card h3,
+.downloads-page .download-metric strong{
+  font-family: "Sora", var(--font-sans);
+}
+
+.downloads-page .page-title{
+  max-width: 11.2ch;
+  font-size: clamp(2.18rem, 4.15vw, 3.8rem);
+  letter-spacing: -.04em;
+  text-wrap: balance;
+}
+
+.downloads-grid{
+  align-items: stretch;
+}
+
+.release-card,
+.coming-soon-card{
+  position: relative;
+  overflow: hidden;
+}
+
+.release-card{
+  background: linear-gradient(180deg, rgba(94,200,255,.09), rgba(255,255,255,.03));
+}
+
+.coming-soon-card{
+  background: linear-gradient(180deg, rgba(255,154,52,.08), rgba(255,255,255,.03));
+}
+
+.downloads-meta{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+  margin-top: var(--space-4);
+}
+
+.downloads-meta-compact{
+  margin-top: var(--space-3);
+}
+
+.download-metric{
+  padding: .95rem 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--border2);
+  background: rgba(255,255,255,.035);
+}
+
+.theme-light .download-metric{
+  background: rgba(255,255,255,.72);
+}
+
+.download-metric.wide{
+  grid-column: 1 / -1;
+}
+
+.download-metric span{
+  display: block;
+  margin-bottom: .38rem;
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted2);
+}
+
+.download-metric strong{
+  display: block;
+  color: var(--text);
+  font-size: .98rem;
+  line-height: 1.45;
+}
+
+.download-metric code{
+  color: var(--text);
+  font-size: .88rem;
+  white-space: normal;
+  word-break: break-all;
+}
+
+.artifact-list{
+  margin-top: var(--space-4);
+}
+
 .changelog-entry .list{
   margin-top: var(--space-3);
 }
@@ -1533,6 +1619,10 @@ a.contact-card:hover{
 
 @media (max-width: 980px){
   .about-pillars{
+    grid-template-columns: 1fr;
+  }
+
+  .downloads-meta{
     grid-template-columns: 1fr;
   }
 }

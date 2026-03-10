@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://nektron.ai/</loc><lastmod>2026-03-09</lastmod></url>
-  <url><loc>https://nektron.ai/about.html</loc><lastmod>2026-03-08</lastmod></url>
+  <url><loc>https://nektron.ai/about.html</loc><lastmod>2026-03-09</lastmod></url>
   <url><loc>https://nektron.ai/docs.html</loc><lastmod>2026-03-09</lastmod></url>
+  <url><loc>https://nektron.ai/downloads.html</loc><lastmod>2026-03-09</lastmod></url>
   <url><loc>https://nektron.ai/changelog.html</loc><lastmod>2026-03-09</lastmod></url>
   <url><loc>https://nektron.ai/grownet.html</loc><lastmod>2026-03-09</lastmod></url>
   <url><loc>https://nektron.ai/grownet-formal-spec.html</loc><lastmod>2026-03-09</lastmod></url>
-  <url><loc>https://nektron.ai/privacy.html</loc><lastmod>2026-03-08</lastmod></url>
-  <url><loc>https://nektron.ai/terms.html</loc><lastmod>2026-03-08</lastmod></url>
-  <url><loc>https://nektron.ai/support.html</loc><lastmod>2026-03-08</lastmod></url>
+  <url><loc>https://nektron.ai/privacy.html</loc><lastmod>2026-03-09</lastmod></url>
+  <url><loc>https://nektron.ai/terms.html</loc><lastmod>2026-03-09</lastmod></url>
+  <url><loc>https://nektron.ai/support.html</loc><lastmod>2026-03-09</lastmod></url>
 </urlset>
