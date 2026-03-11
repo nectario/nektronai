@@ -151,8 +151,15 @@ server {
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
 
+    # Keep the site live, but discourage indexing until public launch.
+    add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+
+    location = / {
+        try_files /index.html =404;
+    }
+
     location / {
-        try_files $uri $uri/ /index.html;
+        try_files $uri $uri/ =404;
     }
 }
 EOF
