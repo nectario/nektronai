@@ -46,3 +46,54 @@ Upload the folder contents to your static host (S3/Cloudflare Pages/GitHub Pages
 
 ## Social previews
 - `assets/og.png` – Open Graph / Twitter preview image (1200×630)
+
+## AWS Traffic Monitoring
+CloudWatch log streaming is enabled for the production Elastic Beanstalk environment with 7-day retention.
+
+- Region: `us-east-2`
+- Environment: `nektron-web-si-prod`
+- Access log group: `/aws/elasticbeanstalk/nektron-web-si-prod/var/log/nginx/access.log`
+
+### Quick tail
+```bash
+aws logs tail /aws/elasticbeanstalk/nektron-web-si-prod/var/log/nginx/access.log \
+  --region us-east-2 \
+  --since 1d
+```
+
+### 1. Homepage hits in the last 24 hours
+Counts successful homepage requests (`GET /` with `200`).
+
+```bash
+aws logs filter-log-events \
+  --region us-east-2 \
+  --log-group-name /aws/elasticbeanstalk/nektron-web-si-prod/var/log/nginx/access.log \
+  --start-time $(( ($(date -u +%s) - 86400) * 1000 )) \
+  --query 'events[?contains(message, `"GET / HTTP"`) && contains(message, ` 200 `)] | length(@)'
+```
+
+### 2. Top IPs in the last 24 hours
+Useful for seeing whether traffic is concentrated in a few bot/scanner sources.
+
+```bash
+aws logs filter-log-events \
+  --region us-east-2 \
+  --log-group-name /aws/elasticbeanstalk/nektron-web-si-prod/var/log/nginx/access.log \
+  --start-time $(( ($(date -u +%s) - 86400) * 1000 )) \
+  --query 'events[].message' \
+  --output text | awk '{print $1}' | sort | uniq -c | sort -rn | head -n 20
+```
+
+### 3. Top suspicious probe paths in the last 24 hours
+Shows common scanner targets such as `.env`, `wp-*`, `xmlrpc.php`, and `.git/config`.
+
+```bash
+aws logs filter-log-events \
+  --region us-east-2 \
+  --log-group-name /aws/elasticbeanstalk/nektron-web-si-prod/var/log/nginx/access.log \
+  --start-time $(( ($(date -u +%s) - 86400) * 1000 )) \
+  --query 'events[].message' \
+  --output text | awk -F'"' '{split($2,r," "); print r[2]}' | \
+  rg '(^/\.env|^/\.git/config|xmlrpc\.php|wp-content|wp-includes|wp-admin|cgi-bin|info\.php|admin\.php|ms-edit\.php)' | \
+  sort | uniq -c | sort -rn | head -n 30
+```
