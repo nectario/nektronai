@@ -56,6 +56,14 @@ npm run update:downloads:lab -- --file "C:\path\to\GrowNetLab.msi" --version "1.
 That command will update `releases.grownetLabApp` and keep the hero CTA pointed at the Lab App.
 
 With `--external`, the script computes metadata from the local file but leaves the binary outside the website repo. This is the preferred workflow for release artifacts.
+By default, `--external` writes public download URLs against:
+
+- `https://d2j3ldvioomkd6.cloudfront.net`
+
+You can override that host with:
+
+- `--base-url <url>`
+- or the `NEKTRON_DOWNLOAD_BASE_URL` environment variable
 
 The script updates:
 

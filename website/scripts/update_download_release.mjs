@@ -9,6 +9,10 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const siteDir = path.resolve(scriptDir, "..");
 const manifestPath = path.join(siteDir, "assets", "downloads", "releases.json");
 const downloadsDir = path.join(siteDir, "assets", "downloads");
+const defaultExternalBaseUrl = (
+  process.env.NEKTRON_DOWNLOAD_BASE_URL ||
+  "https://d2j3ldvioomkd6.cloudfront.net"
+).replace(/\/+$/, "");
 
 const sourcePattern = /^grownet-source-(\d{4})-(\d{2})-(\d{2})-([a-f0-9]+)\.zip$/i;
 
@@ -31,6 +35,7 @@ Lab options:
   --summary <value>         Card summary override
   --eyebrow <value>         Card eyebrow override
   --href <value>            Public href override instead of deriving from --file
+  --base-url <value>        Public base URL used with --external (default: NEKTRON_DOWNLOAD_BASE_URL or ${defaultExternalBaseUrl})
   --file-size <value>       File size label override
   --sha256 <value>          SHA-256 label override
   --external                Compute metadata from --file without copying it into the website repo
@@ -146,7 +151,8 @@ function deriveManagedHref(options, filePath, siteAssetPath) {
   }
 
   if (options.external && filePath) {
-    return `assets/downloads/${path.basename(filePath)}`;
+    const baseUrl = (options["base-url"] || defaultExternalBaseUrl).replace(/\/+$/, "");
+    return `${baseUrl}/assets/downloads/${path.basename(filePath)}`;
   }
 
   if (siteAssetPath) {

@@ -14,7 +14,7 @@
       "fileSize": "50.9 MB",
       "sha256": "E4FB2C887748DCB11AE09BA049C77CA7CF8D9F26E29FE5BB06A91ED9C765229E",
       "downloadLabel": "Download MSI",
-      "downloadHref": "assets/downloads/GrowNetLab.msi",
+      "downloadHref": "https://d2j3ldvioomkd6.cloudfront.net/assets/downloads/GrowNetLab.msi",
       "download": true
     },
     "grownetSourceSnapshot": {
@@ -26,7 +26,7 @@
       "fileSize": "13.0 MB",
       "sha256": "D072BBC473113BBD53AF92D73D5006AB7B0DC7B809CFB3CC053DFD536E74105E",
       "downloadLabel": "Download ZIP",
-      "downloadHref": "assets/downloads/grownet-source-2026-03-12-48a9c9f.zip",
+      "downloadHref": "https://d2j3ldvioomkd6.cloudfront.net/assets/downloads/grownet-source-2026-03-12-48a9c9f.zip",
       "download": true
     }
   }
