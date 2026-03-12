@@ -1,7 +1,7 @@
 {
   "hero": {
     "primaryReleaseId": "grownetLabApp",
-    "primaryButtonLabel": "Download installer",
+    "primaryButtonLabel": "Download MSI",
     "artifacts": "GrowNet Lab App + source snapshot"
   },
   "releases": {
@@ -11,10 +11,10 @@
       "summary": "The desktop lab application for running and exploring GrowNet builds on Windows. This release line is intended to be updated by the .NET 10 WPF installer pipeline.",
       "version": "0.1.0",
       "published": "March 12, 2026",
-      "fileSize": "51.7 MB",
-      "sha256": "716FED4C5D834CEE0BD18EF4738AA08AFAB41BFF23073A42178904446FDF6FFE",
-      "downloadLabel": "Download installer",
-      "downloadHref": "assets/downloads/GrowNetLabSetup.exe",
+      "fileSize": "50.9 MB",
+      "sha256": "FE1245EB1454051910DE2FD218952FCC6E23B0F83B6AD13F3E77B3E3CB5F14DB",
+      "downloadLabel": "Download MSI",
+      "downloadHref": "assets/downloads/GrowNetLab.msi",
       "download": true
     },
     "grownetSourceSnapshot": {
