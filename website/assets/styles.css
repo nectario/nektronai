@@ -349,6 +349,19 @@ h1{
   box-shadow:none;
 }
 
+.button.is-disabled,
+.button.is-disabled:hover,
+.button.is-disabled:active{
+  color: var(--muted2);
+  background: transparent;
+  border-color: var(--border2);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: .72;
+  transform: none;
+  pointer-events: none;
+}
+
 .button svg{ width: 16px; height:16px; opacity:.95; }
 
 .meta-row{
@@ -1535,7 +1548,7 @@ a.contact-card:hover{
 }
 
 .release-card,
-.coming-soon-card{
+.lab-app-card{
   position: relative;
   overflow: hidden;
 }
@@ -1544,8 +1557,8 @@ a.contact-card:hover{
   background: linear-gradient(180deg, rgba(94,200,255,.09), rgba(255,255,255,.03));
 }
 
-.coming-soon-card{
-  background: linear-gradient(180deg, rgba(255,154,52,.08), rgba(255,255,255,.03));
+.lab-app-card{
+  background: linear-gradient(180deg, rgba(255,154,52,.08), rgba(94,200,255,.05));
 }
 
 .downloads-meta{

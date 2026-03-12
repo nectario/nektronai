@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update:downloads:source": "node scripts/update_download_release.mjs source",
+    "update:downloads:lab": "node scripts/update_download_release.mjs lab --help"
   },
   "devDependencies": {
     "vite": "^5.4.14"

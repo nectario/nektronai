@@ -52,6 +52,101 @@
     navBtn.setAttribute("aria-label", "Open navigation");
   }
 
+  function applyText(node, value) {
+    if (!node || typeof value !== "string" || !value) return;
+    node.textContent = value;
+  }
+
+  function setManagedDownloadLink(link, href, label, shouldDownload) {
+    if (!link) return;
+
+    const labelNode = link.querySelector("[data-download-label], [data-download-hero-label]");
+    if (labelNode && typeof label === "string" && label) {
+      labelNode.textContent = label;
+    }
+
+    if (typeof href === "string" && href) {
+      link.setAttribute("href", href);
+      if (shouldDownload) {
+        link.setAttribute("download", "");
+      } else {
+        link.removeAttribute("download");
+      }
+      link.classList.remove("is-disabled");
+      link.removeAttribute("aria-disabled");
+      link.tabIndex = 0;
+      return;
+    }
+
+    link.removeAttribute("href");
+    link.removeAttribute("download");
+    link.classList.add("is-disabled");
+    link.setAttribute("aria-disabled", "true");
+    link.tabIndex = -1;
+  }
+
+  function applyManagedRelease(card, release) {
+    if (!card || !release) return;
+
+    card.querySelectorAll("[data-download-field]").forEach((node) => {
+      const fieldName = node.getAttribute("data-download-field");
+      if (!fieldName || typeof release[fieldName] !== "string") return;
+      node.textContent = release[fieldName];
+    });
+
+    setManagedDownloadLink(
+      card.querySelector("[data-download-link]"),
+      release.downloadHref,
+      release.downloadLabel,
+      !!release.download,
+    );
+  }
+
+  async function initDownloadsPage() {
+    const downloadsRoot = document.querySelector("[data-download-manifest]");
+    if (!downloadsRoot) return;
+
+    const manifestUrl = downloadsRoot.getAttribute("data-download-manifest");
+    if (!manifestUrl) return;
+
+    try {
+      const response = await fetch(manifestUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const manifest = await response.json();
+      const releases = manifest.releases || {};
+
+      Object.entries(releases).forEach(([releaseId, release]) => {
+        applyManagedRelease(
+          document.querySelector(`[data-download-release="${releaseId}"]`),
+          release,
+        );
+      });
+
+      const hero = manifest.hero || {};
+      const primaryRelease = releases[hero.primaryReleaseId];
+      if (primaryRelease) {
+        setManagedDownloadLink(
+          document.querySelector("[data-download-hero-link]"),
+          primaryRelease.downloadHref,
+          hero.primaryButtonLabel || primaryRelease.downloadLabel,
+          !!primaryRelease.download,
+        );
+        applyText(
+          document.querySelector("[data-download-hero-primary-version]"),
+          primaryRelease.version,
+        );
+      }
+
+      applyText(
+        document.querySelector("[data-download-hero-artifacts]"),
+        hero.artifacts,
+      );
+    } catch (error) {
+      console.warn("NektronAI downloads manifest could not be applied.", error);
+    }
+  }
+
   // Init theme (use saved preference if present, otherwise follow system)
   let storedTheme = null;
   try {
@@ -116,6 +211,8 @@
       if (window.innerWidth > 860) closeNav();
     });
   }
+
+  void initDownloadsPage();
 
   // Expose for optional future hooks (no globals leaked by default).
   void nav;
