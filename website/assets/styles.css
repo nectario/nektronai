@@ -560,47 +560,11 @@ h1{
 .quote footer{ margin-top: var(--space-2); color: var(--muted2); font-family: var(--font-mono); font-size: .88rem; }
 
 .home-page .hero{
-  position: relative;
   display:grid;
   grid-template-columns: minmax(0, 1.18fr) minmax(320px, .82fr);
   gap: clamp(1.6rem, 3vw, 2.8rem);
   align-items: start;
   padding: clamp(2.1rem, 4.8vw, 3.5rem) 0 clamp(2.3rem, 4.8vw, 3.6rem);
-  isolation: isolate;
-}
-
-.home-page .hero::before{
-  content:"";
-  position:absolute;
-  inset: -2rem -4% auto -4%;
-  height: calc(100% + 2rem);
-  border-radius: 36px;
-  background:
-    radial-gradient(560px 300px at 12% 18%, rgba(94,200,255,.12), transparent 64%),
-    radial-gradient(520px 280px at 88% 12%, rgba(255,154,52,.1), transparent 60%);
-  pointer-events:none;
-  z-index:-2;
-}
-
-.home-page .hero::after{
-  content:"";
-  position:absolute;
-  inset: 1.1rem 41% auto 0;
-  height: 15.5rem;
-  border-radius: 28px;
-  border: 1px solid rgba(94,200,255,.08);
-  background:
-    linear-gradient(135deg, rgba(94,200,255,.03), transparent 46%),
-    linear-gradient(180deg, rgba(255,255,255,.03), transparent 60%);
-  pointer-events:none;
-  z-index:-1;
-}
-
-.theme-light .home-page .hero::after{
-  border-color: rgba(0,106,138,.08);
-  background:
-    linear-gradient(135deg, rgba(0,106,138,.04), transparent 46%),
-    linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,0));
 }
 
 .home-page .hero-copy{
@@ -821,8 +785,6 @@ h1{
 }
 
 .ribbon-card{
-  position: relative;
-  overflow: hidden;
   padding: 1.1rem 1.15rem 1.2rem;
   border-radius: 18px;
   border: 1px solid var(--border2);
@@ -832,25 +794,6 @@ h1{
 
 .theme-light .ribbon-card{
   background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));
-}
-
-.ribbon-card::after{
-  content:"";
-  position:absolute;
-  inset: auto -12% -20% auto;
-  width: 180px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(94,200,255,.12), transparent 68%);
-  pointer-events:none;
-}
-
-.ribbon-card:nth-child(2)::after{
-  background: radial-gradient(circle, rgba(255,154,52,.12), transparent 68%);
-}
-
-.ribbon-card:nth-child(3)::after{
-  background: radial-gradient(circle, rgba(94,200,255,.08), rgba(255,154,52,.08), transparent 70%);
 }
 
 .ribbon-card h3{
@@ -870,8 +813,6 @@ h1{
 }
 
 .resource-card{
-  position:relative;
-  overflow:hidden;
   display:flex;
   flex-direction:column;
   gap: .7rem;
@@ -894,23 +835,6 @@ h1{
 
 .theme-light .resource-card{
   background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(246,247,251,.78));
-}
-
-.resource-card::after{
-  content:"";
-  position:absolute;
-  inset: auto 1rem 1rem auto;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.09);
-  background: rgba(255,255,255,.04);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-}
-
-.theme-light .resource-card::after{
-  border-color: rgba(0,0,0,.06);
-  background: rgba(255,255,255,.9);
 }
 
 .resource-card-journal{
