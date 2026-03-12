@@ -14,7 +14,7 @@ const sourcePattern = /^grownet-source-(\d{4})-(\d{2})-(\d{2})-([a-f0-9]+)\.zip$
 
 function usage() {
   console.log(`Usage:
-  node scripts/update_download_release.mjs source [--file <zip>] [--make-primary]
+  node scripts/update_download_release.mjs source [--file <zip>] [--external] [--href <path>] [--make-primary]
   node scripts/update_download_release.mjs lab --file <artifact> --version <version> [options]
   node scripts/update_download_release.mjs lab --clear
 
@@ -33,11 +33,13 @@ Lab options:
   --href <value>            Public href override instead of deriving from --file
   --file-size <value>       File size label override
   --sha256 <value>          SHA-256 label override
+  --external                Compute metadata from --file without copying it into the website repo
   --make-primary            Point the hero CTA at this release
   --clear                   Reset the Lab App entry to "coming soon"
 
 Notes:
-  - If --file points outside the website folder, the script copies it into assets/downloads first.
+  - With --external, the script reads metadata from --file without copying it into assets/downloads.
+  - Without --external, files outside the website folder are copied into assets/downloads first.
 `);
 }
 
@@ -53,7 +55,7 @@ function parseArgs(argv) {
     }
 
     const key = token.slice(2);
-    if (key === "make-primary" || key === "clear" || key === "help") {
+    if (key === "make-primary" || key === "clear" || key === "help" || key === "external") {
       options[key] = true;
       continue;
     }
@@ -138,6 +140,22 @@ async function stageArtifactIfNeeded(filePath) {
   return stagedPath;
 }
 
+function deriveManagedHref(options, filePath, siteAssetPath) {
+  if (typeof options.href === "string" && options.href) {
+    return options.href;
+  }
+
+  if (options.external && filePath) {
+    return `assets/downloads/${path.basename(filePath)}`;
+  }
+
+  if (siteAssetPath) {
+    return toSiteRelative(siteAssetPath);
+  }
+
+  return "";
+}
+
 async function findLatestSourceZip() {
   const entries = await fs.readdir(downloadsDir, { withFileTypes: true });
   const candidates = entries
@@ -157,9 +175,11 @@ async function updateSourceRelease(options) {
   const resolvedSourceFile = options.file
     ? await resolveAssetFile(options.file)
     : await findLatestSourceZip();
-  const sourceFile = await stageArtifactIfNeeded(resolvedSourceFile);
+  const stagedSourceFile = options.external
+    ? null
+    : await stageArtifactIfNeeded(resolvedSourceFile);
 
-  const fileName = path.basename(sourceFile);
+  const fileName = path.basename(resolvedSourceFile);
   const match = fileName.match(sourcePattern);
   if (!match) {
     throw new Error(`Source snapshot file name must match grownet-source-YYYY-MM-DD-COMMIT.zip: ${fileName}`);
@@ -167,7 +187,7 @@ async function updateSourceRelease(options) {
 
   const [, year, month, day, commit] = match;
   const publishedDate = new Date(`${year}-${month}-${day}T00:00:00Z`);
-  const stats = await fs.stat(sourceFile);
+  const stats = await fs.stat(resolvedSourceFile);
 
   const manifest = await readManifest();
   manifest.releases.grownetSourceSnapshot = {
@@ -175,9 +195,9 @@ async function updateSourceRelease(options) {
     version: `${year}.${month}.${day} / ${commit}`,
     published: formatHumanDate(publishedDate),
     fileSize: formatBytes(stats.size),
-    sha256: await sha256ForFile(sourceFile),
+    sha256: await sha256ForFile(resolvedSourceFile),
     downloadLabel: "Download ZIP",
-    downloadHref: toSiteRelative(sourceFile),
+    downloadHref: deriveManagedHref(options, resolvedSourceFile, stagedSourceFile),
     download: true,
   };
 
@@ -187,7 +207,7 @@ async function updateSourceRelease(options) {
   }
 
   await writeManifest(manifest);
-  console.log(`Updated grownetSourceSnapshot -> ${toSiteRelative(sourceFile)}`);
+  console.log(`Updated grownetSourceSnapshot -> ${manifest.releases.grownetSourceSnapshot.downloadHref}`);
 }
 
 async function updateLabRelease(options) {
@@ -223,8 +243,10 @@ async function updateLabRelease(options) {
   }
 
   let assetPath = null;
+  let stagedAssetPath = null;
   if (options.file) {
-    assetPath = await stageArtifactIfNeeded(await resolveAssetFile(options.file));
+    assetPath = await resolveAssetFile(options.file);
+    stagedAssetPath = options.external ? null : await stageArtifactIfNeeded(assetPath);
   }
 
   const stats = assetPath ? await fs.stat(assetPath) : null;
@@ -240,7 +262,7 @@ async function updateLabRelease(options) {
     fileSize: options["file-size"] ?? (stats ? formatBytes(stats.size) : manifest.releases.grownetLabApp.fileSize),
     sha256: options.sha256 ?? (assetPath ? await sha256ForFile(assetPath) : manifest.releases.grownetLabApp.sha256),
     downloadLabel: options.label ?? "Download installer",
-    downloadHref: options.href ?? (assetPath ? toSiteRelative(assetPath) : ""),
+    downloadHref: deriveManagedHref(options, assetPath, stagedAssetPath),
     download: true,
   };
 

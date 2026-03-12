@@ -2,3 +2,6 @@ node_modules/
 dist/
 
 archive/
+assets/downloads/*.msi
+assets/downloads/*.exe
+assets/downloads/*.zip

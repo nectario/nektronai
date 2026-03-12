@@ -19,20 +19,21 @@ The source snapshot release should use this filename pattern:
 
 - `grownet-source-YYYY-MM-DD-COMMIT.zip`
 
-Place the new zip in:
+Recommended release flow:
 
-- `website/assets/downloads/`
+- keep the zip outside the website repo
+- upload it to the `nektron.ai` downloads channel
+- then update the manifest from the local file without copying it into git
 
 Then run:
 
 ```bash
 cd C:\Development\Projects\NektronAI\website
-npm run update:downloads:source
+npm run update:downloads:source -- --file "C:\path\to\grownet-source-YYYY-MM-DD-COMMIT.zip" --external
 ```
 
 That command will:
 
-- find the newest matching source zip
 - update `releases.grownetSourceSnapshot`
 - compute and write:
   - `downloadHref`
@@ -41,20 +42,20 @@ That command will:
   - `fileSize`
   - `sha256`
 
+If you prefer the older repo-staged workflow, you can still place the zip in `website/assets/downloads/` and run `npm run update:downloads:source` with no extra flags.
+
 ## Lab App
 
 To publish a new GrowNet Lab App artifact, run:
 
 ```bash
 cd C:\Development\Projects\NektronAI\website
-node scripts/update_download_release.mjs lab --file "C:\path\to\GrowNetLabInstaller.exe" --version "1.0.0" --published "March 12, 2026" --label "Download installer" --make-primary
+npm run update:downloads:lab -- --file "C:\path\to\GrowNetLab.msi" --version "1.0.0" --published "March 12, 2026" --label "Download MSI" --external --make-primary
 ```
 
 That command will update `releases.grownetLabApp` and keep the hero CTA pointed at the Lab App.
 
-If `--file` points outside the website folder, the script copies the artifact into:
-
-- `website/assets/downloads/`
+With `--external`, the script computes metadata from the local file but leaves the binary outside the website repo. This is the preferred workflow for release artifacts.
 
 The script updates:
 
@@ -71,7 +72,7 @@ If the Lab App should temporarily return to a not-yet-published state:
 
 ```bash
 cd C:\Development\Projects\NektronAI\website
-node scripts/update_download_release.mjs lab --clear --make-primary
+npm run update:downloads:lab -- --clear --make-primary
 ```
 
 ## Hero Button
@@ -92,5 +93,7 @@ Current intended behavior:
 ## Important Notes
 
 - Keep using the manifest and updater script instead of editing the rendered download card text by hand.
+- Release binaries should live on the website download host, not in git.
+- `scripts/deploy.sh` excludes managed MSI/EXE/ZIP artifacts so normal website deploys do not delete bucket-hosted releases.
 - After updating either release, verify `website/assets/downloads/releases.json`.
 - Then deploy the website normally.

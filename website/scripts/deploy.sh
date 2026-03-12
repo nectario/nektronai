@@ -171,6 +171,9 @@ aws s3 sync "${SITE_DIR}/" "s3://${BUCKET_NAME}/" --delete --region "${BUCKET_RE
   --exclude "scripts/*" \
   --exclude "archive/*" \
   --exclude "dist/*" \
+  --exclude "assets/downloads/*.msi" \
+  --exclude "assets/downloads/*.exe" \
+  --exclude "assets/downloads/*.zip" \
   --exclude ".gitignore" \
   --exclude "README.md" \
   --exclude "package.json" \
