@@ -165,6 +165,8 @@ fi
 
 aws s3 sync "${SITE_DIR}/" "s3://${BUCKET_NAME}/" --delete --region "${BUCKET_REGION}" \
   --exclude ".git/*" \
+  --exclude ".ebextensions/*" \
+  --exclude ".idea/*" \
   --exclude ".platform/*" \
   --exclude "node_modules/*" \
   --exclude "ops/*" \
@@ -180,8 +182,38 @@ aws s3 sync "${SITE_DIR}/" "s3://${BUCKET_NAME}/" --delete --region "${BUCKET_RE
   --exclude "package-lock.json" \
   --exclude "codex.txt" \
   --exclude "NektronAI.zip" \
-  --exclude "NektronAI_production_ready.zip"
+  --exclude "NektronAI_production_ready.zip" \
+  --exclude "nektronai_site_pr.zip"
 echo "S3 sync complete."
+
+PRIVATE_PATHS=(
+  ".git/"
+  ".ebextensions/"
+  ".idea/"
+  ".platform/"
+  "node_modules/"
+  "ops/"
+  "scripts/"
+  "dist/"
+  "archive/"
+  ".gitignore"
+  "README.md"
+  "package.json"
+  "package-lock.json"
+  "codex.txt"
+  "NektronAI.zip"
+  "NektronAI_production_ready.zip"
+  "nektronai_site_pr.zip"
+)
+
+for target in "${PRIVATE_PATHS[@]}"; do
+  if [[ "${target}" == */ ]]; then
+    aws s3 rm "s3://${BUCKET_NAME}/${target}" --recursive --region "${BUCKET_REGION}" >/dev/null 2>&1 || true
+  else
+    aws s3 rm "s3://${BUCKET_NAME}/${target}" --region "${BUCKET_REGION}" >/dev/null 2>&1 || true
+  fi
+done
+echo "Private path cleanup complete."
 
 # Find CloudFront distribution by alias
 DIST_ID="$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items && contains(Aliases.Items, 'nektron.ai')].Id | [0]" --output text)"
