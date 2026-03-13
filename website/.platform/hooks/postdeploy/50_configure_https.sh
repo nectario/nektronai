@@ -5,6 +5,7 @@ log() { echo "[https-hook] $*"; }
 
 PRIMARY_DOMAIN="${PRIMARY_DOMAIN:-nektron.ai}"
 LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-info@nektron.ai}"
+DOWNLOADS_ORIGIN="${DOWNLOADS_ORIGIN:-https://d2j3ldvioomkd6.cloudfront.net}"
 DOMAINS=(
   "nektron.ai"
   "www.nektron.ai"
@@ -154,6 +155,10 @@ server {
     # Keep the site live, but discourage indexing until public launch.
     add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
 
+    location ^~ /assets/downloads/ {
+        return 302 __DOWNLOADS_ORIGIN__$request_uri;
+    }
+
     location = / {
         try_files /index.html =404;
     }
@@ -163,6 +168,16 @@ server {
     }
 }
 EOF
+
+  DOWNLOADS_ORIGIN="${DOWNLOADS_ORIGIN}" python3 - <<'PY'
+import os
+from pathlib import Path
+
+config_path = Path("/etc/nginx/conf.d/zz_nektron_https.conf")
+config_text = config_path.read_text(encoding="utf-8")
+config_text = config_text.replace("__DOWNLOADS_ORIGIN__", os.environ["DOWNLOADS_ORIGIN"])
+config_path.write_text(config_text, encoding="utf-8")
+PY
 
   mkdir -p /var/www/letsencrypt/.well-known/acme-challenge
 }
