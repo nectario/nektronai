@@ -9,24 +9,24 @@
       "eyebrow": "Application release",
       "title": "GrowNet Lab App",
       "summary": "The desktop lab application for running and exploring GrowNet builds on Windows. This release line is intended to be updated by the .NET 10 WPF installer pipeline.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "published": "March 12, 2026",
       "fileSize": "50.9 MB",
-      "sha256": "E4FB2C887748DCB11AE09BA049C77CA7CF8D9F26E29FE5BB06A91ED9C765229E",
+      "sha256": "E51A37639ADCCB88E23AC91739DE5A7E7D046EB2A37E9EAE8688CC0C73C5001F",
       "downloadLabel": "Download MSI",
-      "downloadHref": "https://d2j3ldvioomkd6.cloudfront.net/assets/downloads/GrowNetLab.msi",
+      "downloadHref": "https://nektron.ai/assets/downloads/GrowNetLab.msi",
       "download": true
     },
     "grownetSourceSnapshot": {
       "eyebrow": "Current release",
       "title": "GrowNet source snapshot",
       "summary": "A clean, versioned archive of the current GrowNet codebase, published as a repository snapshot rather than an installer build.",
-      "version": "2026.03.12 / 48a9c9f",
+      "version": "2026.03.12 / 5df04f7",
       "published": "March 12, 2026",
       "fileSize": "13.0 MB",
-      "sha256": "D072BBC473113BBD53AF92D73D5006AB7B0DC7B809CFB3CC053DFD536E74105E",
+      "sha256": "2088DA2C3E2C7EEC66050948430DB465D73C0620957390108A6D984AD17157FA",
       "downloadLabel": "Download ZIP",
-      "downloadHref": "https://d2j3ldvioomkd6.cloudfront.net/assets/downloads/grownet-source-2026-03-12-48a9c9f.zip",
+      "downloadHref": "https://nektron.ai/assets/downloads/grownet-source-2026-03-12-5df04f7.zip",
       "download": true
     }
   }
