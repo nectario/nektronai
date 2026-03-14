@@ -45,6 +45,52 @@
   text-transform: uppercase;
 }
 
+.grownet-hero-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(1.2rem, 3vw, 2rem);
+  align-items: start;
+}
+
+.grownet-hero-copy {
+  min-width: 0;
+}
+
+.grownet-brand-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(136px, 16vw, 190px);
+  aspect-ratio: 1;
+  margin-top: 0.15rem;
+  padding: clamp(0.75rem, 1.8vw, 1rem);
+  border-radius: 26px;
+  border: 1px solid rgba(94, 200, 255, 0.22);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(135, 247, 255, 0.18), transparent 48%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.025));
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.18);
+}
+
+.theme-light .grownet-brand-panel {
+  border-color: rgba(0, 106, 138, 0.16);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(23, 183, 225, 0.12), transparent 46%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 247, 251, 0.88));
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
+}
+
+.grownet-brand-panel-compact {
+  width: clamp(124px, 14vw, 164px);
+}
+
+.grownet-brand-mark {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.16));
+}
+
 .grownet-title {
   margin: 0;
   font-family: "Sora", var(--font-sans);
@@ -475,6 +521,15 @@
 
   .grownet-toc {
     position: static;
+  }
+
+  .grownet-hero-head {
+    grid-template-columns: 1fr;
+  }
+
+  .grownet-brand-panel,
+  .grownet-brand-panel-compact {
+    width: clamp(128px, 34vw, 180px);
   }
 }
 
