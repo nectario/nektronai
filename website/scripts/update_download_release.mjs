@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { syncDownloadsPageFallback } from "./sync_downloads_page_fallback.mjs";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const siteDir = path.resolve(scriptDir, "..");
@@ -83,6 +84,7 @@ async function readManifest() {
 
 async function writeManifest(manifest) {
   await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+  await syncDownloadsPageFallback(manifest);
 }
 
 async function pathExists(targetPath) {
