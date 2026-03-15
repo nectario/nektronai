@@ -12,9 +12,9 @@
       "version": "0.2.2",
       "published": "March 14, 2026",
       "fileSize": "51.0 MB",
-      "sha256": "94B5F80C3B5A943C598F7A912B334B45BD8AEDBA991D0D2E158C969592A79A41",
+      "sha256": "FD295405F5A80A80A5AD5BCA81C29B53EDA78501881FA3CD651CA2C7B91C7C38",
       "downloadLabel": "Download MSI",
-      "downloadHref": "https://nektron.ai/assets/downloads/GrowNetLab.msi",
+      "downloadHref": "https://nektron.ai/assets/downloads/GrowNetLab-0.2.2.msi",
       "download": true
     },
     "grownetSourceSnapshot": {
