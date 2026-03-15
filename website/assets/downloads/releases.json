@@ -9,12 +9,12 @@
       "eyebrow": "Application release",
       "title": "GrowNet Lab App",
       "summary": "The desktop lab application for running and exploring GrowNet builds on Windows. This release line is intended to be updated by the .NET 10 WPF installer pipeline.",
-      "version": "0.2.3",
+      "version": "0.2.4",
       "published": "March 14, 2026",
       "fileSize": "51.0 MB",
-      "sha256": "7C1AF1E4A81A142EDEAC8907C800B4B4E61D0D9C8EB19336098F532D94059654",
+      "sha256": "FF6CD4D2F2B4B56DEC2BCFF6F52FE60FBED833436EB8694274A4C670D50BA6A8",
       "downloadLabel": "Download MSI",
-      "downloadHref": "https://nektron.ai/assets/downloads/GrowNetLab-0.2.3.msi",
+      "downloadHref": "https://nektron.ai/assets/downloads/GrowNetLab-0.2.4.msi",
       "download": true
     },
     "grownetSourceSnapshot": {
