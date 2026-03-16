@@ -1358,6 +1358,57 @@ a.contact-card:hover{
     padding-top: var(--space-6);
   }
 
+  .home-page .hero-copy,
+  .home-page .hero-copy > *{
+    min-width: 0;
+  }
+
+  .home-page .hero .kicker{
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: .55rem .85rem;
+    line-height: 1.55;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .home-page .hero-cta{
+    align-items: stretch;
+  }
+
+  .home-page .hero-cta .button{
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .home-page .hero-cta .button.primary{
+    flex: 1 1 100%;
+  }
+
+  .home-page .hero-cta .button.secondary{
+    flex: 1 1 calc(50% - .4rem);
+  }
+
+  .home-page .meta-row{
+    gap: .75rem;
+  }
+
+  .home-page .meta-pill{
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    row-gap: .2rem;
+  }
+
+  .home-page .meta-pill code{
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
   .home-thesis-panel,
   .contact-band,
   .focus-card,
