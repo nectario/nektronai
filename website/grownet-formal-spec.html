@@ -98,7 +98,7 @@
 
       <div class="grownet-summary" role="note" aria-label="Working definition">
         <p class="grownet-summary-label">Working definition</p>
-        <p>GrowNet is a growth-based neural architecture that begins with minimal structure, learns locally, interprets input through serial focus and anchoring, allocates new capacity only when novelty and saturation justify it, favors deterministic organization with proximity-biased routing, and aims toward active, continuously adapting intelligence rather than passive input-output inference.</p>
+        <p>GrowNet is a growth-based neural architecture that begins with minimal structure, learns locally, interprets input through serial focus and anchoring, treats Focus Segments as the primary meaningful unit in 2D and beyond, allocates new capacity only when novelty and saturation justify it, favors deterministic organization with proximity-biased routing, and aims toward active, continuously adapting intelligence rather than passive input-output inference.</p>
       </div>
 
       <div class="grownet-resource-note" role="note" aria-label="Companion reading">
@@ -372,17 +372,20 @@
           <h3>6.2 Local learning</h3>
           <p>GrowNet learning SHOULD remain local whenever possible. The architecture is explicitly motivated by dissatisfaction with fully global backpropagation. This does not forbid future error-based components, but they SHOULD be layered on top of local growth and local adaptation rather than replacing them as the central principle.</p>
 
-          <h3>6.3 Focus anchor and reference anchor</h3>
-          <p>Repository materials distinguish several useful concepts:</p>
+          <h3>6.3 Focus Segment and anchor hierarchy</h3>
+          <p>Repository materials now distinguish a fuller hierarchy:</p>
           <ul>
-            <li><strong>Focus Anchor (conceptual):</strong> the currently active point or frame that the system is inspecting in behavioral terms.</li>
-            <li><strong>Reference Anchor (implementation):</strong> the stable anchor used to compute deltas and bin novelty deterministically.</li>
-            <li><strong>Anchor Map (working extension):</strong> a bounded remembered set of meaningful locations or frames that remains available while active focus moves serially.</li>
+            <li><strong>Focus Point:</strong> the currently selected seed or center.</li>
+            <li><strong>Focus Segment:</strong> the locally coherent unit around that point.</li>
+            <li><strong>Segment Anchor:</strong> the local reference that stabilizes that segment.</li>
+            <li><strong>Anchor Trace:</strong> the most local memory of anchoring state.</li>
+            <li><strong>Anchor Field:</strong> the distributed pattern of active local anchors.</li>
+            <li><strong>Anchor Map:</strong> the conceptual readout of that field.</li>
           </ul>
-          <p>This separation SHOULD be maintained because it allows human-readable interpretation while preserving stable internal routing semantics.</p>
+          <p>This hierarchy SHOULD be maintained because it keeps anchoring local and structure-native. In 2D and beyond, the Focus Segment is the primary meaningful unit, while the Focus Point is usually the seed or center from which that segment is determined.</p>
 
           <h3>6.4 Serial focus and candidate generation</h3>
-          <p>GrowNet focus SHOULD be treated as a serial active process rather than a dense simultaneous weighting operation. At any instant, the system SHOULD have one active focus point or one active focused frame, even if multiple candidate points are available.</p>
+          <p>GrowNet focus SHOULD be treated as a serial active process rather than a dense simultaneous weighting operation. At any instant, the system SHOULD have one active Focus Point seeding one current Focus Segment, even if multiple candidate points are available.</p>
           <p>The system MAY maintain multiple candidate focus points at once. Candidate points MAY be generated from:</p>
           <ul>
             <li>energy or saliency,</li>
@@ -394,15 +397,19 @@
           </ul>
           <p>The exact focus policy remains a research parameter, but the architecture SHOULD make the policy explicit.</p>
 
-          <h3>6.5 Anchoring and anchor maps</h3>
-          <p>GrowNet SHOULD distinguish between the currently active focus point and the more persistent anchor state used to interpret future input. A system MAY maintain a small anchor map of currently meaningful locations, patterns, or frames. This allows GrowNet to inspect one point at a time while preserving a remembered map of multiple important locations.</p>
-          <p>Focus SHOULD influence slot selection before local routing decisions are made. Novelty, fallback pressure, and growth decisions SHOULD therefore be interpretable relative to focus and anchor state, not only relative to raw input in isolation.</p>
+          <h3>6.5 Neuronified anchoring and anchor maps</h3>
+          <p>GrowNet SHOULD distinguish between the currently active Focus Point, the current Focus Segment, and the more persistent anchoring state used to interpret future input. A system MAY maintain a conceptual Anchor Map of currently meaningful locations, patterns, or frames, but that map SHOULD be understood as the readout of a distributed Anchor Field rather than as a giant external bookkeeping object.</p>
+          <p>Focus SHOULD influence slot selection before local routing decisions are made. Novelty, fallback pressure, and growth decisions SHOULD therefore be interpretable relative to Focus Segment and anchor state, not only relative to raw input in isolation. A Focus Segment in the world is routed into slot structure inside neurons; it is not the same thing as a slot.</p>
 
-          <h3>6.6 Covert vs overt focus</h3>
+          <h3>6.6 Temporal compression</h3>
+          <p>Explicit time at lower levels SHOULD be allowed to remain explicit. Ticks, pulse runs, gaps, and frame-to-frame continuity MAY all be represented directly at low levels. Later, higher levels MAY absorb that explicit temporal structure into more compact stabilized representation.</p>
+          <p>This temporal compression is expected rather than contradictory. Time may begin explicit and later become compressed.</p>
+
+          <h3>6.7 Covert vs overt focus</h3>
           <p>GrowNet SHOULD support <strong>covert / field focus</strong>, meaning a shift in processing priority without mechanical movement. Embodied or robotic GrowNet systems MAY additionally support <strong>overt / mechanical focus</strong>, meaning a physical reorientation of sensors or effectors toward a selected target.</p>
           <p>Overt focus SHOULD be treated as more expensive than covert focus and MAY be reserved for cases where recentering perception or action is useful.</p>
 
-          <h3>6.7 Revisit and inhibition of return</h3>
+          <h3>6.8 Revisit and inhibition of return</h3>
           <p>To avoid pathological fixation on one salient point, GrowNet MAY implement bounded revisit suppression or inhibition of return. This would bias the focus policy away from immediately reselecting the same point unless task relevance or persistent evidence justifies it.</p>
         </section>
 
@@ -718,7 +725,7 @@
         <section id="concise-formal-definition">
           <h2>19. Concise formal definition</h2>
           <div class="grownet-highlight">
-            <p><strong>GrowNet, in one paragraph</strong><br>GrowNet is a novelty-driven, growth-based neural architecture in which local structure is the primary adaptive medium. It begins with minimal scaffold, allocates new capacity only when local saturation and persistent novelty justify it, organizes computation through slots, neurons, layers, and regions, interprets incoming structure through serial focus and anchoring, regulates behavior through excitatory, inhibitory, and modulatory dynamics, prunes unused connections while preserving dormant reusable substrate, and aims toward active, continuously adapting intelligence for agents, world models, and robotics.</p>
+            <p><strong>GrowNet, in one paragraph</strong><br>GrowNet is a novelty-driven, growth-based neural architecture in which local structure is the primary adaptive medium. It begins with minimal scaffold, allocates new capacity only when local saturation and persistent novelty justify it, organizes computation through slots, neurons, layers, and regions, interprets incoming structure through serial focus and anchoring, treats Focus Segments as the primary meaningful unit in 2D and beyond, regulates behavior through excitatory, inhibitory, and modulatory dynamics, prunes unused connections while preserving dormant reusable substrate, and aims toward active, continuously adapting intelligence for agents, world models, and robotics.</p>
           </div>
         </section>
 

@@ -98,7 +98,7 @@
 
       <div class="grownet-summary" role="note" aria-label="Working summary">
         <p class="grownet-summary-label">Working summary</p>
-        <p>GrowNet is envisioned as a growth-based neural architecture that starts very small, expands only when novelty justifies it, uses local structure, serial focus and anchoring, and energy constraints to regulate development, and aims toward continuous, active intelligence rather than today's passive input-output systems.</p>
+        <p>GrowNet is envisioned as a growth-based neural architecture that starts very small, expands only when novelty justifies it, uses local structure, serial focus and anchoring, treats Focus Segments rather than isolated points as the primary meaningful unit in 2D and beyond, and aims toward continuous, active intelligence rather than today's passive input-output systems.</p>
       </div>
 
       <div class="grownet-resource-note" role="note" aria-label="Related GrowNet resources">
@@ -306,8 +306,18 @@
           <p>The long-term expectation is that balancing, navigation, and other control behaviors would be handled by specialized local circuits rather than giant end-to-end policies.</p>
 
           <h3>Focus, anchoring, and serial inspection</h3>
-          <p>Focus in GrowNet is not the same thing as transformer-style attention. In transformer models, attention is largely a weighting-and-aggregation mechanism over many candidates at once. GrowNet focus is better understood as an active local inspection process: the system generates candidate focus points, selects one point at a time, interprets incoming structure relative to that point, and preserves meaningful locations through anchors rather than through one-shot global mixing.</p>
-          <p>A useful intuition is a black screen with one bright pixel. Focus naturally locks there. If several bright pixels appear, focus does not need to process them literally simultaneously. A more realistic view is rapid serial inspection: the system picks one candidate point, anchors briefly, updates its internal map, and then moves to the next point. This lets GrowNet build a remembered map of multiple important locations while still keeping active focus singular at any moment.</p>
+          <p>Focus in GrowNet is not the same thing as transformer-style attention. In transformer models, attention is largely a weighting-and-aggregation mechanism over many candidates at once. GrowNet focus is better understood as an active local inspection process: the system generates candidate focus points, selects one point at a time, lets that point seed a Focus Segment, interprets incoming structure relative to that segment, and preserves meaningful structure through anchors rather than through one-shot global mixing.</p>
+          <p>A useful intuition is a black screen with one bright pixel. Focus naturally locks there. If several bright pixels appear, focus does not need to process them literally simultaneously. A more realistic view is rapid serial inspection: the system picks one candidate point, seeds a local segment around it, stabilizes that segment with local anchor state, updates its broader anchor organization, and then moves to the next point. This lets GrowNet build a remembered organization of multiple important local units while still keeping active focus singular at any moment.</p>
+          <p>This leads to a cleaner hierarchy:</p>
+          <ul>
+            <li><strong>Focus Point:</strong> the current selected seed or center,</li>
+            <li><strong>Focus Segment:</strong> the locally coherent unit around that point,</li>
+            <li><strong>Segment Anchor:</strong> the local reference that stabilizes that segment,</li>
+            <li><strong>Anchor Trace:</strong> the most local anchoring memory,</li>
+            <li><strong>Anchor Field:</strong> the distributed pattern of many active local anchors,</li>
+            <li><strong>Anchor Map:</strong> the higher-level readout of that field.</li>
+          </ul>
+          <p>In 2D and beyond, the Focus Segment is the primary meaningful unit. A single point or pixel is only the degenerate minimal case.</p>
           <p>Candidate focus points may be chosen by several policies:</p>
           <ul>
             <li>highest energy or strongest saliency first,</li>
@@ -318,15 +328,16 @@
           </ul>
           <p>This means focus is governed by a policy, not only by raw intensity.</p>
           <p>Two forms of focus seem especially useful. <strong>Mechanical focus</strong> is overt reorientation: turning the head, eyes, camera, or body toward a target. This is especially relevant for agents and robotics. <strong>Field focus</strong> is covert reprioritization without movement: processing shifts toward a location even though the sensor itself does not move. Field focus should exist from the beginning. Mechanical focus can come later when GrowNet is embodied.</p>
-          <p>Under this view, anchoring becomes critical. Focus answers: <em>what point is active right now?</em> Anchoring answers: <em>what important points or frames have already been established?</em> GrowNet likely needs not only an active focus point, but also a small anchor map of currently meaningful locations. That map can support revisit, comparison, and control without forcing the system to recompute the whole scene globally at each tick.</p>
-          <p>Architecturally, focus should happen before slot selection. Raw input should first be interpreted relative to current focus and anchor state. Only then should slot routing decide whether the pattern is familiar, close to an existing bin, or novel enough to trigger fallback pressure or growth. In this sense, focus is not merely perceptual; it is part of the novelty and structure-allocation machinery itself.</p>
+          <p>Under this view, anchoring becomes critical. Focus answers: <em>what point is seeding interpretation right now?</em> Anchoring answers: <em>what segment is currently stabilized, and what broader distributed anchor organization is already active?</em> GrowNet likely needs not only an active Focus Point, but also Segment Anchors, local Anchor Traces, and a broader Anchor Field whose current organization can be read conceptually as an Anchor Map. That map should be understood as emergent distributed organization, not as a giant external bookkeeping object.</p>
+          <p>Architecturally, focus should happen before slot selection. Raw input should first be interpreted relative to current focus and anchor state. Only then should slot routing decide whether the segment is familiar, close to an existing internal bin, or novel enough to trigger fallback pressure or growth. In this sense, focus is not merely perceptual; it is part of the novelty and structure-allocation machinery itself.</p>
           <p>Some practical consequences follow naturally:</p>
           <ul>
             <li>repeated nearby inputs should encourage reuse of the same slots,</li>
             <li>large departures from current anchors should raise fallback pressure,</li>
-            <li>anchor maps should let GrowNet preserve several meaningful locations while inspecting them one at a time,</li>
+            <li>distributed anchor organization should let GrowNet preserve several meaningful segments while inspecting them one at a time,</li>
             <li>future sensorimotor systems may use covert focus first and overt focus second.</li>
           </ul>
+          <p>Another important extension is <strong>temporal compression</strong>. Lower levels may keep time explicit: ticks, pulse runs, gaps, and frame-to-frame continuity can remain fully represented. Later, higher levels may compress that explicit temporal structure into more compact stabilized representations. Time may begin explicit and later become compressed without contradiction.</p>
         </section>
 
         <section id="pruning-dormancy">
@@ -503,14 +514,17 @@
           </ul>
           <p>This is one of the most important features of GrowNet: growth is <strong>targeted and bounded</strong>. The architecture does not simply become larger everywhere. It expands where novelty appears and where existing capacity has truly run out.</p>
 
-          <h3>Focus anchor vs reference anchor</h3>
-          <p>One useful clarification from the repository docs is the distinction between several related concepts:</p>
+          <h3>Focus Point, Focus Segment, and distributed anchoring</h3>
+          <p>One useful clarification from the repository docs is that GrowNet now needs a more cohesive hierarchy than a simple point-versus-anchor distinction.</p>
           <ul>
-            <li><strong>Focus Anchor (conceptual):</strong> the currently active point or frame that the system is inspecting in behavioral terms.</li>
-            <li><strong>Reference Anchor (implementation):</strong> the stable FIRST anchor used to compute delta-percent and novelty bins deterministically.</li>
-            <li><strong>Anchor Map (working extension):</strong> a small remembered set of meaningful locations or frames that remains available while active focus moves serially.</li>
+            <li><strong>Focus Point:</strong> the currently selected seed or center.</li>
+            <li><strong>Focus Segment:</strong> the locally coherent unit around that point.</li>
+            <li><strong>Segment Anchor:</strong> the anchor that stabilizes that local segment.</li>
+            <li><strong>Anchor Trace:</strong> the most local memory of anchoring state.</li>
+            <li><strong>Anchor Field:</strong> the distributed pattern of active local anchors.</li>
+            <li><strong>Anchor Map:</strong> the conceptual readout of that field.</li>
           </ul>
-          <p>This is a subtle but valuable distinction. It allows GrowNet to talk naturally about current focus while still preserving a stable internal reference point for repeatable slot selection and routing.</p>
+          <p>This hierarchy matters because it keeps anchoring neuron-native. The Anchor Map should not be treated as a giant external object that remembers things for GrowNet. It should emerge from many local traces and segment anchors across active structure.</p>
           <p>A further clarification from later discussion is that focus should be treated as <strong>serial</strong>, not literally simultaneous. Multiple candidate points may exist at once, but active focus inspects them one at a time. Candidate selection MAY be driven by highest energy, novelty-first, familiarity-first, bounded random choice among strong candidates, or deterministic sequential scan. For embodied systems, GrowNet may also distinguish <strong>field / covert focus</strong> (priority shift without movement) from <strong>mechanical / overt focus</strong> (turning eyes, head, camera, or body toward the selected point).</p>
 
           <h3>Stability and determinism constraints</h3>
