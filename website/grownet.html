@@ -98,7 +98,7 @@
 
       <div class="grownet-summary" role="note" aria-label="Working summary">
         <p class="grownet-summary-label">Working summary</p>
-        <p>GrowNet is envisioned as a growth-based neural architecture that starts very small, expands only when novelty justifies it, uses local structure, serial focus and anchoring, treats Focus Segments rather than isolated points as the primary meaningful unit in 2D and beyond, and aims toward continuous, active intelligence rather than today's passive input-output systems.</p>
+        <p>GrowNet is envisioned as a growth-based neural architecture that starts very small, expands only when novelty justifies it, uses local structure, serial focus, Focus Segments, distributed anchoring, and temporal context to interpret input, treats segment boundaries as soft coherence boundaries rather than only hard edges, and aims toward continuous, active intelligence rather than today's passive input-output systems.</p>
       </div>
 
       <div class="grownet-resource-note" role="note" aria-label="Related GrowNet resources">
@@ -273,6 +273,15 @@
             <li><strong>Modulatory:</strong> regulates learning, growth pressure, attention-like behavior, and higher-level control signals.</li>
           </ul>
           <p>This triad is important because GrowNet is not only about storing patterns. It also needs to regulate growth, suppress instability, and eventually support emotion-like or state-like dynamics.</p>
+
+          <h3>Edge and internal neuron roles</h3>
+          <p>The newer discussions also clarified that GrowNet should distinguish neuron roles by where they live in the structure.</p>
+          <ul>
+            <li><strong>Input neurons:</strong> live on the input edge and accept raw world signals such as scalar values, Morse on/off pulses, image pixels, later audio streams, or future temporal-context feeds.</li>
+            <li><strong>Integration neurons:</strong> live in the body of GrowNet. They combine value context, temporal context, slotting, anchoring, novelty pressure, and growth pressure. These are the neurons that should decide whether a new signal is a continuation, a refinement, or the start of a new segment.</li>
+            <li><strong>Output neurons:</strong> live on the output edge. Later they may emit stabilized categories, control signals, generated values, or future generated modalities such as pictures or other structured outputs.</li>
+          </ul>
+          <p>This distinction matters because the neuron that combines value and time should be thought of as an <strong>integration neuron</strong>, not an output neuron.</p>
         </section>
 
         <section id="growth-rules">
@@ -307,37 +316,58 @@
 
           <h3>Focus, anchoring, and serial inspection</h3>
           <p>Focus in GrowNet is not the same thing as transformer-style attention. In transformer models, attention is largely a weighting-and-aggregation mechanism over many candidates at once. GrowNet focus is better understood as an active local inspection process: the system generates candidate focus points, selects one point at a time, lets that point seed a Focus Segment, interprets incoming structure relative to that segment, and preserves meaningful structure through anchors rather than through one-shot global mixing.</p>
-          <p>A useful intuition is a black screen with one bright pixel. Focus naturally locks there. If several bright pixels appear, focus does not need to process them literally simultaneously. A more realistic view is rapid serial inspection: the system picks one candidate point, seeds a local segment around it, stabilizes that segment with local anchor state, updates its broader anchor organization, and then moves to the next point. This lets GrowNet build a remembered organization of multiple important local units while still keeping active focus singular at any moment.</p>
-          <p>This leads to a cleaner hierarchy:</p>
+
+          <h4>Focus Point and Focus Segment</h4>
+          <p>The cleanest hierarchy now looks like this:</p>
           <ul>
-            <li><strong>Focus Point:</strong> the current selected seed or center,</li>
-            <li><strong>Focus Segment:</strong> the locally coherent unit around that point,</li>
+            <li><strong>Focus Point:</strong> the currently selected seed or center,</li>
+            <li><strong>Focus Segment:</strong> the locally coherent region around that point that the system is currently treating as one unit,</li>
             <li><strong>Segment Anchor:</strong> the local reference that stabilizes that segment,</li>
-            <li><strong>Anchor Trace:</strong> the most local anchoring memory,</li>
+            <li><strong>Anchor Trace:</strong> the neuron-level local memory of anchoring state,</li>
             <li><strong>Anchor Field:</strong> the distributed pattern of many active local anchors,</li>
-            <li><strong>Anchor Map:</strong> the higher-level readout of that field.</li>
+            <li><strong>Anchor Map:</strong> the conceptual readout of that distributed field.</li>
           </ul>
-          <p>In 2D and beyond, the Focus Segment is the primary meaningful unit. A single point or pixel is only the degenerate minimal case.</p>
-          <p>Candidate focus points may be chosen by several policies:</p>
+          <p>In 2D and beyond, the Focus Segment is the primary meaningful unit. A single pixel is the degenerate minimal case. A useful intuition is a black screen with one bright pixel. Focus naturally locks there. But what matters is not only the one selected point. The system quickly begins to treat the coherent local patch around that point as one unit. The same is true for an eye in a face, a square with softened boundaries, a short Morse pulse, or a small audio motif. The point is the seed. The segment is the meaningful thing.</p>
+
+          <h4>Segment boundaries and acceptance profiles</h4>
+          <p>One of the newer insights is that a segment should not be thought of as having a perfectly hard edge. A Focus Segment is better understood as having a <strong>coherence profile</strong> or <strong>acceptance profile</strong>: a region around the focused structure within which deviations are still coherent enough to be treated as the same unit.</p>
+          <p>This is why a square with lighter pixels fading out at its boundary is still experienced as a square. The boundary is soft rather than perfectly binary. It is also why Morse timing can tolerate a few milliseconds of slop while still being treated as the same temporal primitive. The system is not looking for exact equality. It is maintaining a learned local profile of what still belongs to the same segment.</p>
+          <blockquote>
+            <p>A Focus Segment is not determined by a hard boundary, but by a learned acceptance profile: a region around the focused structure within which deviations remain coherent enough to be treated as the same unit. The boundary appears where that coherence falls off or a competing interpretation becomes stronger.</p>
+          </blockquote>
+          <p>Segment boundaries are therefore influenced by the current local anchor, the segment's learned tolerance for deviation, continuity in nearby structure, and competition from other possible segments.</p>
+
+          <h4>Serial focus and candidate selection</h4>
+          <p>GrowNet focus is serial, not literally simultaneous. A frame may contain many candidate points, but active focus inspects them one at a time. Candidate selection may be driven by highest energy or strongest saliency, novelty-first when something departs strongly from the current anchor organization, familiarity-first when known structure matters behaviorally, bounded random choice among strong candidates, or deterministic sequential scan. This means focus is governed by a policy, not only by raw intensity.</p>
+
+          <h4>Distributed anchoring and contextual reinterpretation</h4>
+          <p>Another clarification is that the anchor map should not be imagined as a giant external bookkeeping object. That would feel wrong for GrowNet. A more coherent view is that a Focus Segment carries its own <strong>Segment Anchor</strong>, neurons carry local <strong>Anchor Traces</strong>, many active local traces compose into an <strong>Anchor Field</strong>, and the <strong>Anchor Map</strong> is the conceptual or system-level readout of that field.</p>
+          <p><strong>The Anchor Map is the emergent distributed organization of many local Anchor Traces and Segment Anchors across the active structure. It is not a giant external bookkeeping object.</strong></p>
+          <p>This becomes especially important when interpretation changes over time. Imagine first seeing a face-like upper segment and interpreting it one way, then shifting focus and later realizing a lower segment changes the whole scene. Or imagine a mermaid-like composition where upper body and fish tail remain present as separate anchored segments long enough for a larger interpretation to emerge. The earlier focused segment should not vanish when the next one appears. It should remain active in the current anchor field so the system can reinterpret the scene.</p>
+          <p>That strongly suggests a future concept of <strong>Binding</strong>: a way of relating multiple Focus Segments so the system can treat them as belonging to one larger entity. Binding is still future work, but the focus-segment and anchor hierarchy is meant to make it possible later.</p>
+
+          <h4>Time as context</h4>
+          <p>Another important clarification is that time should not only be an external scheduler concern. GrowNet should be able to treat time as part of the input context itself. The key question is not only what value arrived, but also <em>in what temporal context it arrived</em>.</p>
+          <p>This matters because the same value can mean different things depending on elapsed time. A value such as <code>0.9</code> arriving immediately after <code>0.4</code> may be a surprising continuation of the same segment, while that same value after a long pause may be the start of a new segment or episode. GrowNet should therefore move toward a model in which an integration neuron reacts to value together with temporal context, rather than relying only on an external "if the gap is long, reset the anchor" rule.</p>
+
+          <h4>Signal gaps and observation gaps</h4>
+          <p>A crucial distinction is that not all gaps are the same.</p>
           <ul>
-            <li>highest energy or strongest saliency first,</li>
-            <li>novelty-first when something strongly departs from current anchors,</li>
-            <li>familiarity-first when known structure is behaviorally important,</li>
-            <li>bounded random choice among strong candidates,</li>
-            <li>sequential scan or convolution-like traversal for structured scenes.</li>
+            <li><strong>Signal gap:</strong> part of the signal itself. Morse low-runs are the clearest example.</li>
+            <li><strong>Observation gap:</strong> elapsed time since the last new external observation. Timed scalar interaction is the clearest example.</li>
           </ul>
-          <p>This means focus is governed by a policy, not only by raw intensity.</p>
-          <p>Two forms of focus seem especially useful. <strong>Mechanical focus</strong> is overt reorientation: turning the head, eyes, camera, or body toward a target. This is especially relevant for agents and robotics. <strong>Field focus</strong> is covert reprioritization without movement: processing shifts toward a location even though the sensor itself does not move. Field focus should exist from the beginning. Mechanical focus can come later when GrowNet is embodied.</p>
-          <p>Under this view, anchoring becomes critical. Focus answers: <em>what point is seeding interpretation right now?</em> Anchoring answers: <em>what segment is currently stabilized, and what broader distributed anchor organization is already active?</em> GrowNet likely needs not only an active Focus Point, but also Segment Anchors, local Anchor Traces, and a broader Anchor Field whose current organization can be read conceptually as an Anchor Map. That map should be understood as emergent distributed organization, not as a giant external bookkeeping object.</p>
-          <p>Architecturally, focus should happen before slot selection. Raw input should first be interpreted relative to current focus and anchor state. Only then should slot routing decide whether the segment is familiar, close to an existing internal bin, or novel enough to trigger fallback pressure or growth. In this sense, focus is not merely perceptual; it is part of the novelty and structure-allocation machinery itself.</p>
-          <p>Some practical consequences follow naturally:</p>
-          <ul>
-            <li>repeated nearby inputs should encourage reuse of the same slots,</li>
-            <li>large departures from current anchors should raise fallback pressure,</li>
-            <li>distributed anchor organization should let GrowNet preserve several meaningful segments while inspecting them one at a time,</li>
-            <li>future sensorimotor systems may use covert focus first and overt focus second.</li>
-          </ul>
-          <p>Another important extension is <strong>temporal compression</strong>. Lower levels may keep time explicit: ticks, pulse runs, gaps, and frame-to-frame continuity can remain fully represented. Later, higher levels may compress that explicit temporal structure into more compact stabilized representations. Time may begin explicit and later become compressed without contradiction.</p>
+          <p>These are not interchangeable. In Morse, a long low run is part of the signal. In timed scalar interaction, a long period with no new value entered should not be treated as if the last value were freshly re-observed at every tick. That is why GrowNet now distinguishes signal-gap semantics from observation-gap semantics.</p>
+
+          <h4>Temporal compression</h4>
+          <p>At lower levels, GrowNet may keep time fully explicit: ticks, pulse runs, gaps, frame-to-frame continuity, or a pixel over time behaving like a tiny 1D GrowNet. Later, higher levels may absorb that explicit temporal structure into more compact stabilized representations. Time may therefore begin explicit and later become compressed.</p>
+          <p>This temporal compression should not be treated as a contradiction. It is part of the intended representational evolution of the architecture: preserve explicit lower-level spatiotemporal detail first, then later stabilize it into more compact segment-level or object-level structure.</p>
+
+          <h4>Mechanical and field focus</h4>
+          <p>Two forms of focus still seem especially useful. <strong>Mechanical focus</strong> is overt reorientation: turning the head, eyes, camera, or body toward a target. This is especially relevant for agents and robotics. <strong>Field focus</strong> is covert reprioritization without movement: processing shifts toward a location even though the sensor itself does not move. Field focus should exist from the beginning. Mechanical focus can come later when GrowNet is embodied.</p>
+
+          <h4>Architectural consequence</h4>
+          <p>Architecturally, focus should happen before slot selection. Raw input should first be interpreted relative to current focus, segment, anchor, and temporal context. Only then should slot routing decide whether the segment is familiar, close to an existing internal bin, or novel enough to trigger fallback pressure or growth.</p>
+          <p>In that sense, focus is not merely perceptual. It is part of the novelty and structure-allocation machinery itself.</p>
         </section>
 
         <section id="pruning-dormancy">
@@ -433,6 +463,8 @@
             <li>What forms of off-the-shelf capability should be treated as scaffolding versus truly learned structure?</li>
             <li>Under what exact conditions, if any, should late neuron death happen?</li>
             <li>What is the right focus policy when several salient or meaningful points compete for inspection?</li>
+            <li>How should segment boundaries, coherence profiles, and tolerated deviation bootstrap locally and later adapt?</li>
+            <li>How should binding relate multiple Focus Segments into larger entities without destroying locality?</li>
             <li>How should covert / field focus and overt / mechanical focus interact once GrowNet becomes embodied?</li>
           </ul>
         </section>
@@ -440,7 +472,7 @@
         <section id="concise-definition">
           <h2>12. Concise working definition</h2>
           <div class="grownet-highlight">
-            <p><strong>GrowNet, in one paragraph</strong><br>GrowNet is a growth-based neural architecture that starts with minimal structure and expands only when novelty and capacity pressure justify it. It uses slots, neurons, layers, and regions as different scales of development; relies on excitatory, inhibitory, and modulatory neurons for computation and regulation; uses serial focus and anchoring to interpret input relative to active local reference frames; favors local proximity-based organization; prunes unused connections while preserving dormant structure for possible reuse; and aims toward active, continuously running intelligence suited for agents, robotics, and world-model systems rather than only passive one-shot inference.</p>
+            <p><strong>GrowNet, in one paragraph</strong><br>GrowNet is a growth-based neural architecture that starts with minimal structure and expands only when novelty and capacity pressure justify it. It uses slots, neurons, layers, and regions as different scales of development; distinguishes input, integration, and output neuron roles; interprets incoming structure through serial focus, Focus Segments, distributed anchoring, and temporal context; treats segment boundaries as soft coherence boundaries rather than only hard edges; favors local proximity-based organization; prunes unused connections while preserving dormant structure for possible reuse; allows explicit lower-level time to become temporally compressed at higher levels; and aims toward active, continuously running intelligence suited for agents, robotics, and world-model systems rather than only passive one-shot inference.</p>
           </div>
         </section>
 
@@ -524,7 +556,7 @@
             <li><strong>Anchor Field:</strong> the distributed pattern of active local anchors.</li>
             <li><strong>Anchor Map:</strong> the conceptual readout of that field.</li>
           </ul>
-          <p>This hierarchy matters because it keeps anchoring neuron-native. The Anchor Map should not be treated as a giant external object that remembers things for GrowNet. It should emerge from many local traces and segment anchors across active structure.</p>
+          <p>This hierarchy matters because it keeps anchoring neuron-native. The Anchor Map is the emergent distributed organization of many local Anchor Traces and Segment Anchors across the active structure. It is not a giant external bookkeeping object.</p>
           <p>A further clarification from later discussion is that focus should be treated as <strong>serial</strong>, not literally simultaneous. Multiple candidate points may exist at once, but active focus inspects them one at a time. Candidate selection MAY be driven by highest energy, novelty-first, familiarity-first, bounded random choice among strong candidates, or deterministic sequential scan. For embodied systems, GrowNet may also distinguish <strong>field / covert focus</strong> (priority shift without movement) from <strong>mechanical / overt focus</strong> (turning eyes, head, camera, or body toward the selected point).</p>
 
           <h3>Stability and determinism constraints</h3>
