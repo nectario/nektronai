@@ -151,6 +151,7 @@ server {
     ssl_prefer_server_ciphers off;
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
+    etag on;
 
     # Keep the site live, but discourage indexing until public launch.
     add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
@@ -160,7 +161,15 @@ server {
     }
 
     location = / {
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+        expires -1;
         try_files /index.html =404;
+    }
+
+    location ~* \.html$ {
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+        expires -1;
+        try_files $uri =404;
     }
 
     location / {

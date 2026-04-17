@@ -44,6 +44,66 @@ else
   log "Theme override: <none> (main root files)"
 fi
 
+version_bundle_assets() {
+  log "Stamping static asset URLs with deployment version."
+  BUNDLE_DIR="${BUNDLE_DIR}" VERSION_LABEL="${VERSION_LABEL}" python3 - <<'PY'
+import os
+import re
+from pathlib import Path
+
+bundle_dir = Path(os.environ["BUNDLE_DIR"])
+version = os.environ["VERSION_LABEL"]
+
+html_patterns = [
+    "assets/styles.css",
+    "/assets/styles.css",
+    "assets/site.js",
+    "/assets/site.js",
+    "assets/favicon.svg",
+    "/assets/favicon.svg",
+    "assets/favicon.png",
+    "/assets/favicon.png",
+    "assets/brand/icon.png",
+    "/assets/brand/icon.png",
+    "assets/brand/wordmark-dark-320.png",
+    "/assets/brand/wordmark-dark-320.png",
+    "assets/brand/wordmark-light-320.png",
+    "/assets/brand/wordmark-light-320.png",
+    "assets/brand/wordmark-dark-280.png",
+    "/assets/brand/wordmark-dark-280.png",
+    "assets/brand/wordmark-light-280.png",
+    "/assets/brand/wordmark-light-280.png",
+    "https://nektron.ai/assets/og.png",
+]
+
+css_patterns = [
+    "background_dark.jpg",
+    "background_light.jpg",
+]
+
+def stamp(text: str, asset_path: str) -> str:
+    pattern = re.escape(asset_path) + r"(?:\?v=[^\"')\\s]+)?"
+    return re.sub(pattern, f"{asset_path}?v={version}", text)
+
+for html_path in bundle_dir.rglob("*.html"):
+    text = html_path.read_text(encoding="utf-8")
+    updated = text
+    for asset in html_patterns:
+        updated = stamp(updated, asset)
+    if updated != text:
+        html_path.write_text(updated, encoding="utf-8")
+
+styles_path = bundle_dir / "assets" / "styles.css"
+if styles_path.exists():
+    text = styles_path.read_text(encoding="utf-8")
+    updated = text
+    for asset in css_patterns:
+        updated = stamp(updated, asset)
+    if updated != text:
+        styles_path.write_text(updated, encoding="utf-8")
+PY
+}
+
 mkdir -p "${BUNDLE_DIR}"
 rsync -a --delete \
   --exclude ".git/" \
@@ -63,6 +123,8 @@ rsync -a --delete \
 if [[ -n "${THEME_DIR}" ]]; then
   cp -f "${SITE_DIR}/${THEME_DIR}/"*.html "${BUNDLE_DIR}/"
 fi
+
+version_bundle_assets
 
 ( cd "${BUNDLE_DIR}" && zip -rq "${BUNDLE_ZIP}" . )
 
