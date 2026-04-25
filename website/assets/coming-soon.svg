@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">NektronAI Coming Soon</title>
+  <desc id="desc">A dark research-themed NektronAI coming soon graphic.</desc>
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101827"/>
+      <stop offset=".56" stop-color="#07101b"/>
+      <stop offset="1" stop-color="#041018"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7ee7ff"/>
+      <stop offset=".46" stop-color="#18bfe6"/>
+      <stop offset="1" stop-color="#ff9a34"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="28" stdDeviation="34" flood-color="#000" flood-opacity=".45"/>
+    </filter>
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path d="M42 0H0v42" fill="none" stroke="#ffffff" stroke-opacity=".045" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="675" rx="42" fill="url(#panel)"/>
+  <rect width="1200" height="675" rx="42" fill="url(#grid)"/>
+  <g opacity=".55">
+    <circle cx="182" cy="138" r="3" fill="#5ec8ff"/>
+    <circle cx="282" cy="492" r="4" fill="#5ec8ff"/>
+    <circle cx="972" cy="158" r="3" fill="#5ec8ff"/>
+    <circle cx="1038" cy="430" r="5" fill="#ff9a34"/>
+    <circle cx="816" cy="544" r="3" fill="#5ec8ff"/>
+    <circle cx="474" cy="116" r="4" fill="#ff9a34"/>
+  </g>
+  <g filter="url(#softShadow)">
+    <rect x="108" y="96" width="984" height="483" rx="30" fill="#07111d" fill-opacity=".78" stroke="#ffffff" stroke-opacity=".12"/>
+    <path d="M108 170H1092" stroke="url(#accent)" stroke-width="2" stroke-opacity=".72"/>
+  </g>
+  <g transform="translate(160 213)">
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="9">
+      <path d="M0 20v54l-21 21v50" stroke="#5ec8ff"/>
+      <path d="M42 0v73l54 54v50" stroke="#fff"/>
+      <path d="M116 0v52l-31 31" stroke="#5ec8ff"/>
+      <path d="M145 24v58l28 27v52" stroke="#fff"/>
+      <path d="M-22 162v24l-24 24" stroke="#5ec8ff"/>
+      <path d="M141 190v38" stroke="#5ec8ff"/>
+      <path d="M-44 94h-34" stroke="#fff"/>
+      <path d="M175 112h34" stroke="#5ec8ff"/>
+    </g>
+    <g fill="#5ec8ff">
+      <circle cx="0" cy="20" r="7"/>
+      <circle cx="116" cy="0" r="7"/>
+      <circle cx="141" cy="228" r="7"/>
+      <circle cx="-46" cy="210" r="7"/>
+    </g>
+    <g fill="#fff">
+      <circle cx="42" cy="0" r="7"/>
+      <circle cx="145" cy="24" r="7"/>
+      <circle cx="-78" cy="94" r="7"/>
+    </g>
+  </g>
+  <g transform="translate(410 226)">
+    <text x="0" y="0" fill="#ffffff" font-size="64" font-weight="750" letter-spacing="0" font-family="Segoe UI, Arial, sans-serif">Nektron<tspan fill="#11b8df">AI</tspan></text>
+    <text x="0" y="96" fill="#ffffff" font-size="76" font-weight="780" letter-spacing="0" font-family="Segoe UI, Arial, sans-serif">Coming Soon</text>
+    <rect x="0" y="138" width="540" height="2" fill="url(#accent)" opacity=".88"/>
+    <text x="0" y="202" fill="#aeb8cc" font-size="29" font-weight="450" letter-spacing="0" font-family="Segoe UI, Arial, sans-serif">Research site temporarily private.</text>
+  </g>
+</svg>

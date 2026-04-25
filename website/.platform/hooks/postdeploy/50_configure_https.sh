@@ -6,6 +6,11 @@ log() { echo "[https-hook] $*"; }
 PRIMARY_DOMAIN="${PRIMARY_DOMAIN:-nektron.ai}"
 LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-info@nektron.ai}"
 DOWNLOADS_ORIGIN="${DOWNLOADS_ORIGIN:-https://d2j3ldvioomkd6.cloudfront.net}"
+SITE_COMING_SOON_ENABLED="${SITE_COMING_SOON_ENABLED:-false}"
+SITE_BASIC_AUTH_ENABLED="${SITE_BASIC_AUTH_ENABLED:-false}"
+SITE_BASIC_AUTH_USER="${SITE_BASIC_AUTH_USER:-nektron}"
+SITE_BASIC_AUTH_PASSWORD="${SITE_BASIC_AUTH_PASSWORD:-}"
+SITE_BASIC_AUTH_REALM="${SITE_BASIC_AUTH_REALM:-NektronAI private preview}"
 DOMAINS=(
   "nektron.ai"
   "www.nektron.ai"
@@ -119,6 +124,28 @@ request_or_renew_cert() {
     "${domain_args[@]}"
 }
 
+configure_basic_auth_file() {
+  if [[ "${SITE_BASIC_AUTH_ENABLED}" != "true" ]]; then
+    rm -f /etc/nginx/.nektron_htpasswd
+    return 0
+  fi
+
+  if [[ -z "${SITE_BASIC_AUTH_PASSWORD}" ]]; then
+    log "SITE_BASIC_AUTH_ENABLED=true but SITE_BASIC_AUTH_PASSWORD is empty."
+    exit 1
+  fi
+
+  if ! command -v openssl >/dev/null 2>&1; then
+    log "openssl is required to generate the Basic Auth password file."
+    exit 1
+  fi
+
+  local password_hash
+  password_hash="$(openssl passwd -apr1 "${SITE_BASIC_AUTH_PASSWORD}")"
+  printf '%s:%s\n' "${SITE_BASIC_AUTH_USER}" "${password_hash}" >/etc/nginx/.nektron_htpasswd
+  chmod 644 /etc/nginx/.nektron_htpasswd
+}
+
 write_nginx_tls_config() {
   log "Writing nginx HTTPS config."
   cat >/etc/nginx/conf.d/zz_nektron_https.conf <<'EOF'
@@ -156,35 +183,97 @@ server {
     # Keep the site live, but discourage indexing until public launch.
     add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
 
+    location = /coming-soon.html {
+        add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+        expires -1;
+        try_files /coming-soon.html =404;
+    }
+
+    location = /assets/coming-soon.svg {
+        try_files /assets/coming-soon.svg =404;
+    }
+
+    location = /assets/background_dark.jpg {
+        try_files /assets/background_dark.jpg =404;
+    }
+
+    location = /assets/favicon.svg {
+        try_files /assets/favicon.svg =404;
+    }
+
+    location = /assets/favicon.png {
+        try_files /assets/favicon.png =404;
+    }
+
     location ^~ /assets/downloads/ {
+        __PRIVATE_AUTH__
         return 302 __DOWNLOADS_ORIGIN__$request_uri;
     }
 
-    location = / {
-        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
-        expires -1;
-        try_files /index.html =404;
+    __ROOT_LOCATION__
+
+    location ^~ /assets/ {
+        __PRIVATE_AUTH__
+        try_files $uri $uri/ =404;
     }
 
     location ~* \.html$ {
+        __PRIVATE_AUTH__
+        add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
         add_header Cache-Control "no-cache, no-store, must-revalidate" always;
         expires -1;
         try_files $uri =404;
     }
 
     location / {
+        __PRIVATE_AUTH__
         try_files $uri $uri/ =404;
     }
 }
 EOF
 
-  DOWNLOADS_ORIGIN="${DOWNLOADS_ORIGIN}" python3 - <<'PY'
+  DOWNLOADS_ORIGIN="${DOWNLOADS_ORIGIN}" \
+  SITE_COMING_SOON_ENABLED="${SITE_COMING_SOON_ENABLED}" \
+  SITE_BASIC_AUTH_ENABLED="${SITE_BASIC_AUTH_ENABLED}" \
+  SITE_BASIC_AUTH_REALM="${SITE_BASIC_AUTH_REALM}" \
+  python3 - <<'PY'
 import os
 from pathlib import Path
 
 config_path = Path("/etc/nginx/conf.d/zz_nektron_https.conf")
 config_text = config_path.read_text(encoding="utf-8")
 config_text = config_text.replace("__DOWNLOADS_ORIGIN__", os.environ["DOWNLOADS_ORIGIN"])
+auth_enabled = os.environ["SITE_BASIC_AUTH_ENABLED"] == "true"
+coming_soon_enabled = os.environ["SITE_COMING_SOON_ENABLED"] == "true"
+
+if auth_enabled:
+    realm = os.environ["SITE_BASIC_AUTH_REALM"].replace('"', '\\"')
+    private_auth = (
+        f'auth_basic "{realm}";\n'
+        "        auth_basic_user_file /etc/nginx/.nektron_htpasswd;"
+    )
+else:
+    private_auth = ""
+
+if coming_soon_enabled:
+    root_location = """location = / {
+        add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+        expires -1;
+        try_files /coming-soon.html =404;
+    }"""
+else:
+    root_auth = f"{private_auth}\n        " if private_auth else ""
+    root_location = f"""location = / {{
+        {root_auth}add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+        expires -1;
+        try_files /index.html =404;
+    }}"""
+
+config_text = config_text.replace("__PRIVATE_AUTH__", private_auth)
+config_text = config_text.replace("__ROOT_LOCATION__", root_location)
 config_path.write_text(config_text, encoding="utf-8")
 PY
 
@@ -204,6 +293,7 @@ main() {
   update_certbot_account_email
   configure_renewal_hooks
   request_or_renew_cert
+  configure_basic_auth_file
   write_nginx_tls_config
   nginx -t
   systemctl reload nginx
