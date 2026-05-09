@@ -11,6 +11,7 @@ SITE_BASIC_AUTH_ENABLED="${SITE_BASIC_AUTH_ENABLED:-false}"
 SITE_BASIC_AUTH_USER="${SITE_BASIC_AUTH_USER:-nektron}"
 SITE_BASIC_AUTH_PASSWORD="${SITE_BASIC_AUTH_PASSWORD:-}"
 SITE_BASIC_AUTH_REALM="${SITE_BASIC_AUTH_REALM:-NektronAI private preview}"
+SITE_RESEARCH_PUBLIC_ENABLED="${SITE_RESEARCH_PUBLIC_ENABLED:-false}"
 DOMAINS=(
   "nektron.ai"
   "www.nektron.ai"
@@ -208,7 +209,7 @@ server {
 
     location ^~ /assets/downloads/ {
         __PRIVATE_AUTH__
-        return 302 __DOWNLOADS_ORIGIN__$request_uri;
+        __DOWNLOADS_ACTION__
     }
 
     __ROOT_LOCATION__
@@ -237,6 +238,7 @@ EOF
   SITE_COMING_SOON_ENABLED="${SITE_COMING_SOON_ENABLED}" \
   SITE_BASIC_AUTH_ENABLED="${SITE_BASIC_AUTH_ENABLED}" \
   SITE_BASIC_AUTH_REALM="${SITE_BASIC_AUTH_REALM}" \
+  SITE_RESEARCH_PUBLIC_ENABLED="${SITE_RESEARCH_PUBLIC_ENABLED}" \
   python3 - <<'PY'
 import os
 from pathlib import Path
@@ -246,6 +248,7 @@ config_text = config_path.read_text(encoding="utf-8")
 config_text = config_text.replace("__DOWNLOADS_ORIGIN__", os.environ["DOWNLOADS_ORIGIN"])
 auth_enabled = os.environ["SITE_BASIC_AUTH_ENABLED"] == "true"
 coming_soon_enabled = os.environ["SITE_COMING_SOON_ENABLED"] == "true"
+research_public_enabled = os.environ["SITE_RESEARCH_PUBLIC_ENABLED"] == "true"
 
 if auth_enabled:
     realm = os.environ["SITE_BASIC_AUTH_REALM"].replace('"', '\\"')
@@ -274,6 +277,9 @@ else:
 
 config_text = config_text.replace("__PRIVATE_AUTH__", private_auth)
 config_text = config_text.replace("__ROOT_LOCATION__", root_location)
+downloads_origin = os.environ["DOWNLOADS_ORIGIN"]
+downloads_action = f"return 302 {downloads_origin}$request_uri;" if research_public_enabled else "return 404;"
+config_text = config_text.replace("__DOWNLOADS_ACTION__", downloads_action)
 config_path.write_text(config_text, encoding="utf-8")
 PY
 

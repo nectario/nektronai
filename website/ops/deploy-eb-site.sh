@@ -19,6 +19,7 @@ AWS_REGION="${AWS_REGION:-us-east-2}"
 EB_APP_NAME="${EB_APP_NAME:-NektronWeb}"
 EB_ENV_NAME="${EB_ENV_NAME:-nektron-web-si-prod}"
 THEME_DIR="${THEME_DIR:-}"
+SITE_RESEARCH_PUBLIC_ENABLED="${SITE_RESEARCH_PUBLIC_ENABLED:-false}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SITE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -43,6 +44,7 @@ if [[ -n "${THEME_DIR}" ]]; then
 else
   log "Theme override: <none> (main root files)"
 fi
+log "Research public: ${SITE_RESEARCH_PUBLIC_ENABLED}"
 
 version_bundle_assets() {
   log "Stamping static asset URLs with deployment version."
@@ -108,6 +110,82 @@ if styles_path.exists():
 PY
 }
 
+apply_public_safe_overlay() {
+  if [[ "${SITE_RESEARCH_PUBLIC_ENABLED}" == "true" ]]; then
+    return 0
+  fi
+
+  log "Applying public-safe research overlay."
+
+  if [[ ! -d "${SITE_DIR}/public-safe" ]]; then
+    echo "ERROR: public-safe overlay directory missing."
+    exit 1
+  fi
+
+  cp -f "${SITE_DIR}/public-safe/index.html" "${BUNDLE_DIR}/index.html"
+  cp -f "${SITE_DIR}/public-safe/about.html" "${BUNDLE_DIR}/about.html"
+  cp -f "${SITE_DIR}/public-safe/sitemap.xml" "${BUNDLE_DIR}/sitemap.xml"
+
+  for target in grownet.html grownet-formal-spec.html docs.html downloads.html changelog.html; do
+    cp -f "${SITE_DIR}/public-safe/research-private.html" "${BUNDLE_DIR}/${target}"
+  done
+
+  BUNDLE_DIR="${BUNDLE_DIR}" python3 - <<'PY'
+import re
+from pathlib import Path
+
+bundle_dir = Path(__import__("os").environ["BUNDLE_DIR"])
+safe_nav = """<nav id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html#research">Research</a>
+      <a href="index.html#products">Products</a>
+      <a href="about.html">About</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>"""
+safe_footer = """<small>NektronAI is a research-first AI company building practical products and long-horizon AI foundations.</small>"""
+safe_links = """<div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="index.html#research">Research</a>
+        <a href="index.html#products">Products</a>
+        <a href="index.html#contact">Contact</a>
+      </div>"""
+
+for name in ("privacy.html", "support.html", "terms.html"):
+    path = bundle_dir / name
+    if not path.exists():
+        continue
+    text = path.read_text(encoding="utf-8")
+    text = re.sub(r'<nav id="primary-nav" aria-label="Primary navigation">.*?</nav>', safe_nav, text, flags=re.S)
+    text = re.sub(r'<small>NektronAI is a research-first AI company building .*?</small>', safe_footer, text, flags=re.S)
+    text = re.sub(r'<div class="footer-links">\s*<a href="about\.html">About</a>.*?<a href="index\.html#contact">Contact</a>\s*</div>', safe_links, text, flags=re.S)
+    path.write_text(text, encoding="utf-8")
+PY
+
+  rm -rf \
+    "${BUNDLE_DIR}/ai_lab_sophisticated" \
+    "${BUNDLE_DIR}/mysterious_sophisticated" \
+    "${BUNDLE_DIR}/precision_sophisticated" \
+    "${BUNDLE_DIR}/variants" \
+    "${BUNDLE_DIR}/public-safe" \
+    "${BUNDLE_DIR}/assets/docs" \
+    "${BUNDLE_DIR}/assets/downloads"
+
+  rm -f \
+    "${BUNDLE_DIR}/README.md" \
+    "${BUNDLE_DIR}/package.json" \
+    "${BUNDLE_DIR}/package-lock.json" \
+    "${BUNDLE_DIR}/assets/grownet.css" \
+    "${BUNDLE_DIR}/assets/brand/grownet-logo.svg" \
+    "${BUNDLE_DIR}/assets/brand/grownet-logo-preview.png" \
+    "${BUNDLE_DIR}/assets/brand/grownet-mark.svg" \
+    "${BUNDLE_DIR}/assets/brand/grownet-mark-preview.png"
+
+  if grep -RIlE 'GrowNet|grownet|GROWNET' "${BUNDLE_DIR}" >/tmp/nektron-grownet-public-matches 2>/dev/null; then
+    echo "ERROR: public-safe bundle still contains GrowNet references:"
+    sed -n '1,80p' /tmp/nektron-grownet-public-matches
+    exit 1
+  fi
+}
+
 mkdir -p "${BUNDLE_DIR}"
 rsync -a --delete \
   --exclude ".git/" \
@@ -128,6 +206,7 @@ if [[ -n "${THEME_DIR}" ]]; then
   cp -f "${SITE_DIR}/${THEME_DIR}/"*.html "${BUNDLE_DIR}/"
 fi
 
+apply_public_safe_overlay
 version_bundle_assets
 
 ( cd "${BUNDLE_DIR}" && zip -rq "${BUNDLE_ZIP}" . )
