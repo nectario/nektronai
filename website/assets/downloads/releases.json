@@ -21,12 +21,12 @@
       "eyebrow": "Current release",
       "title": "GrowNet source snapshot",
       "summary": "A clean, versioned archive of the current GrowNet codebase, published as a repository snapshot rather than an installer build.",
-      "version": "2026.03.19 / cfd0a25",
-      "published": "March 19, 2026",
-      "fileSize": "10.8 MB",
-      "sha256": "72EEB758F4D7DD1C4A545054B01175C0079730DAFEE3214475AA9620BBA85093",
+      "version": "2026.06.06 / 504ea07",
+      "published": "June 6, 2026",
+      "fileSize": "11.1 MB",
+      "sha256": "C3D9DA6CB811DB26C072E78EE6BB9E5ACB2DFE1066AAFD1F011945CDBEE15BC2",
       "downloadLabel": "Download ZIP",
-      "downloadHref": "https://nektron.ai/assets/downloads/grownet-source-2026-03-19-cfd0a25.zip",
+      "downloadHref": "assets/downloads/grownet-source-2026-06-06-504ea07.zip",
       "download": true
     }
   }
