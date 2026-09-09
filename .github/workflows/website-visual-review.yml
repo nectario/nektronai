@@ -21,16 +21,24 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Archive static preview source (no release binaries)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Prepare exact baseline and static preview source
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          mkdir -p review/source
+          mkdir -p review/baseline
+          git archive "$BASE_SHA" website/index.html website/assets | tar -x -C review/baseline
           python3 - <<'PY'
           from pathlib import Path
           import shutil
           source = Path('website')
           target = Path('review/source/website')
           for file in source.rglob('*'):
-              if not file.is_file() or file.suffix.lower() not in {'.html', '.css', '.js', '.json', '.svg', '.png', '.jpg', '.woff2'}:
+              if not file.is_file() or file.suffix.lower() not in {'.html', '.css', '.js', '.json', '.svg', '.png', '.jpg'}:
                   continue
               if any(part in {'node_modules', 'dist', 'build', 'downloads'} for part in file.parts):
                   continue
@@ -38,7 +46,42 @@ jobs:
               dest.parent.mkdir(parents=True, exist_ok=True)
               shutil.copy2(file, dest)
           PY
+      - name: Static structure, contrast and design-only content guard
+        working-directory: website
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "$HEAD_REF" = 'design/refined-research-homepage' ]; then
+            BASELINE_HTML=../review/baseline/website/index.html python3 tests/homepage_static.py
+          else
+            python3 tests/homepage_static.py
+          fi
+          node --check assets/home-refinement.js
+          node --check tests/homepage_browser.cjs
+      - name: Locked dependency install and existing Vite build
+        working-directory: website
+        run: |
+          npm ci
+          npm run build
+      - name: Install isolated browser-review tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/nektron-review" --no-audit --no-fund playwright@1.55.1 @axe-core/playwright@4.10.2
+          "$RUNNER_TEMP/nektron-review/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Render and check the actual static site
+        working-directory: website
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > ../review/preview-server.log 2>&1 &
+          CURRENT_PID=$!
+          python3 -m http.server 8767 --bind 127.0.0.1 --directory ../review/baseline/website > ../review/baseline-server.log 2>&1 &
+          BASE_PID=$!
+          trap 'kill "$CURRENT_PID" "$BASE_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8765/ > /dev/null && curl --fail --silent http://127.0.0.1:8767/ > /dev/null; then break; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/nektron-review/node_modules" BASELINE_URL=http://127.0.0.1:8767 node tests/homepage_browser.cjs
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: nektronai-static-review
           path: review/

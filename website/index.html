@@ -23,7 +23,9 @@
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/brand/icon.png">
   <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="assets/home-refinement.css">
   <script src="assets/site.js" defer></script>
+  <script src="assets/home-refinement.js" defer></script>
 </head>
 <body class="home-page">
   <a class="skip-link" href="#content">Skip to content</a>
@@ -68,7 +70,7 @@
     <section class="hero home-hero">
       <div class="hero-copy">
         <div class="kicker">Research-first • New learning systems • Product-funded R&amp;D</div>
-        <h1>Advance bold AI foundations. Build the next generation of AI.</h1>
+        <h1><span class="headline-thought">Advance bold AI foundations.</span> <span class="headline-thought">Build the next generation of AI.</span></h1>
         <p class="hero-lede">
           NektronAI started with one core thesis: current AI approaches may not be enough. Our research explores, through
           <strong>GrowNet</strong>, a <strong>biologically inspired</strong> direction where learning is local, event-driven, and growth-aware,
@@ -117,7 +119,11 @@
           </article>
         </div>
 
-        <div class="research-loop" aria-label="Research loop">
+
+      </aside>
+    </section>
+
+    <div class="research-loop" aria-label="Research loop">
           <div class="loop-step">
             <div class="loop-index">01</div>
             <div>
@@ -140,8 +146,6 @@
             </div>
           </div>
         </div>
-      </aside>
-    </section>
 
     <section class="home-ribbon" aria-label="Positioning highlights">
       <article class="ribbon-card">
@@ -164,16 +168,19 @@
     <section class="home-resource-shelf" aria-label="Research surface">
       <a class="resource-card resource-card-journal" href="grownet.html">
         <span class="resource-label">Journal reference</span>
+        <svg class="resource-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <strong>Read the full GrowNet journal.</strong>
         <span>Origin, motivation, working vocabulary, and the current architecture surface.</span>
       </a>
       <a class="resource-card resource-card-docs" href="docs.html">
         <span class="resource-label">Docs hub</span>
+        <svg class="resource-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <strong>Move from overview to formal structure.</strong>
         <span>Open the docs hub for the journal, formal spec, changelog, and release surface.</span>
       </a>
       <a class="resource-card resource-card-downloads" href="downloads.html">
         <span class="resource-label">Downloads</span>
+        <svg class="resource-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <strong>Track fixed artifacts and release lines.</strong>
         <span>Browse the GrowNet Lab App release line and versioned source snapshots.</span>
       </a>
