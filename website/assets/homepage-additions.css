@@ -1,0 +1,26 @@
+/* Approved homepage additions ONLY: decorative background and two product cards.
+   Do not override homepage tokens, typography, navigation, buttons or existing cards.
+   The full Research Atelier companion belongs exclusively to secondary pages. */
+body.home-page::before {
+  inset: 78px 0 auto;
+  height: min(64rem, 110vw);
+  min-height: 32rem;
+  background: url("backgrounds/atelier-flow-dark.webp") center top / cover no-repeat;
+  -webkit-mask-image: linear-gradient(transparent, #000 12%, #000 72%, transparent);
+  mask-image: linear-gradient(transparent, #000 12%, #000 72%, transparent);
+}
+.theme-light body.home-page::before {
+  background-image: url("backgrounds/atelier-flow-light.webp");
+}
+/* Match the original three-column product cards, rather than two wide banners.
+   Existing card classes supply all color, typography, border and button styling. */
+body.home-page .product-family-grid {
+  gap: 20px;
+  margin-top: 20px;
+}
+@media (max-width: 980px) {
+  body.home-page .product-family-grid { grid-template-columns: 1fr; }
+}
+@media (forced-colors: active), print {
+  body.home-page::before { display: none; }
+}

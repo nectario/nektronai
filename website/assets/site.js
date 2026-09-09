@@ -8,6 +8,9 @@
   const siteRoot = new URL('../', scriptUrl);
   const pagePath = '/' + location.pathname.slice(siteRoot.pathname.length);
   if (!location.pathname.startsWith(siteRoot.pathname) || !routes.has(pagePath)) return;
+  // The approved homepage has its own styles and navigation enhancement.
+  // Only its explicit background/product stylesheet may extend that design.
+  if (pagePath === "/" || pagePath === "/index.html") return;
   function enable() {
     document.body.classList.add('atelier-site');
     if (['/privacy.html','/terms.html'].includes(pagePath)) document.body.classList.add('atelier-legal');

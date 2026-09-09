@@ -4,11 +4,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { default: AxeBuilder } = require('@axe-core/playwright');
+const checkApprovedHomepage = require('./homepage_preservation.cjs');
 const base = process.env.REVIEW_URL || 'http://127.0.0.1:8765';
 assert.ok(['127.0.0.1', 'localhost'].includes(new URL(base).hostname));
 const out = path.resolve('../review/sitewide');
 fs.mkdirSync(out, { recursive: true });
 const routes = ['index','about','docs','downloads','changelog','grownet','grownet-formal-spec','privacy','terms','support'];
+const readySelector = route => route === 'index' ? 'body.home-page.home-nav-ready' : 'body.atelier-site.atelier-nav-ready';
 const results = [];
 (async () => {
  const browser = await chromium.launch();
@@ -23,7 +25,7 @@ const results = [];
     for (const width of [320,390,768,1440]) {
      await page.setViewportSize({width,height:1000});
      await page.goto(`${base}/${route}.html`,{waitUntil:'load'});
-     await page.locator('body.atelier-site').waitFor();
+     await page.locator(readySelector(route)).waitFor();
      await page.evaluate(() => document.fonts.ready);
      assert.equal(await page.locator('h1').count(),1,route+' heading');
      assert.equal(await page.evaluate(() => document.documentElement.classList.contains('theme-light')),theme==='light');
@@ -47,6 +49,7 @@ const results = [];
      if(route==='index') {
       assert.equal(await page.locator('[data-added-products] .product-card').count(),2);
       assert.equal(await page.locator('.home-product-grid .product-card').count(),3);
+      assert.equal(await page.locator('body.atelier-site').count(),0,'Homepage keeps its approved design scope');
      }
      if(route.startsWith('grownet') && width===390) {
       const region=page.locator('.grownet-table-wrap').first();
@@ -58,7 +61,7 @@ const results = [];
     }
     // Persistence from each secondary page, not just from the homepage.
     const toggle=page.locator('[data-theme-toggle]');await toggle.click();
-    await page.reload({waitUntil:'load'});await page.locator('body.atelier-site').waitFor();
+    await page.reload({waitUntil:'load'});await page.locator(readySelector(route)).waitFor();
     assert.equal(await page.evaluate(() => document.documentElement.classList.contains('theme-light')),theme!=='light');
     await toggle.click();
     assert.equal(await page.evaluate(() => document.documentElement.classList.contains('theme-light')),theme==='light');
@@ -86,7 +89,8 @@ const results = [];
    assert.ok(await fallback.locator('#primary-nav a').first().isVisible());
   }
   await nojs.close();
-  fs.writeFileSync(path.join(out,'results.json'),JSON.stringify({cases:results,themePersistence:'passed',forcedColors:'passed',noJs:'Original presentation retained',note:'Real locally-served pages. Automated tests are not a complete accessibility audit.'},null,2));
+  await checkApprovedHomepage(browser,base,process.env.BASELINE_URL || 'http://127.0.0.1:8767',out);
+  fs.writeFileSync(path.join(out,'results.json'),JSON.stringify({cases:results,homepagePreservation:'12 comparative cases passed',themePersistence:'passed',forcedColors:'passed',noJs:'Original presentation retained',note:'Real locally-served pages. Automated tests are not a complete accessibility audit.'},null,2));
   console.log('Passed '+results.length+' canonical route/theme/width cases.');
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

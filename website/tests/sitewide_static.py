@@ -34,11 +34,13 @@ class SitewideChecks(unittest.TestCase):
     def test_added_products_are_bounded_and_do_not_invent_availability(self):
         html=(ROOT/'index.html').read_text()
         self.assertEqual(html.count('data-added-products="nektron-family"'),1)
-        block=html.split('data-added-products="nektron-family">',1)[1].split('<div class="grid cols-3 home-product-grid">',1)[0]
+        block=html.split('data-added-products="nektron-family">',1)[1].split('<div class="callout home-product-note"',1)[0]
         for name in ('Nektron Write','Nektron Mail'):self.assertIn('<h3>'+name+'</h3>',block)
         self.assertEqual(re.findall(r'href="([^"]+)"',block),['#contact','#contact'])
         self.assertNotRegex(block.lower(),r'coming soon|download|available now|macos|windows|subscription')
         for name in ('DeepTrading.ai','InterviewHelperAI','TagMySpend.com'):self.assertIn(name,html)
+        self.assertLess(html.index('class="grid cols-3 home-product-grid"'),html.index('data-added-products='))
+        self.assertIn('class="grid cols-3 product-family-grid"',html)
     def test_all_original_copy_links_images_metadata_and_ids(self):
         baseline=os.getenv('BASELINE_SITE')
         if not baseline:self.skipTest('Supply the PR base directory for the design-only content guard')
@@ -50,6 +52,9 @@ class SitewideChecks(unittest.TestCase):
                 for field in ('words','links','images','meta','ids'):self.assertEqual(getattr(a,field),getattr(b,field),field)
         original=(Path(baseline)/'assets/site.js').read_text()
         self.assertTrue((ROOT/'assets/site.js').read_text().endswith(original),'Existing theme/download logic is unchanged')
+        for name in ('styles.css','home-refinement.css','home-refinement.js'):
+            self.assertEqual((ROOT/'assets'/name).read_bytes(),(Path(baseline)/'assets'/name).read_bytes(),
+                             'The approved homepage design must not be revised: '+name)
     def test_route_scope_is_explicit_and_failure_keeps_original_page(self):
         js=(ROOT/'assets/site.js').read_text().split('// NektronAI — tiny client script',1)[0]
         for name in PAGES:self.assertIn('/'+name,js)
@@ -57,6 +62,22 @@ class SitewideChecks(unittest.TestCase):
         self.assertIn("addEventListener('load', enable",js)
         self.assertNotRegex(js,r'innerHTML|textContent|fetch\(|localStorage\.setItem|remove\(')
         self.assertIn('button.focus()',js)
+        guard='if (pagePath === "/" || pagePath === "/index.html") return;'
+        self.assertIn(guard,js)
+        self.assertLess(js.index(guard),js.index('function enable()'))
+    def test_homepage_additions_do_not_load_the_secondary_redesign(self):
+        html=(ROOT/'index.html').read_text()
+        self.assertIn('<body class="home-page">',html)
+        self.assertIn('href="assets/homepage-additions.css"',html)
+        self.assertNotIn('href="assets/atelier.css"',html)
+        css=(ROOT/'assets/homepage-additions.css').read_text()
+        self.assertNotRegex(css,r'--(?:text|muted|accent|atelier-[\w-]+)\s*:')
+        self.assertNotRegex(css,r'font-size|font-family|box-shadow|\.button|\.header-inner|\.home-thesis-panel')
+        self.assertIn('body.home-page::before',css)
+        self.assertIn('body.home-page .product-family-grid',css)
+        # Wording changes are expressly deferred, including pressure-test framing.
+        for text in ('Pressure-test','pressure-test','Current products do not yet use GrowNet.'):
+            self.assertIn(text,html)
     def test_gradients_backgrounds_and_accessible_states(self):
         css=(ROOT/'assets/atelier.css').read_text()
         for term in ('prefers-reduced-motion','forced-colors','@media print',':focus-visible','atelier-nav-ready','overflow-y: auto'):
