@@ -1,0 +1,45 @@
+name: Website visual review
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['website/**', '.github/workflows/website-visual-review.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: website-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  static-site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Archive static preview source (no release binaries)
+        run: |
+          mkdir -p review/source
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          source = Path('website')
+          target = Path('review/source/website')
+          for file in source.rglob('*'):
+              if not file.is_file() or file.suffix.lower() not in {'.html', '.css', '.js', '.json', '.svg', '.png', '.jpg', '.woff2'}:
+                  continue
+              if any(part in {'node_modules', 'dist', 'build', 'downloads'} for part in file.parts):
+                  continue
+              dest = target / file.relative_to(source)
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(file, dest)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nektronai-static-review
+          path: review/
+          retention-days: 14
