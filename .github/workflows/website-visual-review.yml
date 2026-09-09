@@ -15,7 +15,7 @@ concurrency:
 jobs:
   static-site:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,13 +33,16 @@ jobs:
           mkdir -p review/baseline
           git fetch --no-tags --depth=1 origin "$BASE_SHA"
           git archive "$BASE_SHA" website/index.html website/assets | tar -x -C review/baseline
+          for page in about docs downloads changelog grownet grownet-formal-spec privacy terms support; do
+            git show "$BASE_SHA:website/$page.html" > "review/baseline/website/$page.html"
+          done
           python3 - <<'PY'
           from pathlib import Path
           import shutil
           source = Path('website')
           target = Path('review/source/website')
           for file in source.rglob('*'):
-              if not file.is_file() or file.suffix.lower() not in {'.html', '.css', '.js', '.json', '.svg', '.png', '.jpg'}:
+              if not file.is_file() or file.suffix.lower() not in {'.html', '.css', '.js', '.json', '.svg', '.png', '.jpg', '.webp'}:
                   continue
               if any(part in {'node_modules', 'dist', 'build', 'downloads'} for part in file.parts):
                   continue
@@ -57,8 +60,15 @@ jobs:
           else
             python3 tests/homepage_static.py
           fi
+          if [ "$HEAD_REF" = 'design/sitewide-research-atelier' ]; then
+            BASELINE_SITE=../review/baseline/website python3 tests/sitewide_static.py
+          else
+            python3 tests/sitewide_static.py
+          fi
           node --check assets/home-refinement.js
+          node --check assets/site.js
           node --check tests/homepage_browser.cjs
+          node --check tests/sitewide_browser.cjs
       - name: Locked dependency install and existing Vite build
         working-directory: website
         run: |
@@ -81,6 +91,7 @@ jobs:
             sleep 1
           done
           NODE_PATH="$RUNNER_TEMP/nektron-review/node_modules" BASELINE_URL=http://127.0.0.1:8767 node tests/homepage_browser.cjs
+          NODE_PATH="$RUNNER_TEMP/nektron-review/node_modules" node tests/sitewide_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
