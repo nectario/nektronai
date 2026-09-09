@@ -1,3 +1,41 @@
+// Research Atelier: progressive presentation enhancement on canonical pages only.
+// Existing page HTML, research prose, legal copy and release metadata are untouched.
+(() => {
+  const routes = new Set(['/', '/index.html', '/about.html', '/docs.html', '/downloads.html',
+    '/changelog.html', '/grownet.html', '/grownet-formal-spec.html', '/privacy.html', '/terms.html', '/support.html']);
+  const scriptUrl = document.currentScript?.src;
+  if (!scriptUrl) return;
+  const siteRoot = new URL('../', scriptUrl);
+  const pagePath = '/' + location.pathname.slice(siteRoot.pathname.length);
+  if (!location.pathname.startsWith(siteRoot.pathname) || !routes.has(pagePath)) return;
+  // The approved homepage has its own styles and navigation enhancement.
+  // Only its explicit background/product stylesheet may extend that design.
+  if (pagePath === "/" || pagePath === "/index.html") return;
+  function enable() {
+    document.body.classList.add('atelier-site');
+    if (['/privacy.html','/terms.html'].includes(pagePath)) document.body.classList.add('atelier-legal');
+    const header = document.querySelector('body > header');
+    const button = header?.querySelector('[data-nav-toggle]');
+    const nav = header?.querySelector('#primary-nav');
+    if (header && button && nav && !document.body.classList.contains('atelier-nav-ready')) {
+      document.body.classList.add('atelier-nav-ready');
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && header.classList.contains('nav-open') &&
+            (nav.contains(document.activeElement) || document.activeElement === button)) button.focus();
+      }, true);
+    }
+    document.querySelectorAll('.grownet-table-wrap').forEach((region) => { region.tabIndex = 0; });
+  }
+  const href = new URL('atelier.css', scriptUrl).href;
+  if (Array.from(document.styleSheets).some((sheet) => sheet.href === href)) { enable(); return; }
+  const stylesheet = document.createElement('link');
+  stylesheet.rel = 'stylesheet';
+  stylesheet.href = href;
+  // Retain the readable original presentation if the additive asset cannot load.
+  stylesheet.addEventListener('load', enable, { once: true });
+  document.head.append(stylesheet);
+})();
+
 // NektronAI — tiny client script (theme + mobile nav)
 // No frameworks. Fast, accessible, and production-friendly.
 
