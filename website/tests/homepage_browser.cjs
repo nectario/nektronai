@@ -52,7 +52,8 @@ async function ready(page, url) {
         fs.writeFileSync(path.join(out, `axe-${theme}-${width}.json`), JSON.stringify(axe.violations, null, 2));
         assert.deepEqual(axe.violations.map(v => ({id:v.id, nodes:v.nodes.map(n=>n.target)})), [], 'Automated accessibility rules');
         if (width <= 860) {
-          const menu = page.getByRole('button',{name:'Open navigation',exact:true});
+          const menu = page.locator('[data-nav-toggle]');
+          assert.equal(await menu.getAttribute('aria-label'),'Open navigation');
           await menu.click();
           assert.equal(await menu.getAttribute('aria-expanded'),'true');
           await page.locator('#primary-nav a').first().focus();
