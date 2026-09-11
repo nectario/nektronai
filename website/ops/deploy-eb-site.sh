@@ -57,6 +57,8 @@ bundle_dir = Path(os.environ["BUNDLE_DIR"])
 version = os.environ["VERSION_LABEL"]
 
 html_patterns = [
+    "assets/grownet.css",
+    "/assets/grownet.css",
     "assets/styles.css",
     "/assets/styles.css",
     "assets/site.js",

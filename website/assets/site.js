@@ -26,7 +26,9 @@
     }
     document.querySelectorAll('.grownet-table-wrap').forEach((region) => { region.tabIndex = 0; });
   }
-  const href = new URL('atelier.css', scriptUrl).href;
+  const stylesheetUrl = new URL('atelier.css', scriptUrl);
+  stylesheetUrl.search = new URL(scriptUrl).search;
+  const href = stylesheetUrl.href;
   if (Array.from(document.styleSheets).some((sheet) => sheet.href === href)) { enable(); return; }
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
