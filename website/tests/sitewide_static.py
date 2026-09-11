@@ -75,9 +75,9 @@ class SitewideChecks(unittest.TestCase):
         self.assertNotRegex(css,r'font-size|font-family|box-shadow|\.button|\.header-inner|\.home-thesis-panel')
         self.assertIn('body.home-page::before',css)
         self.assertIn('body.home-page .product-family-grid',css)
-        # Wording changes are expressly deferred, including pressure-test framing.
-        for text in ('Pressure-test','pressure-test','Current products do not yet use GrowNet.'):
-            self.assertIn(text,html)
+        # The owner has now approved the separate product/research narrative.
+        # Keep the capability boundary; homepage_vision.py guards the new copy.
+        self.assertIn('Current products do not yet use GrowNet.',html)
     def test_gradients_backgrounds_and_accessible_states(self):
         css=(ROOT/'assets/atelier.css').read_text()
         for term in ('prefers-reduced-motion','forced-colors','@media print',':focus-visible','atelier-nav-ready','overflow-y: auto'):

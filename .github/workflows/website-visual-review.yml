@@ -50,10 +50,11 @@ jobs:
               dest.parent.mkdir(parents=True, exist_ok=True)
               shutil.copy2(file, dest)
           PY
-      - name: Static structure, contrast and design-only content guard
+      - name: Static structure, contrast and scoped content guards
         working-directory: website
         env:
           HEAD_REF: ${{ github.head_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           if [ "$HEAD_REF" = 'design/refined-research-homepage' ]; then
             BASELINE_HTML=../review/baseline/website/index.html python3 tests/homepage_static.py
@@ -65,10 +66,17 @@ jobs:
           else
             python3 tests/sitewide_static.py
           fi
+          if [ "$HEAD_REF" = 'content/product-vision-and-grownet' ]; then
+            VISION_BASE_REF="$BASE_SHA" python3 tests/homepage_vision.py
+          else
+            python3 tests/homepage_vision.py
+          fi
           node --check assets/home-refinement.js
           node --check assets/site.js
           node --check tests/homepage_browser.cjs
           node --check tests/sitewide_browser.cjs
+          node --check tests/homepage_vision_browser.cjs
+          node --check tests/homepage_preservation.cjs
       - name: Locked dependency install and existing Vite build
         working-directory: website
         run: |
@@ -80,6 +88,8 @@ jobs:
           "$RUNNER_TEMP/nektron-review/node_modules/.bin/playwright" install --with-deps chromium
       - name: Render and check the actual static site
         working-directory: website
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 > ../review/preview-server.log 2>&1 &
           CURRENT_PID=$!
@@ -91,6 +101,9 @@ jobs:
             sleep 1
           done
           NODE_PATH="$RUNNER_TEMP/nektron-review/node_modules" BASELINE_URL=http://127.0.0.1:8767 node tests/homepage_browser.cjs
+          if [ "$HEAD_REF" = 'content/product-vision-and-grownet' ]; then
+            export HOMEPAGE_COPY_REVIEW=1
+          fi
           NODE_PATH="$RUNNER_TEMP/nektron-review/node_modules" node tests/sitewide_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
