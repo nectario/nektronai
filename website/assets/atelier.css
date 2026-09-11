@@ -159,8 +159,11 @@ body.atelier-site .grownet-prose blockquote { background: linear-gradient(130deg
 body.atelier-site .grownet-prose code { background: var(--atelier-pearl-end); color: var(--text); }
 body.atelier-site .grownet-table-wrap { border-color: var(--border2); border-radius: 12px; }
 body.atelier-site .grownet-prose th { background: var(--atelier-blue-end); color: var(--text); }
-body.atelier-site .grownet-prose tbody tr:nth-child(odd) { background: var(--atelier-paper); }
+/* Soften the darker stripe 30% toward its lighter neighbor in each theme. */
+body.atelier-site .grownet-prose tbody tr:nth-child(odd) { background: color-mix(in srgb, var(--atelier-paper) 70%, var(--atelier-even) 30%); }
 body.atelier-site .grownet-prose tbody tr:nth-child(even) { background: var(--atelier-even); }
+.theme-light body.atelier-site .grownet-prose tbody tr:nth-child(odd) { background: var(--atelier-paper); }
+.theme-light body.atelier-site .grownet-prose tbody tr:nth-child(even) { background: color-mix(in srgb, var(--atelier-even) 70%, var(--atelier-paper) 30%); }
 body.atelier-site .grownet-summary { background: linear-gradient(130deg,var(--atelier-blue-start),var(--atelier-blue-end)); }
 body.atelier-site .grownet-language-card { padding: 18px; }
 body.atelier-site .grownet-toplink { background: linear-gradient(130deg,var(--atelier-pearl-start),var(--atelier-pearl-end)); border-color: var(--border); color: var(--accent); }

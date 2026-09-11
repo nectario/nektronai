@@ -484,7 +484,7 @@
 }
 
 .grownet-prose tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.012);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.012) 70%, rgba(94, 200, 255, 0.028) 30%);
 }
 
 .grownet-prose tbody tr:nth-child(even) {
@@ -496,7 +496,7 @@
 }
 
 .theme-light .grownet-prose tbody tr:nth-child(even) {
-  background: rgba(0, 106, 138, 0.03);
+  background: rgba(0, 106, 138, 0.021);
 }
 
 .grownet-prose td {

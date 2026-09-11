@@ -136,6 +136,7 @@ from pathlib import Path
 
 bundle_dir = Path(__import__("os").environ["BUNDLE_DIR"])
 safe_nav = """<nav id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
       <a href="index.html#research">Research</a>
       <a href="index.html#products">Products</a>
       <a href="about.html">About</a>
