@@ -6,8 +6,10 @@ Prepared for ongoing research reflection, implementation planning, and future pa
 
 **Status:** living internal document — captures current thinking, not final claims.
 
+**Canonical status:** the Word version of this journal and the Word version of the GrowNet Formal Specification are GrowNet's joint primary conceptual authority. Their Markdown files are synchronized secondary representations.
+
 > **Working summary**  
-> GrowNet is envisioned as a growth-based neural architecture that starts very small, expands only when novelty justifies it, uses local structure, serial focus and anchoring, treats Focus Segments rather than isolated points as the primary meaningful unit in 2D and beyond, and aims toward continuous, active intelligence rather than today’s passive input-output systems.
+> GrowNet is envisioned as a growth-based neural architecture that starts very small, expands only when novelty justifies it, uses local structure and energy constraints to regulate development, and aims toward continuous, active intelligence rather than today's passive input-output systems.
 
 # 1. Origin and motivation
 
@@ -45,14 +47,30 @@ The long-term ambition goes beyond model replacement. The architecture is imagin
 
 # 3. Core structural vocabulary
 
-The architecture currently revolves around four scales of structural creation. Each step up the ladder is more expensive, so the system naturally tries the cheapest form of adaptation first.
+GrowNet has one neuron-like computational structure — the neuron — surrounded by private internal state and higher-level organizational containers. Slots are visible only inside their owning neuron. Layers and regions organize lower-level structure; they are not larger neurons and do not independently learn, clamp, cross thresholds, or fire.
 
-| Level | Meaning | Typical use | Relative cost |
+| Level | Architectural role | Creation owner | Relative cost |
 |---|---|---|---|
-| Slot | Small local memory cell inside a neuron | Store / route a new local pattern before larger structural change | Lowest |
-| Neuron | Local computational unit | Add specialized local capacity when slots are no longer enough | Low |
-| Layer | Feature / abstraction organization inside a region | Increase depth and representational capacity inside a domain | Medium |
-| Region | Higher-order organizational domain | Create or connect to a new functional container when a region has become too deep | Highest |
+| Slot | Private representational state inside exactly one neuron | The owning neuron allocates and manages its slots | Lowest |
+| Neuron | Computational and learning unit; organizes slots and is the unit that can fire | Its containing layer creates neurons | Low |
+| Layer | Organizational container for neurons; does not independently fire | Its containing region creates layers | Medium |
+| Region | Organizational container for layers and a boundary for specialization, policy, energy, lifecycle, and growth arbitration; not a targeted signal path and does not independently fire | GrowNet creates regions | Highest |
+
+The containment hierarchy is:
+
+```text
+GrowNet
+-> Regions
+   -> Layers
+      -> Neurons
+         -> private Slots
+```
+
+## Structural ownership and creation
+
+Creation authority follows containment. A neuron allocates slots, a layer creates neurons, a region creates layers, and GrowNet creates regions. A lower level may report novelty, saturation, or growth pressure upward, but the containing owner decides and commits the structural mutation. No code path should bypass that ownership chain.
+
+Slots are not independently addressable network nodes. They are not `InputBinding` or `OutputReadout` targets, do not form `Connection` endpoints, and do not fire. They remain the neuron's private local representational machinery.
 
 ## Neuron types
 
@@ -61,6 +79,67 @@ The architecture currently revolves around four scales of structural creation. E
 - **Modulatory:** regulates learning, growth pressure, attention-like behavior, and higher-level control signals.
 
 This triad is important because GrowNet is not only about storing patterns. It also needs to regulate growth, suppress instability, and eventually support emotion-like or state-like dynamics.
+
+## Edge and internal neuron roles
+
+The newer discussions also clarified that GrowNet should distinguish neuron roles by where they live in the structure.
+
+- **Input neurons** live on the input edge and accept raw world signals such as scalar values, Morse on/off pulses, image pixels, later audio streams, or future temporal-context feeds.
+- **Integration neurons** live in the body of GrowNet. They combine value context, temporal context, slotting, anchoring, novelty pressure, and growth pressure. These are the neurons that should decide whether a new signal is a continuation, a refinement, or the start of a new segment.
+- **Output neurons** live on the output edge. Later they may emit stabilized categories, control signals, generated values, or future generated modalities such as pictures or other structured outputs.
+
+This distinction matters because the neuron that combines value and time should be thought of as an **integration neuron**, not an output neuron.
+
+A base neuron has one local scalar input concept. Source dimension, coordinates, shape, and modality belong to source contracts, `InputBinding`s, deliberately constructed populations, mapping, Focus, Anchors, topology, and observation context—not to separate base-neuron 2D, 3D, image, audio, or video input methods. Specialized shaped populations remain legitimate when they deliver through the ordinary scalar neuron boundary.
+
+## Category output and label neurons
+
+The output edge also needs a more precise category vocabulary. GrowNet should not turn repeated patterns into a fixed softmax class vector or a separate classifier head. Instead, a stable Focus Segment should be able to route through internal GrowNet structure until an **OutputNeuron with `output_role = category`** fires.
+
+GrowNet uses **neuronified** as a formal architectural term. A concept is neuronified when its model-responsible state, interpretation, or decision is expressed through GrowNet's own structural primitives and ordinary internal behavior—local memory, routing, anchoring, firing, learning, and growth—rather than imposed by an external manager, classifier, dictionary, or hard-coded decision system. This does not mean every concern becomes a Neuron or give Slots, Layers, Regions, bindings, readouts, or Fields an independent decision or firing identity. **Neuron-native** may describe language or implementation aligned with this criterion; it is not a replacement for the architectural term. Host-side source mapping, contract validation, observation preparation, explicit target identification, fact recording and display, and session coordination remain valid within their declared boundaries.
+
+In this framing, the category is the neuronified output path. It may be anonymous at first, and it may grow or stabilize through the same novelty and capacity-pressure philosophy that governs the rest of GrowNet. Human-readable names belong to a separate **Label Neuron** or label-neuron layer.
+
+This distinction matters because labels and meanings are not one-to-one. The same label can point to different category meanings, such as "bank" as a financial institution or "bank" as a river edge. The same category can also have several labels, such as "dog" and "canine." The label association names or relates to a category output path; it does not create the category by itself.
+
+Raw visual and multimodal observations therefore remain raw. Studio, CLI, or supervised workflows may request label associations, but raw observation payloads should not smuggle in semantic labels, object detections, externally supplied Focus Segments, or externally supplied anchors as model truth.
+
+Useful short form:
+
+```text
+Focus Segment
+-> internal GrowNet route
+-> category-role Output Neuron fires
+-> optional Label Neuron association
+```
+
+## Neuron firing, Connections, and host boundaries
+
+> **Containers organize. Connections carry. Neurons decide and fire.**
+
+Only neurons decide and fire. Many neurons may fire during the same logical integration interval. A “layer output” or “region output” is shorthand for firing events produced by neurons organized by that container; neither a Layer nor a Region acquires an independent firing identity.
+
+A directed Neuron-to-Neuron `Connection` is GrowNet's only targeted internal transmission primitive. The same primitive applies within a Layer and between Layers. A `Connection` may carry a contribution and retain approved locally adaptive transmission state, such as weight, under Neuron-owned learning rules; it does not independently interpret or integrate a population, cross a firing threshold, decide, or fire.
+
+- `InputBinding` is topology-neutral, non-neural host configuration that maps a named external channel to explicitly existing Neurons or to a deliberately constructed population;
+- `OutputReadout` is topology-neutral, non-neural host observation of firing events from explicitly designated Neurons or a deliberately constructed population;
+- neither surface creates hidden neural topology, consumes neural RNG, learns, integrates, clamps, crosses a threshold, decides, or fires;
+- `OutputReadout` remains selected-firing observation rather than diagnostics or full-network instrumentation, and neither surface supplies Focus, Anchor, category, or semantic truth.
+
+When several signals reach a neuron in the same integration phase, that neuron should reduce them deterministically, apply any retained-state decay, and then apply its own gradual ceiling before deciding whether to fire:
+
+```text
+integrated_input = decayed_prior_state + sum(weighted_contributions)
+activation       = soft_clamp(integrated_input)
+```
+
+The soft clamp belongs to the receiving neuron. It should be smooth, monotonic, sign-preserving, and bounded; its exact function and ceiling may remain configurable. Applying the clamp after integration preserves the meaning of population recruitment while preventing an individual neuron from reaching an unbounded state.
+
+Population signals should not be averaged by default. Ten participating neurons should normally be capable of exerting more influence than one participating neuron. Averaging would erase that meaningful recruitment signal and could make paid structural growth behaviorally irrelevant. Growth cost, local competition, energy availability, neuronal decay, and neuronal clamping are the preferred controls on runaway dynamics.
+
+If many neurons must jointly produce one thresholded output, directed `Connection`s should converge on an actual relay, release, or output neuron. That neuron performs integration, clamping, learning, thresholding, and firing through ordinary GrowNet machinery. An `OutputReadout` only observes the resulting firing event.
+
+A diffuse Modulatory Field remains a separate owner-gated research proposal, distinct from settled Anchor Fields and covert / field Focus. It is not part of the accepted Portless Connectivity runtime. If later accepted, thresholded release must originate in neurons; the Field itself must not become a hidden neuron, cross a firing threshold, decide, or fire. Its ownership, delivery, and decay semantics remain unresolved.
 
 # 4. Growth rules and region logic
 
@@ -72,15 +151,28 @@ This local preference is both biologically inspired and architecturally stabiliz
 
 ## Region creation rule
 
-A region is not merely another stack of layers. It is a higher-level organizational boundary, often corresponding to a substantially different type of input or computation. In practice, region pressure is driven by layer capacity: if one region accumulates too many layers, the system should create or connect to a new region rather than keep deepening the same one indefinitely.
+A region is GrowNet's highest standard organizational container. It organizes layers and establishes specialization, policy, energy-accounting, lifecycle, and growth-arbitration scope, but it is not an independently firing computational unit or a second targeted signal path.
+
+Targeted transmission remains `Connection`-owned. Any future Neuron-to-Neuron `Connection` across Region membership boundaries requires a separate owner decision about identity, ownership, lifetime, and execution; Regions themselves are not connected signal processors.
+
+Region creation should be rare. A practical GrowNet normally begins with a useful preset region structure or reserve. GrowNet should create another region only when existing regions cannot be reused, pressure persists, the new domain is sufficiently distinct or the existing organization is persistently overloaded, global energy and cooldown rules permit it, and the configured region policy allows it.
 
 - Region motivation = modality separation plus functional specialization.
 - A new region begins with a minimal scaffold rather than a full prebuilt structure.
 - Pre-creating more regions reduces the chance that new regions need to be created later.
+- GrowNet, rather than any region, owns the decision to create a new region.
 
 ## Scaffold vs emergence
 
 GrowNet supports both developmental emergence and scaffolding. In one mode, the network starts with very little and grows structure organically. In another mode, regions or other structures may be pre-created to guide early organization. This allows practical experimentation without giving up the larger philosophy of self-organization.
+
+## Structural adaptability controls
+
+Adaptability is a user-facing structural policy, not an all-or-nothing property. Slots within neurons, neurons within layers, layers within regions, and regions within GrowNet may each be configured independently as fixed, capped-adaptive, or adaptive without a user-specified count ceiling.
+
+“Fully adaptive” does not mean physically unlimited. Energy availability, creation cost, novelty requirements, cooldowns, deterministic arbitration, and available compute still govern every creation.
+
+GrowNet should provide meaningful defaults so ordinary users are not expected to tune the hierarchy. The default profile should normally keep the region structure preset or conservatively capped while allowing the structure below each region to adapt. Advanced users may enable adaptable regions, define a maximum region count, constrain any lower level, or deliberately choose full structural flexibility.
 
 # 5. Connectivity and feedback loops
 
@@ -102,43 +194,114 @@ The long-term expectation is that balancing, navigation, and other control behav
 
 Focus in GrowNet is not the same thing as transformer-style attention. In transformer models, attention is largely a weighting-and-aggregation mechanism over many candidates at once. GrowNet focus is better understood as an active local inspection process: the system generates candidate focus points, selects one point at a time, lets that point seed a Focus Segment, interprets incoming structure relative to that segment, and preserves meaningful structure through anchors rather than through one-shot global mixing.
 
-A useful intuition is a black screen with one bright pixel. Focus naturally locks there. If several bright pixels appear, focus does not need to process them literally simultaneously. A more realistic view is rapid serial inspection: the system picks one candidate point, seeds a local segment around it, stabilizes that segment with local anchor state, updates its broader anchor organization, and then moves to the next point. This lets GrowNet build a remembered organization of multiple important local units while still keeping active focus singular at any moment.
+### Focus Point and Focus Segment
 
-This leads to a cleaner hierarchy:
+The cleanest hierarchy now looks like this:
 
-- **Focus Point:** the current selected seed or center
+- **Focus Point:** the currently selected seed or center
 - **Focus Segment:** the locally coherent region around that point that the system is currently treating as one unit
 - **Segment Anchor:** the local reference that stabilizes that segment
-- **Anchor Trace:** the most local anchoring memory
-- **Anchor Field:** the distributed pattern of many active local anchors
-- **Anchor Map:** the higher-level readout of that distributed field
+- **Anchor Trace:** the neuron-local anchoring state and memory associated with local structure
+- **Anchor Field:** the distributed, neuronified anchoring state formed by neuron-local Anchor Traces and Segment Anchors associated with Focus Segments; it preserves currently maintained contextual organization across serial Focus shifts and time
+- **Anchor Map:** GrowNet's system-level conceptual readout of the Anchor Field; a runtime surface may materialize a bounded snapshot or index, but the map is not the centralized memory or decision authority
+- Future **Binding:** the separate future mechanism that may establish that multiple Focus Segments belong to one larger entity or interpretation
 
-In 2D and beyond, the Focus Segment is the primary meaningful unit. A single point or pixel is only the degenerate minimal case.
+This hierarchy matters because it keeps anchoring local and structure-native. In 2D and beyond, the Focus Segment is the primary meaningful unit. A single point or pixel is only the degenerate minimal case.
 
-Candidate focus points may be chosen by several policies:
+A useful intuition is a black screen with one bright pixel. Focus naturally locks there. But what matters is not only the one selected point. The system quickly begins to treat the coherent local patch around that point as one unit. The same is true for a person’s eye, a square with softened boundaries, a short Morse pulse, or a small audio motif. The point is the seed. The segment is the meaningful thing.
 
-- highest energy or strongest saliency first,
-- novelty-first when something strongly departs from current anchors,
-- familiarity-first when known structure is behaviorally important,
+### Segment boundaries and acceptance profiles
+
+One of the newer insights is that a segment should not be thought of as having a perfectly hard edge. A Focus Segment is better understood as having a **coherence profile** or **acceptance profile**: a region around the focused structure within which deviations are still coherent enough to be treated as the same unit.
+
+This is why a square with lighter pixels fading out at its boundary is still experienced as a square. The boundary is soft rather than perfectly binary. It is also why Morse timing can tolerate a few milliseconds of slop while still being treated as the same temporal primitive. The system is not looking for exact equality. It is maintaining a learned local profile of what still belongs to the same segment.
+
+A good way to say it is:
+
+> A Focus Segment is not determined by a hard boundary, but by a learned acceptance profile: a region around the focused structure within which deviations remain coherent enough to be treated as the same unit. The boundary appears where that coherence falls off or a competing interpretation becomes stronger.
+
+This means segment boundaries are influenced by:
+
+- the current local anchor,
+- the segment’s learned tolerance for deviation,
+- continuity in nearby structure,
+- and competition from other possible segments.
+
+### Serial focus and candidate selection
+
+GrowNet focus is serial, not literally simultaneous. A frame may contain many candidate points, but active focus inspects them one at a time. Candidate selection may be driven by:
+
+- highest energy or strongest saliency,
+- novelty-first when something departs strongly from the current anchor organization,
+- familiarity-first when known structure matters behaviorally,
 - bounded random choice among strong candidates,
-- sequential scan or convolution-like traversal for structured scenes.
+- deterministic sequential scan.
 
 This means focus is governed by a policy, not only by raw intensity.
 
-Two forms of focus seem especially useful. **Mechanical focus** is overt reorientation: turning the head, eyes, camera, or body toward a target. This is especially relevant for agents and robotics. **Field focus** is covert reprioritization without movement: processing shifts toward a location even though the sensor itself does not move. Field focus should exist from the beginning. Mechanical focus can come later when GrowNet is embodied.
+### Distributed anchoring and contextual reinterpretation
 
-Under this view, anchoring becomes critical. Focus answers: *what point is seeding interpretation right now?* Anchoring answers: *what segment is currently stabilized, and what broader distributed anchor organization is already active?* GrowNet likely needs not only an active Focus Point, but also Segment Anchors, local Anchor Traces, and a broader Anchor Field whose current organization can be read conceptually as an Anchor Map. That map should be understood as emergent distributed organization, not as a giant external bookkeeping object.
+The owner-corrected architecture makes the responsibility split explicit: anchoring remains distributed and neuronified, while the Anchor Map is its system-level readout:
 
-Architecturally, focus should happen before slot selection. Raw input should first be interpreted relative to current focus and anchor state. Only then should slot routing decide whether the segment is familiar, close to an existing internal bin, or novel enough to trigger fallback pressure or growth. In this sense, focus is not merely perceptual; it is part of the novelty and structure-allocation machinery itself.
+- each Focus Segment has an associated **Segment Anchor**
+- neurons carry local **Anchor Traces** with spatial, temporal, or spatiotemporal context
+- local Anchor Traces and Segment Anchors compose the distributed **Anchor Field**
+- the Anchor Field preserves currently maintained contextual organization across serial Focus shifts and time, while the **Anchor Map** reads that organization out
 
-Some practical consequences follow naturally:
+In short, an Anchor Map is GrowNet's system-level conceptual readout of the distributed, neuronified Anchor Field formed by neuron-local Anchor Traces and Segment Anchors associated with Focus Segments across the active structure. A runtime `AnchorMap` may materialize a bounded snapshot or index, but it must never become GrowNet's sole memory, interpretation, familiarity/novelty, or decision authority.
 
-- repeated nearby inputs should encourage reuse of the same slots,
-- large departures from current anchors should raise fallback pressure,
-- distributed anchor organization should let GrowNet preserve several meaningful segments while inspecting them one at a time,
-- future sensorimotor systems may use covert focus first and overt focus second.
+This becomes especially important when interpretation changes over time. Imagine first seeing a face-like upper segment and interpreting it as “man,” then shifting focus and later seeing that the lower portion is really a woman wearing a man’s mask. The earlier focused segment should not vanish when the next one appears. Its distributed anchoring state may persist, compete, decay, or be revised as later evidence arrives. The same logic applies to the mermaid example: upper body and fish tail can remain contextually present without the Anchor Map itself deciding what they mean together.
 
-Another important extension is **temporal compression**. Lower levels may keep time explicit: ticks, pulse runs, gaps, and frame-to-frame continuity can remain fully represented. Later, higher levels may compress that explicit temporal structure into more compact stabilized representations. In other words, time may begin explicit and later become compressed without contradiction.
+Contextual coexistence in an Anchor Field or its Anchor Map readout does not establish that multiple Focus Segments belong to one larger entity or interpretation. That relationship belongs to future **perceptual binding**. Perceptual binding remains separate semantic work and is not host `InputBinding`, which supplies no Focus, Anchor, category, or semantic truth.
+
+### Time as context
+
+Another important clarification is that time should not only be an external scheduler concern. GrowNet should be able to treat time as part of the input context itself. The key question is not only:
+
+- what value arrived?
+
+but also:
+
+- in what temporal context did it arrive?
+
+This matters because the same value can mean different things depending on elapsed time.
+
+For example:
+
+- `0.9` arriving immediately after `0.4` may be a surprising continuation of the same segment
+- `0.9` arriving after a long pause may be the start of a new segment or episode
+
+So GrowNet should move toward a model in which an integration neuron reacts to value together with temporal context, rather than relying only on an external “if the gap is long, reset the anchor” rule.
+
+### Signal gaps and observation gaps
+
+A crucial distinction is that not all gaps are the same.
+
+- A **signal gap** is part of the signal itself. Morse low-runs are the clearest example.
+- An **observation gap** is elapsed time since the last new external observation. Timed scalar interaction is the clearest example.
+
+These are not interchangeable. In Morse, a long low run is part of the signal. In timed scalar interaction, a long period with no new value entered should not necessarily be treated as if the last value were freshly re-observed at every tick. This is why the later temporal-context work distinguishes signal-gap semantics from observation-gap semantics.
+
+### Temporal compression
+
+At lower levels, GrowNet may keep time fully explicit: ticks, pulse runs, gaps, frame-to-frame continuity, or a pixel over time behaving like a tiny 1D GrowNet. Later, higher levels may absorb that explicit temporal structure into more compact stabilized representations. Time may therefore begin explicit and later become compressed.
+
+This temporal compression should not be treated as a contradiction. It is part of the intended representational evolution of the architecture. The retina may first capture explicit 2D structure, while later processing compresses that structure into more compact higher-level meaning. GrowNet is expected to be able to do something analogous: preserve explicit lower-level spatiotemporal detail first, then later stabilize it into more compact segment-level or object-level structure.
+
+### Mechanical and field focus
+
+Two forms of focus still seem especially useful.
+
+- **Mechanical focus** is overt reorientation: turning the head, eyes, camera, or body toward a target. This is especially relevant for agents and robotics.
+- **Field focus** is covert reprioritization without movement: processing shifts toward a location even though the sensor itself does not move.
+
+Field focus should exist from the beginning. Mechanical focus can come later when GrowNet is embodied.
+
+### Architectural consequence
+
+Architecturally, focus should happen before slot selection. Raw input should first be interpreted relative to current focus, segment, anchor, and temporal context. Only then should slot routing decide whether the segment is familiar, close to an existing internal bin, or novel enough to trigger fallback pressure or growth.
+
+In that sense, focus is not merely perceptual. It is part of the novelty and structure-allocation machinery itself.
 
 # 6. Pruning, dormancy, reuse, and late death
 
@@ -158,12 +321,13 @@ That distinction matters. GrowNet should not immediately kill neurons just becau
 
 Reuse is conservative: when a neuron is reused, its internal state remains what it was before rather than being fully wiped. This makes the architecture more like a living structural system with latent reservoirs of prior development. It may also become relevant for ideas about memory, recovery, and reactivation.
 
-# **7. Memory, access paths, and retrieval failure**
+# 7. Memory, access paths, and the Alzheimer’s intuition
 
-An important intuition behind part of the design is that forgetting may sometimes be less about memory disappearing and more about losing the path to it.
-This is not presented as a scientific or clinical claim. It is better understood as a systems intuition: memory may depend not only on stored structure, but also on whether active routes still exist that can reactivate that structure. GrowNet’s dormant-and-reusable neuron idea aligns with that view.
+A painful but important intuition behind part of the design is the belief that forgetting may sometimes be less about memory vanishing and more about losing the path to it. This was discussed in the context of witnessing Alzheimer’s up close.
 
-From this perspective, the architecture benefits from preserving latent substrate whenever possible. Connections can fade. Access routes can weaken. Yet the system may still retain historical structure that could, under the right conditions, become useful again.
+This is not stated here as a clinical claim. It is better treated as a systems intuition: memory may depend not only on stored structure, but on whether live routes still exist that can reactivate that structure. GrowNet’s dormant-and-reusable neuron idea aligns with that intuition.
+
+Under this view, the architecture benefits from preserving latent substrate whenever possible. Connections can disappear. Access routes can weaken. But the system may still hold historical structure that could, under the right circumstances, become useful again.
 
 # 8. Emotions, regulation, and active intelligence
 
@@ -208,16 +372,32 @@ Another important biological observation is neuroplasticity after injury. If one
 - What forms of off-the-shelf capability should be treated as scaffolding versus truly learned structure?
 - Under what exact conditions, if any, should late neuron death happen?
 - What is the right focus policy when several salient or meaningful points compete for inspection?
+- How should segment boundaries, coherence profiles, and tolerated deviation bootstrap locally and later adapt?
+- How should binding relate multiple Focus Segments into larger entities without destroying locality?
 - How should covert / field focus and overt / mechanical focus interact once GrowNet becomes embodied?
+- When exactly should persistent output-edge novelty grow a new category-role Output Neuron, and how should label associations remain separate from category formation?
 
 # 12. Concise working definition
 
-> **GrowNet, in one paragraph**  
-> GrowNet is a growth-based neural architecture that starts with minimal structure and expands only when novelty and capacity pressure justify it. It uses slots, neurons, layers, and regions as different scales of development; relies on excitatory, inhibitory, and modulatory neurons for computation and regulation; uses serial focus and anchoring to interpret input relative to active local reference frames; favors local proximity-based organization; prunes unused connections while preserving dormant structure for possible reuse; and aims toward active, continuously running intelligence suited for agents, robotics, and world-model systems rather than only passive one-shot inference.
+GrowNet is a growth-based neural architecture that starts with minimal structure and expands only when novelty and capacity pressure justify it. A neuron privately organizes slots and owns learning, clamping, thresholding, and firing; a `Connection` may retain only approved local transmission state under Neuron-owned rules. Layers organize neurons, Regions organize layers, directed `Connection`s carry targeted internal contributions, `InputBinding`s map host channels without neural mutation, and `OutputReadout`s observe selected firings without computation or hidden topology. GrowNet distinguishes input, integration, and output neuron roles; interprets incoming structure through serial focus, Focus Segments, distributed anchoring, and temporal context; routes stable Focus Segments toward category-role Output Neurons while keeping human-readable labels separate as Label Neurons and associations; treats segment boundaries as soft coherence boundaries rather than only hard edges; favors local proximity-based organization; prunes unused connections while preserving dormant structure for possible reuse; allows explicit lower-level time to become temporally compressed at higher levels; and aims toward active, continuously running intelligence suited for agents, robotics, and world-model systems rather than only passive one-shot inference.
 
-# 13. Notes for future updates
+# 13. Canonical update and implementation policy
 
-This document should be treated as a living journal reference. It captures the state of the ideas expressed in the discussion that produced it. Future versions could add diagrams, formal growth contracts, mathematical notation, Blender prototype details, benchmark plans, and a separate section distinguishing settled design decisions from speculative hypotheses.
+The Word editions of this journal and the GrowNet Formal Specification are GrowNet's joint primary conceptual authority. Their Markdown editions are synchronized secondary representations intended for review, search, version control, and tooling. Architectural changes normally enter both primary Word documents as one coordinated canonical change and are then synchronized to both Markdown mirrors. A later owner-accepted ADR may act as a binding interim amendment only within its exact stated scope until incorporation; no model, implementation, test, contract, or majority can create or widen architecture.
+
+Machine-facing details belong to the applicable owner-selected versioned machine contract within its declared activation scope and remain subordinate to canon and accepted ADRs. Canonical synchronization alone does not activate a contract or authorize an implementation checkpoint. Conflicts among canon, mirrors, ADRs, contracts, and implementations must be reconciled deliberately rather than allowed to drift silently; settled decisions and speculative hypotheses should remain visibly distinct.
+
+## Implementation language policy
+
+The runtime-language program order is Python, Mojo, Java, C++, TypeScript, and Rust. The order may change only by owner decision. Python remains the readability-first reference implementation and Mojo the strategic high-performance peer; Java and C++ retain separate runtime programs within the Java-style interface family. TypeScript and Rust require explicit role decisions before their runtime programs advance.
+
+Python and Mojo form the **Pythonic interface family**, where public APIs use `snake_case`. Java and C++ form the **Java-style interface family**, where methods and variables use `camelCase` and types use `PascalCase`. Once a shared public concept is implemented within a family, family members must not diverge in naming, argument meaning, defaults, observable behavior, or serialization. Every executable runtime checkpoint has one implementation-language owner and requires independent authorization, audit, and acceptance. Application Studio remains a separate C# host and integration track. No implementation language is architectural authority.
+
+## Pre-release clean replacement
+
+Before public release, after an owner-approved replacement proves parity and preserves continuing value, the superseded active path should be removed. Compatibility aliases, shims, fallbacks, and alternate execution routes are not preserved by default; any exception requires explicit owner authorization.
+
+These documents remain living references. Future versions may add diagrams, formal growth contracts, mathematical notation, Blender prototype details, benchmark plans, and clearer labels for decisions versus open hypotheses, while following the coordinated update rule above.
 
 # Appendix A. Golden Rule
 
@@ -238,7 +418,7 @@ This is the clearest operational summary of GrowNet’s learning philosophy. The
 | A new slot is needed, but the neuron is already at strict capacity | **Fallback and mark pressure** | Reuse deterministically for the moment, but record that novelty exceeded local capacity. |
 | Fallback persists over time and cooldown rules allow it | **Grow a neuron** | Add same-kind local capacity exactly where novelty pressure is occurring. |
 | Aggregate pressure becomes too high for the layer / region | **Grow a layer** | Add representational depth within the region. |
-| One region accumulates too much depth | **Create or connect to a new region** | Expand into a new organizational domain rather than forcing infinite depth into one region. |
+| Persistent regional overload cannot be resolved through reuse and policy permits expansion | **Create a new region** | Rarely create a new organizational domain rather than forcing infinite depth into one region; cross-Region Connection behavior remains owner-gated. |
 
 ## Growth ladder under the Golden Rule
 
@@ -247,22 +427,19 @@ The repository phrasing maps very naturally onto the journal’s existing growth
 - **Slot:** cheapest local adaptation.
 - **Neuron:** next step when slots are saturated and novelty persists.
 - **Layer:** added when local neuron pressure has become structurally meaningful.
-- **Region:** added or connected when a region has become too deep or when specialization / modality separation demands a new container.
+- **Region:** rarely created by GrowNet when persistent overload cannot be resolved through reuse or when permitted specialization / modality separation demands a new container. Regions themselves are not connected signal processors; any future cross-Region Neuron-to-Neuron `Connection` remains owner-gated.
 
 This is one of the most important features of GrowNet: growth is **targeted and bounded**. The architecture does not simply become larger everywhere. It expands where novelty appears and where existing capacity has truly run out.
 
-## Focus Point, Focus Segment, and distributed anchoring
+## Focus anchor vs reference anchor
 
-One useful clarification from the repository docs is that GrowNet now needs a more cohesive hierarchy than a simple point-versus-anchor distinction.
+One useful clarification from the repository docs is the distinction between several related concepts:
 
-- **Focus Point:** the currently selected seed or center.
-- **Focus Segment:** the locally coherent unit around that point.
-- **Segment Anchor:** the anchor that stabilizes that local segment.
-- **Anchor Trace:** the most local memory of anchoring state.
-- **Anchor Field:** the distributed pattern of active local anchors.
-- **Anchor Map:** the conceptual readout of that field.
+- **Focus Anchor (conceptual):** the currently active point or frame that the system is inspecting in behavioral terms.
+- **Reference Anchor (policy-specific implementation):** under the current **FIRST** policy, the stable reference used to compute delta-percent and novelty bins deterministically; it is not a universal semantic anchor.
+- **Anchor Map (conceptual readout):** GrowNet's system-level conceptual readout of the neuronified Anchor Field formed by local Anchor Traces and Segment Anchors. A materialized map may be bounded, never memory, interpretation, or decision authority.
 
-This hierarchy matters because it keeps anchoring neuron-native. The Anchor Map should not be treated as a giant external object that remembers things for GrowNet. It should emerge from many local traces and segment anchors across active structure.
+Active Focus is serial. The Anchor Field preserves context across shifts and time; remembered-location views are projections, not ownership. Future Binding—not the map—may establish larger entity relationships among Focus Segments.
 
 A further clarification from later discussion is that focus should be treated as **serial**, not literally simultaneous. Multiple candidate points may exist at once, but active focus inspects them one at a time. Candidate selection MAY be driven by highest energy, novelty-first, familiarity-first, bounded random choice among strong candidates, or deterministic sequential scan. For embodied systems, GrowNet may also distinguish **field / covert focus** (priority shift without movement) from **mechanical / overt focus** (turning eyes, head, camera, or body toward the selected point).
 
@@ -275,10 +452,19 @@ Important accompanying constraints from the repo material:
 - growth is **local** rather than global,
 - growth is **rate-limited** by cooldowns and capacity rules,
 - routing should remain **deterministic** once chosen,
-- the system should avoid turning novelty into uncontrolled structural explosion,
-- and at the region level there should be a strong safety invariant such as **one growth action per region per tick**.
+- and the system should avoid turning novelty into uncontrolled structural explosion.
 
 This matches the spirit of the original journal: GrowNet should feel alive and developmental, but not chaotic.
+
+### One growth action per region per tick
+
+Within one tick, many neurons and layers in a region may report novelty, saturation, or growth pressure. Those requests are collected without mutating shared regional structure. At the deterministic end-of-tick arbitration point, the region may commit **at most one neuron-or-layer structural growth transaction**. Selection must use stable identifiers and declared priorities rather than traversal order.
+
+Here, a tick is a logical integration and growth-arbitration boundary, not automatically wall time, source or temporal-context time, a Focus step, a timestamp, Region operation identity, or a global synchronous scheduler step.
+
+Creating the selected element and its required initial wiring counts as one atomic growth transaction. Private slot allocation remains owned by its neuron and does not consume the region-wide growth action. Neuron firing, weight updates, reinforcement, decay, pruning decisions, and other non-structural learning also remain outside this limit. Creating a region is a separate, rare GrowNet-level decision and is not charged to an existing region's budget.
+
+This invariant lets every candidate be evaluated against the same pre-growth regional state, prevents one novelty event from cascading through several structural levels in a single tick, bounds instantaneous energy and allocation work, and makes runs reproducible across traversal orders and parallel implementations. Deferred valid requests remain eligible on later ticks; the invariant slows structural commitment without suppressing ordinary neuronal activity or learning.
 
 ## Simple intuition example
 
@@ -384,10 +570,8 @@ Under that framing, GrowNet’s real goal is not only to grow, but to grow **cle
 
 ## Suggested role in the journal
 
-Conceptually, KU and BKU can become the evaluation language for GrowNet’s long-term claims:
+KU / BKU strongly fit GrowNet’s research narrative and long-term evaluation:
 
 - how much useful structure is gained from each novel input,
 - how cleanly local growth converts novelty into knowledge,
-- whether GrowNet can outperform conventional architectures in *knowledge yield per sample* rather than merely final benchmark score.
-
-That makes KU / BKU a very strong fit for GrowNet’s broader research narrative.
+- whether GrowNet beats conventional architectures on *per-sample knowledge yield*, not merely final score.

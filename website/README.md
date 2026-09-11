@@ -47,6 +47,30 @@ Upload the folder contents to your static host (S3/Cloudflare Pages/GitHub Pages
 ## Social previews
 - `assets/og.png` – Open Graph / Twitter preview image (1200×630)
 
+## GrowNet reference synchronization
+
+The journal and formal-spec pages render the synchronized Markdown mirrors
+of GrowNet's two canonical Word documents. After an approved source update,
+run from this directory:
+
+```bash
+python -m pip install Markdown==3.10.3
+python scripts/sync_grownet_docs.py --grownet-root ../../GrowNet
+python scripts/sync_grownet_docs.py --grownet-root ../../GrowNet --check
+```
+
+The tool updates only the article bodies, their tables of contents, and the
+four named `.md`/`.docx` downloads. Existing numbered-section URLs and site
+navigation remain stable. It refuses unexpected changes to the source section
+structure so those URLs can be reviewed. Review the page summaries, edition
+dates, docs hub, and changelog separately when the source changes.
+
+Architecture documents contain both intended invariants and future research;
+the public implementation-status notes must preserve the distinction between
+the accepted Python scope and global Contract V6 activation. The sync tool
+does not export repository history, internal governance packets, app builds,
+or source-code releases, and does not deploy the site.
+
 ## AWS Traffic Monitoring
 CloudWatch log streaming is enabled for the production Elastic Beanstalk environment with 7-day retention.
 
