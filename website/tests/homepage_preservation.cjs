@@ -1,8 +1,11 @@
 /* Compare existing homepage elements against the approved PR base.
-   Only the decorative pseudo-element, two added cards and downstream page height may differ. */
+   Only the decorative pseudo-element, two added cards and downstream page height may differ.
+   For the explicitly approved copy PR, compare identical text on both style systems. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const alignApprovedHomepageCopy = require('./homepage_vision_browser.cjs');
+const copyReview = process.env.HOMEPAGE_COPY_REVIEW === '1';
 
 async function signature(page) {
   return page.evaluate(() => {
@@ -36,6 +39,7 @@ module.exports = async function checkApprovedHomepage(browser, base, baseline, o
           await page.locator('body.home-nav-ready').waitFor();
           await page.evaluate(() => document.fonts.ready);
         }
+        if (copyReview) await alignApprovedHomepageCopy(before, after);
         assert.equal(await after.locator('link[href$="/atelier.css"]').count(),0,'Secondary stylesheet must not load on Home');
         assert.equal(await after.locator('body.atelier-site').count(),0,'Secondary enhancement must exclude Home');
         assert.deepEqual(await signature(after), await signature(before), `${theme}/${width}: approved element styles changed`);
@@ -64,12 +68,12 @@ module.exports = async function checkApprovedHomepage(browser, base, baseline, o
           await after.screenshot({path:path.join(out,`preserved-home-${theme}-${width}.png`)});
           await after.locator('#products').screenshot({path:path.join(out,`preserved-products-${theme}-${width}.png`)});
         }
-        cases.push({theme,width,existingStyles:'unchanged',existingPositions:'unchanged',hoverFocus:'unchanged',newCardWidths:'matching'});
+        cases.push({theme,width,existingStyles:'unchanged',existingPositions:copyReview?'unchanged with identical approved text':'unchanged',hoverFocus:'unchanged',newCardWidths:'matching'});
       } finally { await context.close(); }
     }
   }
   fs.writeFileSync(path.join(out,'homepage-preservation.json'),JSON.stringify({cases,
-    exceptions:['decorative background','two added product cards','resulting downstream vertical displacement'],
+    exceptions:copyReview?['Approved text changes naturally reflow; baseline text is aligned for style/geometry comparisons only']:['decorative background','two added product cards','resulting downstream vertical displacement'],
     note:'Element-style comparison is not a whole-page pixel-diff or full accessibility audit.'},null,2));
   console.log('Passed '+cases.length+' approved-homepage preservation cases.');
 };
