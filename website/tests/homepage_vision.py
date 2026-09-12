@@ -78,18 +78,18 @@ class VisionChecks(unittest.TestCase):
             self.assertIn(phrase, self.text)
         self.assertNotRegex(self.text, r'(?:powered by|running on|built on) GrowNet')
 
-    def test_all_five_products_and_existing_destinations_remain(self):
-        for name in ('Nektron Write', 'Nektron Mail', 'DeepTrading.ai', 'InterviewHelperAI', 'TagMySpend.com'):
+    def test_all_six_products_and_existing_destinations_remain(self):
+        for name in ('Nektron Write', 'Nektron Mail', 'Nektron Moments', 'DeepTrading.ai', 'InterviewHelperAI', 'TagMySpend.com'):
             self.assertIn(name, self.text)
         self.assertIn('Independent brands:', self.text)
         self.assertIn('Nektron product family', self.text)
-        self.assertEqual(sum(a.get('class') == 'card product-card' for t, a in self.page.tags), 5)
+        self.assertEqual(sum(a.get('class') == 'card product-card' for t, a in self.page.tags), 6)
         anchors = [a.get('href') for t, a in self.page.tags if t == 'a']
         for destination in ('grownet.html', '#products', '#contact', 'https://www.deeptrading.ai',
                             'https://www.interviewhelper.ai', 'https://tagmyspend.com'):
             self.assertIn(destination, anchors)
         family = self.html.split('data-added-products="nektron-family">', 1)[1].split('<div class="callout home-product-note"', 1)[0]
-        self.assertEqual(re.findall(r'href="([^"]+)"', family), ['#contact', '#contact'])
+        self.assertEqual(re.findall(r'href="([^"]+)"', family), ['#contact', '#contact', '#contact'])
 
     def test_social_text_matches_the_mission_without_changing_image_or_canonical(self):
         meta = {a.get('name', a.get('property')): a.get('content') for t, a in self.page.tags if t == 'meta'}

@@ -35,11 +35,18 @@ class SitewideChecks(unittest.TestCase):
         html=(ROOT/'index.html').read_text()
         self.assertEqual(html.count('data-added-products="nektron-family"'),1)
         block=html.split('data-added-products="nektron-family">',1)[1].split('<div class="callout home-product-note"',1)[0]
-        for name in ('Nektron Write','Nektron Mail'):self.assertIn('<h3>'+name+'</h3>',block)
-        self.assertEqual(re.findall(r'href="([^"]+)"',block),['#contact','#contact'])
+        for name in ('Nektron Write','Nektron Mail','Nektron Moments'):self.assertIn('<h3>'+name+'</h3>',block)
+        self.assertEqual(re.findall(r'href="([^"]+)"',block),['#contact','#contact','#contact'])
         self.assertNotRegex(block.lower(),r'coming soon|download|available now|macos|windows|subscription')
         for name in ('DeepTrading.ai','InterviewHelperAI','TagMySpend.com'):self.assertIn(name,html)
-        self.assertLess(html.index('class="grid cols-3 home-product-grid"'),html.index('data-added-products='))
+        self.assertLess(html.index('data-added-products='),html.index('<section id="ventures"'))
+        products=html.split('<section id="products"',1)[1].split('</section>',1)[0]
+        ventures=html.split('<section id="ventures"',1)[1].split('</section>',1)[0]
+        self.assertEqual(products.count('class="card product-card"'),3)
+        self.assertEqual(ventures.count('class="card product-card"'),3)
+        for name in ('DeepTrading.ai','InterviewHelperAI','TagMySpend.com'):
+            self.assertIn(name,ventures)
+            self.assertNotIn(name,products)
         self.assertIn('class="grid cols-3 product-family-grid"',html)
     def test_all_original_copy_links_images_metadata_and_ids(self):
         baseline=os.getenv('BASELINE_SITE')

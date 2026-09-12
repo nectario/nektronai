@@ -47,7 +47,8 @@ const results = [];
       assert.deepEqual(axe.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)})),[],name+' accessibility');
      }
      if(route==='index') {
-      assert.equal(await page.locator('[data-added-products] .product-card').count(),2);
+      assert.equal(await page.locator('#products [data-added-products] .product-card').count(),3);
+      assert.equal(await page.locator('#ventures .product-card').count(),3);
       assert.equal(await page.locator('.home-product-grid .product-card').count(),3);
       assert.equal(await page.locator('body.atelier-site').count(),0,'Homepage keeps its approved design scope');
      }
