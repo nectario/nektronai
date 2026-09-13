@@ -69,7 +69,7 @@ class VisionChecks(unittest.TestCase):
         self.assertNotIn('GrowNet', lead)
 
     def test_products_have_independent_value_and_ai_is_more_than_chat(self):
-        for phrase in ('AI into core functionality', 'beyond chatbot integration',
+        for phrase in ('AI built into how they function', 'beyond chatbot integration',
                        'value in their own right', 'Product revenue also helps sustain',
                        'meticulous attention to the user experience'):
             self.assertIn(phrase, self.text)
