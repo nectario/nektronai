@@ -65,7 +65,8 @@ class VisionChecks(unittest.TestCase):
         headline = re.search(r'<h1>(.*?)</h1>', self.html, re.S).group(1)
         lead = re.search(r'<p class="hero-lede">(.*?)</p>', self.html, re.S).group(1)
         self.assertLess(headline.index('Rethink AI'), headline.index('Reimagine'))
-        self.assertLess(lead.index('GrowNet'), lead.index('reimagining'))
+        self.assertLess(lead.index('building new AI foundations'), lead.index('reimagining'))
+        self.assertNotIn('GrowNet', lead)
 
     def test_products_have_independent_value_and_ai_is_more_than_chat(self):
         for phrase in ('AI into core functionality', 'beyond chatbot integration',
@@ -99,7 +100,8 @@ class VisionChecks(unittest.TestCase):
         meta = {a.get('name', a.get('property')): a.get('content') for t, a in self.page.tags if t == 'meta'}
         self.assertEqual(meta['description'], meta['og:description'])
         self.assertIn('reimagines everyday and professional apps', meta['description'])
-        self.assertLess(meta['description'].index('GrowNet'), meta['description'].index('reimagines'))
+        self.assertLess(meta['description'].index('building new AI foundations'), meta['description'].index('reimagines'))
+        self.assertNotIn('GrowNet', meta['description'])
         self.assertNotIn('pressure-test', meta['description'])
         self.assertIn('New AI Foundations & Reimagined Apps', meta['og:title'])
         self.assertEqual(meta['og:image'], meta['twitter:image'])

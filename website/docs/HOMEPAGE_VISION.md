@@ -2,8 +2,9 @@
 
 ## Owner-approved framing
 
-Research comes first in company-level introductions: lead with GrowNet and new
-AI foundations, then describe the product mission. Preserve this ordering in the
+Research comes first in company-level introductions: lead with the work of
+building new AI foundations, rather than the unannounced GrowNet project name,
+then describe the product mission. Preserve this ordering in the
 hero, summaries, footer, and search/share metadata. Individual product descriptions
 can focus on their own purpose; current products do not yet use GrowNet.
 
