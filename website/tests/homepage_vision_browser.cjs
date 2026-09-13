@@ -21,7 +21,7 @@ async function textSnapshot(page) {
 
 module.exports = async function alignApprovedHomepageCopy(before, after) {
   assert.equal((await after.locator('h1').innerText()).replace(/\s+/g, ' ').trim(),
-    'Reimagine the apps we use. Rethink AI from the ground up.');
+    'Rethink AI from the ground up. Reimagine the apps we use.');
   assert.equal((await after.locator('.panel-kicker').textContent()).trim(), 'Our boldest undertaking');
   const note = after.locator('.home-product-note');
   assert.ok(await note.isVisible());

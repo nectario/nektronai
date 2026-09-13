@@ -2,6 +2,11 @@
 
 ## Owner-approved framing
 
+Research comes first in company-level introductions: lead with GrowNet and new
+AI foundations, then describe the product mission. Preserve this ordering in the
+hero, summaries, footer, and search/share metadata. Individual product descriptions
+can focus on their own purpose; current products do not yet use GrowNet.
+
 NektronAI has two complementary ambitions, not a current GrowNet-to-products
 technology pipeline. Products reimagine the apps people rely on in everyday life
 and professional work. AI belongs in their core functionality, beyond simply

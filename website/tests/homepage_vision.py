@@ -62,6 +62,10 @@ class VisionChecks(unittest.TestCase):
                        'everyday life and professional work'):
             self.assertIn(phrase, self.text)
         self.assertNotIn('my boldest undertaking', self.text.lower())
+        headline = re.search(r'<h1>(.*?)</h1>', self.html, re.S).group(1)
+        lead = re.search(r'<p class="hero-lede">(.*?)</p>', self.html, re.S).group(1)
+        self.assertLess(headline.index('Rethink AI'), headline.index('Reimagine'))
+        self.assertLess(lead.index('GrowNet'), lead.index('reimagining'))
 
     def test_products_have_independent_value_and_ai_is_more_than_chat(self):
         for phrase in ('AI into core functionality', 'beyond chatbot integration',
@@ -95,9 +99,9 @@ class VisionChecks(unittest.TestCase):
         meta = {a.get('name', a.get('property')): a.get('content') for t, a in self.page.tags if t == 'meta'}
         self.assertEqual(meta['description'], meta['og:description'])
         self.assertIn('reimagines everyday and professional apps', meta['description'])
-        self.assertIn('GrowNet pursues', meta['description'])
+        self.assertLess(meta['description'].index('GrowNet'), meta['description'].index('reimagines'))
         self.assertNotIn('pressure-test', meta['description'])
-        self.assertIn('Reimagined Apps & New AI Foundations', meta['og:title'])
+        self.assertIn('New AI Foundations & Reimagined Apps', meta['og:title'])
         self.assertEqual(meta['og:image'], meta['twitter:image'])
         self.assertIn(('link', {'rel': 'canonical', 'href': 'https://nektron.ai/'}), self.page.tags)
 
