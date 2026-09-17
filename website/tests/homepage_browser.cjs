@@ -23,6 +23,7 @@ async function ready(page, url) {
     for (const theme of ['light', 'dark']) {
       for (const width of [320, 390, 768, 900, 1440, 1920]) {
         const context = await browser.newContext({ viewport: { width, height: 1000 }, colorScheme: theme, reducedMotion: 'reduce' });
+        await context.route('**/api/account/session', route => route.fulfill({json:{authenticated:false}}));
         const page = await context.newPage();
         const errors = [], failures = [];
         page.on('pageerror', e => errors.push(e.message));
@@ -80,6 +81,7 @@ async function ready(page, url) {
     // All original header/footer destinations still load. Research/docs/download
     // content is unmodified; these are navigation smoke checks, not rewrites.
     const context=await browser.newContext({viewport:{width:1440,height:1000},colorScheme:'light'});
+    await context.route('**/api/account/session', route => route.fulfill({json:{authenticated:false}}));
     const page=await context.newPage();
     const destinations=['about.html','grownet.html','docs.html','downloads.html','changelog.html','privacy.html','terms.html','support.html'];
     for(const route of destinations){

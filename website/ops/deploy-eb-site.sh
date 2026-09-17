@@ -34,6 +34,16 @@ VERSION_LABEL="nektron-web-${TS}"
 BUNDLE_DIR="/tmp/nektron-eb-bundle-${TS}"
 BUNDLE_ZIP="/tmp/nektron-eb-${TS}.zip"
 ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+ACCOUNT_SECRET_ARN="${NEKTRON_ACCOUNT_SECRET_ARN:-}"
+if [[ -d "${SITE_DIR}/server/accounts" && -z "${ACCOUNT_SECRET_ARN}" ]]; then
+  ACCOUNT_SECRET_ARN="$(aws elasticbeanstalk describe-configuration-settings \
+    --region "${AWS_REGION}" --application-name "${EB_APP_NAME}" --environment-name "${EB_ENV_NAME}" \
+    --query "ConfigurationSettings[0].OptionSettings[?OptionName=='NEKTRON_ACCOUNT_SECRET_ARN'].Value | [0]" --output text)"
+  if [[ -z "${ACCOUNT_SECRET_ARN}" || "${ACCOUNT_SECRET_ARN}" == "None" ]]; then
+    echo "ERROR: Configure the website account backend before deploying account navigation."
+    exit 1
+  fi
+fi
 EB_BUCKET="elasticbeanstalk-${AWS_REGION}-${ACCOUNT_ID}"
 S3_KEY="nektron/${VERSION_LABEL}.zip"
 
@@ -57,6 +67,10 @@ bundle_dir = Path(os.environ["BUNDLE_DIR"])
 version = os.environ["VERSION_LABEL"]
 
 html_patterns = [
+    "assets/account.css",
+    "/assets/account.css",
+    "assets/account.js",
+    "/assets/account.js",
     "assets/homepage-additions.css",
     "/assets/homepage-additions.css",
     "assets/database-connector.css",
@@ -231,10 +245,14 @@ aws elasticbeanstalk create-application-version \
   --source-bundle S3Bucket="${EB_BUCKET}",S3Key="${S3_KEY}" >/dev/null
 
 log "Updating environment ${EB_ENV_NAME}"
+account_options=()
+if [[ -n "${ACCOUNT_SECRET_ARN}" ]]; then
+  account_options=(--option-settings "Namespace=aws:elasticbeanstalk:application:environment,OptionName=NEKTRON_ACCOUNT_SECRET_ARN,Value=${ACCOUNT_SECRET_ARN}")
+fi
 aws elasticbeanstalk update-environment \
   --region "${AWS_REGION}" \
   --environment-name "${EB_ENV_NAME}" \
-  --version-label "${VERSION_LABEL}" >/dev/null
+  --version-label "${VERSION_LABEL}" "${account_options[@]}" >/dev/null
 
 log "Deployment started."
 log "Version: ${VERSION_LABEL}"

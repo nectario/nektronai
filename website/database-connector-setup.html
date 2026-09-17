@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self' https://dev-cmgmokiptmjiwjri.us.auth0.com https://3frqh3q39i.execute-api.us-east-2.amazonaws.com; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>Your databases · Database Connector</title>
+  <link rel="icon" href="/assets/database-connector-setup/icon-upload.png"><link rel="stylesheet" href="/assets/database-connector-setup/app.css">
+  <script type="module" src="/assets/database-connector-setup/app.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/database-connector-setup.html"><img src="/assets/database-connector-setup/icon.png" alt="" width="38" height="38"><span>Database Connector</span></a><button id="signin" class="quiet">Sign in</button></header>
+  <main>
+    <div id="preview-note" class="notice" hidden>Design preview · no credentials are sent or saved.</div>
+    <section class="page-heading"><div><p class="eyebrow">YOUR WORKSPACE</p><h1>Your databases</h1><p class="subtitle">Connect once. Explore with ChatGPT.</p></div><button id="add" class="primary"><span aria-hidden="true">＋</span> Add database</button></section>
+    <p id="page-message" class="page-message" role="status" aria-live="polite"></p>
+    <section id="connections" class="connections" aria-label="Database connections"></section>
+    <section id="empty" class="empty"><div class="icon-halo"><img src="/assets/database-connector-setup/icon.png" alt="" width="88" height="88"></div><h2>Your first connection starts here</h2><p>Add a database, then ask questions in ChatGPT.<br>We’ll handle the connection. You bring the questions.</p><button id="empty-add" class="primary">Add your first database <span aria-hidden="true">↗</span></button><div class="trust"><span>✓ Read-only access</span><span>✓ Encrypted credentials</span></div></section>
+    <aside class="next-step"><span class="chat-icon" aria-hidden="true">✦</span><div><strong>One connector. All your questions.</strong><p>Once connected, choose Database Connector in ChatGPT and ask about your data in your own words.</p></div></aside>
+    <footer><span>Database Connector · Nektron, Inc.</span><a href="mailto:info@nektron.ai">Contact support</a><span>Your credentials stay out of your conversations.</span></footer>
+  </main>
+  <dialog id="database-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+    <div class="dialog-top"><div class="small-icon"><img src="/assets/database-connector-setup/icon.png" alt="" width="36" height="36"></div><button id="close" class="icon-button" aria-label="Close add database dialog">×</button></div>
+    <h2 id="dialog-title">Add a database</h2><p id="dialog-description">A few details, and you’re ready to ask.</p>
+    <form id="database-form" novalidate>
+      <div class="engine"><div><span class="engine-mark" aria-hidden="true">▤</span><strong>MySQL</strong></div><span class="badge">Read-only</span></div>
+      <div class="tabs" role="tablist" aria-label="Connection input method"><button type="button" id="details-tab" role="tab" aria-selected="true" aria-controls="details-panel">Connection details</button><button type="button" id="string-tab" role="tab" aria-selected="false" aria-controls="string-panel" tabindex="-1">Connection string</button></div>
+      <div id="details-panel" role="tabpanel" aria-labelledby="details-tab">
+        <div class="host-row"><label>Host<input id="host" name="host" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="db.example.com" maxlength="253" required></label><label class="port">Port<input id="port" name="port" type="number" value="3306" min="3306" max="3306" required></label></div>
+        <label>Database<input id="database" name="database" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="my_database" maxlength="64" required></label>
+        <label>Username<input id="username" name="username" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="readonly_user" maxlength="128" required></label>
+        <label for="password">Password</label><div class="password-wrap"><input id="password" name="password" type="password" autocomplete="off" placeholder="Database password" maxlength="4096" required><button id="show-password" type="button" aria-label="Show database password">Show</button></div>
+      </div>
+      <div id="string-panel" role="tabpanel" aria-labelledby="string-tab" hidden><label for="connection-string">Connection string</label><input id="connection-string" type="password" autocomplete="off" spellcheck="false" placeholder="mysql://user:password@host:3306/database" maxlength="8192"><p class="hint">Paste your MySQL connection URL. TLS is always required.</p></div>
+      <details class="optional"><summary>Connection name <span>Optional</span></summary><label class="sr-only" for="name">Connection name</label><input id="name" name="name" autocomplete="off" placeholder="Defaults to your database name" maxlength="100"></details>
+      <div id="form-error" class="form-error" role="alert" hidden></div>
+      <div id="progress" class="progress" role="status" aria-live="polite" hidden><span class="spinner" aria-hidden="true"></span><span id="progress-text">Checking your connection…</span></div>
+      <p class="credential-note"><span aria-hidden="true">♧</span> Use a read-only database account. Credentials are encrypted and never shared with ChatGPT.</p>
+      <div class="dialog-actions"><button id="cancel" type="button" class="secondary">Cancel</button><button id="connect" type="submit" class="primary">Connect database <span aria-hidden="true">→</span></button></div>
+    </form>
+    <div id="success" class="success" hidden><div class="success-mark" aria-hidden="true">✓</div><h3>You’re connected</h3><p id="success-message"></p><p>Open ChatGPT, choose Database Connector, and ask your first question.</p><button id="done" class="primary">Done</button></div>
+  </dialog>
+</body>
+</html>

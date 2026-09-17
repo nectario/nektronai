@@ -181,6 +181,9 @@ server {
     ssl_session_timeout 10m;
     etag on;
 
+    # Account backend code is deployed here for systemd, never served as files.
+    location ^~ /server/ { return 404; }
+
     # Keep the site live, but discourage indexing until public launch.
     add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
 

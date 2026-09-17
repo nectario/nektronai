@@ -17,6 +17,7 @@ const results = [];
  try {
   for (const theme of ['light','dark']) {
    const context = await browser.newContext({colorScheme:theme,reducedMotion:'reduce'});
+   await context.route('**/api/account/session', route => route.fulfill({json:{authenticated:false}}));
    const page = await context.newPage();
    const errors = [], missing = [];
    page.on('pageerror', e => errors.push(e.message));

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Sign up | NektronAI</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="assets/atelier.css">
+  <link rel="stylesheet" href="assets/account.css">
+  <script src="assets/site.js" defer></script>
+  <script src="assets/account.js" defer></script>
+</head>
+<body class="atelier-site account-page">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div id="top"></div>
+<header>
+  <div class="container header-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark-320.png" alt="NektronAI" width="320" height="74" decoding="async"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light-320.png" alt="NektronAI" width="320" height="74" decoding="async"></span>
+    </a>
+
+    <div class="nav-actions">
+      <button class="icon-btn nav-toggle" type="button" data-nav-toggle aria-controls="primary-nav" aria-expanded="false" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</svg>
+        <span class="icon-btn-label">Menu</span>
+      </button>
+      <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3 4.9 19.1M19.1 19.1l-1.8-1.8M6.7 6.7 4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+      </button>
+    </div>
+
+    <nav id="primary-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="index.html#research">Research</a>
+      <a href="grownet.html">GrowNet</a>
+      <a href="docs.html">Docs</a>
+      <a href="downloads.html">Downloads</a>
+      <a href="index.html#products">Products</a>
+      <a href="about.html">About</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="login.html" data-account-login>Log in</a>
+      <a href="signup.html" class="account-nav-signup" data-account-signup>Sign up</a>
+    </nav>
+  </div>
+</header>
+<main id="content" class="container">
+  <section class="account-shell">
+    <div class="account-intro">
+      <p class="section-kicker">Your Nektron account</p>
+      <h1>Create your Nektron account.</h1>
+      <p>Create an account to manage your Nektron profile. Use the same Auth0 identity you already use with Database Connector.</p>
+      <p class="account-note">Authentication is handled securely by Auth0. Your password is never stored by this website.</p>
+    </div>
+    <div class="account-card">
+      <div data-account-entry>
+        <h2>One account. A place to start.</h2>
+        <a class="button primary" href="/api/account/login?mode=signup" data-auth-start>Sign up with email</a>
+        <p class="account-choice"><a href="login.html">Already have an account? Log in.</a></p>
+        <p class="account-note">Email verification and password recovery are available in the secure sign-in flow. Signing up does not purchase a subscription or grant access to private databases.</p>
+      </div>
+
+      <p class="account-status" data-account-status role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+<footer class="footer"><div class="container"><small>Nektron, Inc.</small>
+  <div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="mailto:info@nektron.ai">Account support</a></div>
+</div></footer>
+</body>
+</html>

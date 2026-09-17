@@ -1,4 +1,6 @@
 node_modules/
+server/**/__pycache__/
+server/**/.venv/
 dist/
 
 archive/

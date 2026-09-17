@@ -2,7 +2,8 @@
 // Existing page HTML, research prose, legal copy and release metadata are untouched.
 (() => {
   const routes = new Set(['/', '/index.html', '/about.html', '/docs.html', '/downloads.html',
-    '/changelog.html', '/grownet.html', '/grownet-formal-spec.html', '/privacy.html', '/terms.html', '/support.html']);
+    '/changelog.html', '/grownet.html', '/grownet-formal-spec.html', '/privacy.html', '/terms.html', '/support.html',
+    '/login.html', '/signup.html', '/account.html']);
   const scriptUrl = document.currentScript?.src;
   if (!scriptUrl) return;
   const siteRoot = new URL('../', scriptUrl);

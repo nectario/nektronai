@@ -32,6 +32,7 @@ module.exports = async function checkApprovedHomepage(browser, base, baseline, o
   for (const theme of ['light','dark']) {
     for (const width of [320,390,768,900,1440,1920]) {
       const context = await browser.newContext({viewport:{width,height:1000},colorScheme:theme,reducedMotion:'reduce'});
+      await context.route('**/api/account/session', route => route.fulfill({json:{authenticated:false}}));
       try {
         const before = await context.newPage(), after = await context.newPage();
         for (const [page, url] of [[before, baseline], [after, base]]) {

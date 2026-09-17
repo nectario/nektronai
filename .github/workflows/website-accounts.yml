@@ -1,0 +1,26 @@
+name: Website account security checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['website/server/accounts/**', 'website/scripts/configure_accounts.py', '.github/workflows/website-accounts.yml']
+  push:
+    branches: [main]
+    paths: ['website/server/accounts/**', 'website/scripts/configure_accounts.py', '.github/workflows/website-accounts.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  account-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r website/server/accounts/requirements.txt
+      - run: python -m unittest discover -s website/server/accounts/tests -v
