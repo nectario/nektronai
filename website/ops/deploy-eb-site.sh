@@ -73,6 +73,8 @@ html_patterns = [
     "/assets/account.js",
     "assets/homepage-additions.css",
     "/assets/homepage-additions.css",
+    "assets/home-refinement.css",
+    "/assets/home-refinement.css",
     "assets/database-connector.css",
     "/assets/database-connector.css",
     "assets/database-connector.js",

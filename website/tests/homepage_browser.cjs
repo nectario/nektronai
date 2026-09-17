@@ -18,7 +18,7 @@ async function ready(page, url) {
   await page.locator('h1').waitFor();
 }
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({channel:'chrome'});
   try {
     for (const theme of ['light', 'dark']) {
       for (const width of [320, 390, 768, 900, 1440, 1920]) {
@@ -30,9 +30,20 @@ async function ready(page, url) {
         page.on('response', r => { if (r.url().startsWith(base) && r.status() >= 400) failures.push([r.status(), r.url()]); });
         await ready(page, base);
         await page.waitForFunction(() => document.body.classList.contains('home-nav-ready'));
+        for (const image of await page.locator('img[loading="lazy"]').all()) {
+          await image.scrollIntoViewIfNeeded();
+          await image.evaluate(el=>el.decode());
+        }
+        await page.evaluate(()=>scrollTo(0,0));
         assert.equal(await page.locator('h1').count(), 1);
         assert.equal(await page.evaluate(() => document.documentElement.classList.contains('theme-light')), theme === 'light');
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${theme}/${width} overflow`);
+        assert.ok(await page.locator('.home-section-head .section-kicker').evaluateAll(nodes=>nodes.every(n=>getComputedStyle(n).fontSize==='13px')));
+        assert.ok(await page.locator('.home-meta-row .meta-pill, .home-meta-row code').evaluateAll(nodes=>nodes.every(n=>getComputedStyle(n).fontSize==='14px')));
+        assert.ok(await page.evaluate(()=>{
+          const layer=getComputedStyle(document.body,'::before');
+          return layer.backgroundRepeat==='repeat-y' && parseFloat(layer.height)>=document.body.offsetHeight-80;
+        }),'Background artwork spans the full homepage');
         const material = await page.locator('.home-thesis-panel').evaluate(el => getComputedStyle(el).backgroundImage);
         assert.ok(material.includes('linear-gradient'));
         assert.equal(await page.locator('.home-ribbon .ribbon-card').count(), 3);

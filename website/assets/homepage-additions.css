@@ -2,12 +2,12 @@
    Do not override homepage tokens, typography, navigation, buttons or existing cards.
    The full Research Atelier companion belongs exclusively to secondary pages. */
 body.home-page::before {
-  inset: 78px 0 auto;
-  height: min(64rem, 110vw);
-  min-height: 32rem;
-  background: url("backgrounds/atelier-flow-dark.webp") center top / cover no-repeat;
-  -webkit-mask-image: linear-gradient(transparent, #000 12%, #000 72%, transparent);
-  mask-image: linear-gradient(transparent, #000 12%, #000 72%, transparent);
+  inset: 78px 0 0;
+  height: auto;
+  min-height: 0;
+  background: url("backgrounds/atelier-flow-dark.webp") center top / 100% clamp(640px, 85vw, 1200px) repeat-y;
+  -webkit-mask-image: linear-gradient(transparent, #000 64px, #000 calc(100% - 96px), transparent);
+  mask-image: linear-gradient(transparent, #000 64px, #000 calc(100% - 96px), transparent);
 }
 .theme-light body.home-page::before {
   background-image: url("backgrounds/atelier-flow-light.webp");
