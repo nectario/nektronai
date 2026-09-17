@@ -38,8 +38,8 @@ async function ready(page, url) {
         assert.equal(await page.locator('h1').count(), 1);
         assert.equal(await page.evaluate(() => document.documentElement.classList.contains('theme-light')), theme === 'light');
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${theme}/${width} overflow`);
-        assert.ok(await page.locator('.home-section-head .section-kicker').evaluateAll(nodes=>nodes.every(n=>getComputedStyle(n).fontSize==='13px')));
-        assert.ok(await page.locator('.home-meta-row .meta-pill, .home-meta-row code').evaluateAll(nodes=>nodes.every(n=>getComputedStyle(n).fontSize==='14px')));
+        assert.ok(await page.locator('.home-section-head .section-kicker').evaluateAll(nodes=>nodes.every(n=>getComputedStyle(n).fontSize==='14px')));
+        assert.ok(await page.locator('.home-meta-row .meta-pill, .home-meta-row code').evaluateAll(nodes=>nodes.every(n=>getComputedStyle(n).fontSize==='15px')));
         assert.ok(await page.evaluate(()=>{
           const layer=getComputedStyle(document.body,'::before');
           return layer.backgroundRepeat==='repeat-y' && parseFloat(layer.height)>=document.body.offsetHeight-80;

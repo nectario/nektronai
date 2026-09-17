@@ -168,13 +168,13 @@ body.home-page .meta-pill {
   border: 0;
   border-radius: 0;
   background: none;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.75;
   color: var(--muted2);
   overflow-wrap: anywhere;
 }
 body.home-page .meta-pill > span { margin-right: 4px; }
-body.home-page .meta-pill code { font-size: 14px; }
+body.home-page .meta-pill code { font-size: 15px; }
 body.home-page .home-thesis-panel {
   position: relative;
   padding: clamp(24px, 2.5vw, 34px);
@@ -230,7 +230,7 @@ body.home-page .ribbon-card:nth-child(1), body.home-page .focus-card-research { 
 body.home-page .ribbon-card:nth-child(2), body.home-page .focus-card-products { background: linear-gradient(130deg, var(--atelier-warm-start), var(--atelier-warm-end)); }
 body.home-page .ribbon-card:nth-child(3) { background: linear-gradient(130deg, var(--atelier-slate-start), var(--atelier-slate-end)); }
 body.home-page :is(.card-eyebrow, .section-kicker, .product-label, .contact-label, .resource-label) { font-size: 10px; font-weight: 600; letter-spacing: .12em; line-height: 1.65; color: var(--accent); margin-bottom: 12px; }
-body.home-page .home-section-head .section-kicker { font-size: 13px; }
+body.home-page .home-section-head .section-kicker { font-size: 14px; }
 body.home-page :is(.ribbon-card h3, .card h3) { font-size: 16px; line-height: 1.45; margin-bottom: 10px; letter-spacing: -.025em; }
 body.home-page .ribbon-card p:last-child { font-size: 14px; line-height: 1.75; }
 body.home-page .resource-card { position: relative; min-height: auto; padding: 22px 24px; gap: 10px; transition: border-color 140ms ease, box-shadow 140ms ease; }
