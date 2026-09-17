@@ -45,6 +45,16 @@ fs.mkdirSync(out, {recursive:true});
           }
           assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${name}/${theme}/${width} overflow`);
           assert.equal(await page.locator('h1').count(),1);
+          if (name === 'signup') {
+            assert.equal(await page.getByRole('heading',{level:1,name:'Create your NektronAI account.',exact:true}).count(),1);
+            const wordmark = page.locator('h1 .account-brand-wordmark');
+            assert.equal(await wordmark.count(),1);
+            assert.equal(await wordmark.locator('path').count(),9);
+            assert.equal(await wordmark.getAttribute('aria-hidden'),'true');
+            assert.equal(await wordmark.locator('[fill="#00acd8"]').count(),2,'Preserve cyan AI lettering');
+            assert.equal(await wordmark.evaluate(el=>getComputedStyle(el).color),theme==='light'?'rgb(0, 0, 0)':'rgb(255, 255, 255)');
+            assert.ok(await wordmark.evaluate(el=>el.getBoundingClientRect().right<=innerWidth),'Wordmark fits the viewport');
+          }
           assert.equal(new URL(page.url()).hash,'');
           if (width !== 320) {
             await page.screenshot({path:path.join(out,`${name}-${theme}-${width}.png`),fullPage:true});
