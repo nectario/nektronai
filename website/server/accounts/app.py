@@ -1,4 +1,4 @@
-"""Auth0 login with PKCE, verified identity profiles, and server-side sessions."""
+"""Same-origin email/password authentication for the Nektron website."""
 import hashlib
 import json
 import os
@@ -9,13 +9,14 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import boto3
-from authlib.integrations.flask_client import OAuth
 from flask import Flask, jsonify, redirect, request, session
 from flask.sessions import SecureCookieSession, SessionInterface
 from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from store import AccountUnavailable, Store
+from store import Store
+from credentials import normalize_email, password_hash, password_matches, password_valid
+from mail import Mailer
 
 COOKIE = "__Host-nektron_session"
 
@@ -92,29 +93,18 @@ def load_settings():
     return settings
 
 
-def create_app(settings=None, store=None, remote=None):
+def create_app(settings=None, store=None, mailer=None):
     settings = settings if settings is not None else load_settings()
     app = Flask(__name__, static_folder=None)
-    # The service binds only loopback; nginx overwrites these forwarded headers.
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
     app.config.update(MAX_CONTENT_LENGTH=4096, SECRET_KEY=secrets.token_hex(32))
     origin = settings.get("NEKTRON_SITE_ORIGIN", "https://nektron.ai").rstrip("/")
-    issuer = settings.get("NEKTRON_AUTH_ISSUER", "").rstrip("/") + "/"
     enabled = settings.get("NEKTRON_ACCOUNT_ENABLED") == "true"
-    if enabled and (urlparse(origin).scheme != "https" or urlparse(issuer).scheme != "https"
-                    or not settings.get("NEKTRON_AUTH_CLIENT_ID")):
-        raise ValueError("HTTPS origin, issuer and Auth0 client ID are required")
+    if enabled and urlparse(origin).scheme != "https":
+        raise ValueError("HTTPS site origin is required")
     backend = store or (Store(settings) if enabled else None)
+    delivery = mailer or (Mailer(settings) if enabled else None)
     app.session_interface = DatabaseSessions(backend)
-    if remote is None and enabled:
-        oauth = OAuth(app)
-        remote = oauth.register(
-            "identity", client_id=settings["NEKTRON_AUTH_CLIENT_ID"],
-            client_secret=settings.get("NEKTRON_AUTH_CLIENT_SECRET") or None,
-            server_metadata_url=issuer + ".well-known/openid-configuration",
-            client_kwargs={"scope": "openid profile email", "code_challenge_method": "S256", "default_timeout": 10,
-                           "token_endpoint_auth_method": "client_secret_post" if settings.get("NEKTRON_AUTH_CLIENT_SECRET") else "none"},
-        )
 
     @app.before_request
     def require_ready():
@@ -126,8 +116,11 @@ def create_app(settings=None, store=None, remote=None):
             if request.headers.get("Origin") != origin:
                 return jsonify(error="INVALID_ORIGIN"), 403
             csrf = request.headers.get("X-CSRF-Token", "")
-            if not csrf or not secrets.compare_digest(csrf, session.get("csrf", "")):
+            expected = session.get("csrf", "")
+            if not csrf.isascii() or not csrf or not secrets.compare_digest(csrf, expected):
                 return jsonify(error="INVALID_CSRF"), 403
+            if not request.is_json:
+                return jsonify(error="JSON_REQUIRED"), 415
 
     @app.after_request
     def private_response(response):
@@ -141,11 +134,41 @@ def create_app(settings=None, store=None, remote=None):
 
     @app.errorhandler(Exception)
     def error_response(error):
-        # Do not log exception strings, request URLs, codes, tokens, or DB credentials.
         if isinstance(error, HTTPException):
             return jsonify(error="REQUEST_FAILED"), error.code
         app.logger.error("account_request_failed type=%s", type(error).__name__)
         return jsonify(error="ACCOUNT_UNAVAILABLE"), 503
+
+    def payload(allowed):
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict) or set(data) - set(allowed):
+            raise ValueError("INVALID_INPUT")
+        return data
+
+    def limited(action, email=None, limit=20, seconds=600):
+        ip = request.remote_addr or "unknown"
+        if not backend.allow_request(action + ":ip:" + ip, limit=limit, seconds=seconds):
+            return True
+        if email and not backend.allow_request(action + ":email:" + email,
+                                               limit=min(limit, 10), seconds=seconds):
+            return True
+        return False
+
+    def send_link(email, purpose):
+        result = backend.issue_token(email, purpose)
+        if result:
+            try:
+                delivery.send(result["email"], purpose, result["token"])
+                backend.mark_token_sent(result["token"])
+            except Exception as error:
+                # Do not reveal existence via delivery errors, or log the link/email.
+                app.logger.error("account_email_delivery_failed type=%s", type(error).__name__)
+
+    def accepted(start):
+        # Give existing and missing accounts the same response and a timing floor.
+        if not app.testing:
+            time.sleep(max(0, 1.0 - (time.monotonic() - start)))
+        return jsonify(accepted=True), 202
 
     @app.get("/api/account/health")
     def health():
@@ -153,71 +176,148 @@ def create_app(settings=None, store=None, remote=None):
             backend.read_session("0" * 64)
         return jsonify(status="ready" if enabled else "not_configured"), 200 if enabled else 503
 
+    @app.get("/api/account/csrf")
+    def csrf_token():
+        if request.headers.get("Sec-Fetch-Site") == "cross-site":
+            return jsonify(error="INVALID_ORIGIN"), 403
+        if limited("csrf", limit=120):
+            return jsonify(error="TRY_LATER"), 429
+        if "csrf" not in session:
+            session["csrf"] = secrets.token_urlsafe(32)
+        return jsonify(csrfToken=session["csrf"])
+
     @app.get("/api/account/session")
     def current_user():
         user_id = session.get("user_id")
         if not user_id:
             return jsonify(authenticated=False)
-        user = backend.get_user(user_id)
+        user = backend.get_user(user_id, session.get("auth_tag"))
         if user is None:
             session.clear()
             return jsonify(authenticated=False)
         return jsonify(authenticated=True, user=user, csrfToken=session["csrf"])
 
-    @app.get("/api/account/login")
-    def login():
-        if request.headers.get("Sec-Fetch-Site") == "cross-site":
-            return jsonify(error="INVALID_ORIGIN"), 403
-        if request.host != urlparse(origin).netloc:
-            mode = "signup" if request.args.get("mode") == "signup" else "login"
-            return redirect(origin + "/api/account/login?mode=" + mode)
-        if not backend.allow_request(request.remote_addr or "unknown"):
-            return jsonify(error="TRY_LATER"), 429
-        return_to = request.args.get("returnTo", "/account.html")
-        if return_to not in ("/account.html", "/database-connector.html"):
-            return_to = "/account.html"
-        # New flow invalidates an older login flow and prevents session fixation.
-        app.session_interface.rotate(session)
-        session.expires = int(time.time()) + 600
-        session["return_to"] = return_to
-        session["flow_started"] = int(time.time())
-        session["flow_nonce"] = secrets.token_urlsafe(32)
-        parameters = {"screen_hint": "signup"} if request.args.get("mode") == "signup" else {}
-        return remote.authorize_redirect(origin + "/api/account/callback", nonce=session["flow_nonce"], **parameters)
-
-    @app.get("/api/account/callback")
-    def callback():
-        started = session.get("flow_started", 0)
-        if not started or not 0 <= time.time() - started <= 600:
-            if not session.get("user_id"):
-                session.clear()
-            return redirect("/login.html?error=expired")
+    @app.post("/api/account/signup")
+    def signup():
+        start = time.monotonic()
         try:
-            # Authlib validates state, PKCE exchange, JWKS signature, issuer,
-            # audience, expiry and the OIDC nonce before returning userinfo.
-            token = remote.authorize_access_token(leeway=30)
-            claims = token.get("userinfo")
-            if (not token.get("id_token") or not claims or claims.get("iss") != issuer
-                    or not claims.get("sub") or claims.get("nonce") != session.get("flow_nonce")):
-                raise AccountUnavailable()
-            if claims.get("email_verified") is not True:
-                session.clear()
-                return redirect("/login.html?error=verify_email")
-            user_id = backend.sync_profile(issuer, claims)
-        except Exception:
-            session.clear()
-            return redirect("/login.html?error=signin_failed")
-        destination = session.get("return_to", "/account.html")
-        if destination not in ("/account.html", "/database-connector.html"):
-            destination = "/account.html"
+            data = payload(("email", "password", "firstName", "lastName"))
+            email = normalize_email(data.get("email"))
+            password = data.get("password")
+            if not password_valid(password):
+                raise ValueError("INVALID_PASSWORD")
+            names = [data.get(k, "") for k in ("firstName", "lastName")]
+            if any(not isinstance(n, str) or len(n) > 100 or any(ord(ch) < 32 for ch in n) for n in names):
+                raise ValueError("INVALID_NAME")
+        except ValueError as error:
+            return jsonify(error=str(error)), 400
+        if limited("signup", email, limit=5, seconds=3600):
+            return jsonify(error="TRY_LATER"), 429
+        created = backend.create_pending(email, password_hash(password), *(n.strip() for n in names))
+        if created:
+            send_link(email, "verify")
+        else:
+            account = backend.find_account(email)
+            if account and account["AccountStatus"] == "pending":
+                # The address owner must replace a pre-registered password,
+                # not accidentally activate a password chosen by someone else.
+                send_link(email, "reset")
+        return accepted(start)
+
+    @app.post("/api/account/login")
+    def login():
+        try:
+            data = payload(("email", "password"))
+            email = normalize_email(data.get("email"))
+            password = data.get("password")
+            if not isinstance(password, str) or not 1 <= len(password) <= 128:
+                raise ValueError("INVALID_INPUT")
+        except ValueError:
+            return jsonify(error="INVALID_CREDENTIALS"), 401
+        if limited("login", email, limit=30):
+            return jsonify(error="TRY_LATER"), 429
+        account = backend.find_account(email)
+        matches = password_matches(account["PasswordHash"] if account else None, password)
+        if not account or not matches or account["AccountStatus"] not in ("active", "pending"):
+            return jsonify(error="INVALID_CREDENTIALS"), 401
+        if account["EmailVerified"] != 1 or account["AccountStatus"] == "pending":
+            return jsonify(error="EMAIL_NOT_VERIFIED"), 403
+        identity = backend.finish_login(account["UserId"], account["PasswordHash"])
+        if not identity:
+            return jsonify(error="INVALID_CREDENTIALS"), 401
         app.session_interface.rotate(session)
-        session.update(user_id=user_id, csrf=secrets.token_urlsafe(32))
-        return redirect(destination)
+        session.update(identity)
+        session["csrf"] = secrets.token_urlsafe(32)
+        return jsonify(authenticated=True, redirect="/account.html")
+
+    @app.post("/api/account/request-verification")
+    def request_verification():
+        start = time.monotonic()
+        try:
+            email = normalize_email(payload(("email",)).get("email"))
+        except ValueError:
+            return jsonify(error="INVALID_EMAIL"), 400
+        if limited("verify_request", email, limit=3, seconds=3600):
+            return jsonify(error="TRY_LATER"), 429
+        send_link(email, "verify")
+        return accepted(start)
+
+    @app.post("/api/account/request-reset")
+    def request_reset():
+        start = time.monotonic()
+        try:
+            email = normalize_email(payload(("email",)).get("email"))
+        except ValueError:
+            return jsonify(error="INVALID_EMAIL"), 400
+        if limited("reset_request", email, limit=3, seconds=3600):
+            return jsonify(error="TRY_LATER"), 429
+        send_link(email, "reset")
+        return accepted(start)
+
+    def read_token(data):
+        token = data.get("token")
+        if not isinstance(token, str) or not re.fullmatch(r"[A-Za-z0-9_-]{43}", token):
+            raise ValueError("INVALID_LINK")
+        return token
+
+    @app.post("/api/account/verify-email")
+    def verify_email():
+        if limited("verify", limit=20):
+            return jsonify(error="TRY_LATER"), 429
+        try:
+            token = read_token(payload(("token",)))
+        except ValueError:
+            return jsonify(error="INVALID_LINK"), 400
+        if not backend.consume_token(token, "verify"):
+            return jsonify(error="INVALID_LINK"), 400
+        return jsonify(verified=True)
+
+    @app.post("/api/account/reset-password")
+    def reset_password():
+        if limited("reset", limit=20):
+            return jsonify(error="TRY_LATER"), 429
+        try:
+            data = payload(("token", "password"))
+            token = read_token(data)
+            new_hash = password_hash(data.get("password"))
+        except ValueError as error:
+            return jsonify(error=str(error)), 400
+        if not backend.consume_token(token, "reset", new_hash):
+            return jsonify(error="INVALID_LINK"), 400
+        session.clear()
+        return jsonify(reset=True)
 
     @app.post("/api/account/logout")
     def logout():
         session.clear()
-        # End this website session without signing the user out of other products.
         return jsonify(signedOut=True)
+
+    @app.get("/api/account/login")
+    def old_login_link():
+        return redirect("/signup.html" if request.args.get("mode") == "signup" else "/login.html")
+
+    @app.get("/api/account/callback")
+    def old_callback():
+        return redirect("/login.html")
 
     return app

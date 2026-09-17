@@ -1,6 +1,9 @@
-"""Website profiles and opaque sessions. Never match or link accounts by email."""
+"""Native website accounts, hashed action tokens, and opaque sessions."""
 import hashlib
 import json
+import hmac
+import secrets
+import uuid
 import ssl
 import time
 from contextlib import contextmanager
@@ -8,9 +11,7 @@ from pathlib import Path
 
 import pymysql
 
-
-class AccountUnavailable(Exception):
-    pass
+from credentials import credential_tag
 
 
 class Store:
@@ -77,40 +78,98 @@ class Store:
             cur.execute("DELETE FROM WebsiteSession WHERE ExpiresAt<%s LIMIT 100", (now,))
             return attempts <= limit
 
-    def sync_profile(self, issuer, claims):
-        subject = claims.get("sub")
-        email = claims.get("email")
-        if not isinstance(subject, str) or not subject or not isinstance(email, str) or not email:
-            raise AccountUnavailable()
-        if len(email) > 320 or claims.get("email_verified") is not True:
-            raise AccountUnavailable()
-        user_id = "oidc:" + hashlib.sha256((issuer + "\n" + subject).encode()).hexdigest()
+    def find_account(self, email):
         with self.connection() as c, c.cursor() as cur:
-            cur.execute("SELECT UserId,AccountStatus FROM `User` WHERE UserId=%s FOR UPDATE", (user_id,))
-            user = cur.fetchone()
-            if user and user["AccountStatus"] != "active":
-                raise AccountUnavailable()
-            if user:
-                cur.execute("UPDATE `User` SET LastLoginDate=UTC_TIMESTAMP() WHERE UserId=%s", (user_id,))
-            else:
-                try:
-                    # This deliberately cannot be interpreted as a usable local password.
-                    cur.execute(
-                        "INSERT INTO `User` (UserId,Email,PasswordHash,FirstName,LastName,Role,"
-                        "AccountStatus,EmailVerified,LastLoginDate) VALUES (%s,%s,%s,%s,%s,'user','active',1,UTC_TIMESTAMP())",
-                        (user_id, email, "!external-auth:oidc", str(claims.get("given_name") or "")[:100],
-                         str(claims.get("family_name") or "")[:100]))
-                except pymysql.IntegrityError:
-                    # Duplicate email is not permission to merge identities or restore accounts.
-                    raise AccountUnavailable() from None
-        return user_id
+            cur.execute("SELECT UserId,Email,PasswordHash,FirstName,LastName,AccountStatus,EmailVerified "
+                        "FROM `User` WHERE Email=%s", (email,))
+            return cur.fetchone()
 
-    def get_user(self, user_id):
+    def create_pending(self, email, hashed_password, first_name, last_name):
         with self.connection() as c, c.cursor() as cur:
-            cur.execute("SELECT UserId,Email,FirstName,LastName,EmailVerified,AccountStatus "
+            try:
+                cur.execute(
+                    "INSERT INTO `User` (UserId,Email,PasswordHash,FirstName,LastName,Role,AccountStatus,EmailVerified) "
+                    "VALUES (%s,%s,%s,%s,%s,'user','pending',0)",
+                    ("native:" + str(uuid.uuid4()), email, hashed_password, first_name, last_name))
+                return True
+            except pymysql.IntegrityError:
+                # A repeated signup never replaces an existing password or account state.
+                return False
+
+    def finish_login(self, user_id, expected_hash):
+        with self.connection() as c, c.cursor() as cur:
+            cur.execute("SELECT PasswordHash,AccountStatus,EmailVerified FROM `User` WHERE UserId=%s FOR UPDATE", (user_id,))
+            row = cur.fetchone()
+            if (not row or row["AccountStatus"] != "active" or row["EmailVerified"] != 1
+                    or not hmac.compare_digest(row["PasswordHash"], expected_hash)):
+                return None
+            cur.execute("UPDATE `User` SET LastLoginDate=UTC_TIMESTAMP() WHERE UserId=%s", (user_id,))
+            return {"user_id": user_id, "auth_tag": credential_tag(expected_hash)}
+
+    def issue_token(self, email, purpose):
+        now = int(time.time())
+        with self.connection() as c, c.cursor() as cur:
+            # Lock the user first in both issuance and consumption.
+            cur.execute("SELECT UserId,Email,PasswordHash,AccountStatus,EmailVerified FROM `User` WHERE Email=%s FOR UPDATE", (email,))
+            row = cur.fetchone()
+            if not row or row["AccountStatus"] not in ("pending", "active"):
+                return None
+            if purpose == "verify" and (row["EmailVerified"] == 1 or row["AccountStatus"] != "pending"):
+                return None
+            if purpose not in ("verify", "reset"):
+                raise ValueError("Unknown token purpose")
+            raw = secrets.token_urlsafe(32)
+            digest = hashlib.sha256(raw.encode()).hexdigest()
+            expiry = now + (86400 if purpose == "verify" else 1800)
+            cur.execute("DELETE FROM WebsiteActionToken WHERE UserId=%s AND Purpose=%s", (row["UserId"], purpose))
+            cur.execute("INSERT INTO WebsiteActionToken (TokenHash,UserId,Purpose,CredentialTag,ExpiresAt) "
+                        "VALUES (%s,%s,%s,%s,%s)",
+                        (digest, row["UserId"], purpose, credential_tag(row["PasswordHash"]), expiry))
+            cur.execute("DELETE FROM WebsiteActionToken WHERE ExpiresAt<%s LIMIT 100", (now,))
+            return {"email": row["Email"], "token": raw}
+
+    def mark_token_sent(self, raw):
+        digest = hashlib.sha256(raw.encode()).hexdigest()
+        with self.connection() as c, c.cursor() as cur:
+            cur.execute("UPDATE WebsiteActionToken SET SentAt=%s WHERE TokenHash=%s", (int(time.time()), digest))
+
+    def consume_token(self, raw, purpose, new_hash=None):
+        digest = hashlib.sha256(raw.encode()).hexdigest()
+        with self.connection() as c, c.cursor() as cur:
+            cur.execute("SELECT UserId FROM WebsiteActionToken WHERE TokenHash=%s", (digest,))
+            hint = cur.fetchone()
+            if not hint:
+                return False
+            cur.execute("SELECT UserId,PasswordHash,AccountStatus FROM `User` WHERE UserId=%s FOR UPDATE", (hint["UserId"],))
+            user = cur.fetchone()
+            cur.execute("SELECT * FROM WebsiteActionToken WHERE TokenHash=%s FOR UPDATE", (digest,))
+            token = cur.fetchone()
+            if (not user or not token or token["UserId"] != user["UserId"]
+                    or token["Purpose"] != purpose or token["ExpiresAt"] <= int(time.time())
+                    or user["AccountStatus"] not in ("active", "pending")
+                    or not hmac.compare_digest(token["CredentialTag"], credential_tag(user["PasswordHash"]))):
+                return False
+            if purpose == "verify":
+                if user["AccountStatus"] != "pending":
+                    return False
+                cur.execute("UPDATE `User` SET EmailVerified=1,AccountStatus='active' WHERE UserId=%s", (user["UserId"],))
+            elif purpose == "reset" and new_hash:
+                cur.execute("UPDATE `User` SET PasswordHash=%s,EmailVerified=1,AccountStatus='active' WHERE UserId=%s",
+                            (new_hash, user["UserId"]))
+            else:
+                return False
+            cur.execute("DELETE FROM WebsiteActionToken WHERE UserId=%s", (user["UserId"],))
+            cur.execute("DELETE FROM WebsiteSession WHERE JSON_UNQUOTE(JSON_EXTRACT(Data,'$.user_id'))=%s", (user["UserId"],))
+            return True
+
+    def get_user(self, user_id, auth_tag=None):
+        with self.connection() as c, c.cursor() as cur:
+            cur.execute("SELECT UserId,Email,FirstName,LastName,EmailVerified,AccountStatus,PasswordHash "
                         "FROM `User` WHERE UserId=%s", (user_id,))
             row = cur.fetchone()
-            if not row or row["AccountStatus"] != "active" or row["EmailVerified"] != 1:
+            if (not row or row["AccountStatus"] != "active" or row["EmailVerified"] != 1
+                    or not isinstance(auth_tag, str) or not row["PasswordHash"].startswith("$argon2id$")
+                    or not hmac.compare_digest(auth_tag, credential_tag(row["PasswordHash"]))):
                 return None
             return {"email": row["Email"], "firstName": row["FirstName"] or "",
                     "lastName": row["LastName"] or "", "emailVerified": True}

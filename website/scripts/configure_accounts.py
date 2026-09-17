@@ -1,7 +1,7 @@
 """Provision website account storage and a narrowly scoped runtime secret.
 
 Reads NEKTRON_DB_* from the process environment. No credential values are printed.
-Default is a read-only preflight. Use --apply after configuring the Auth0 callback.
+Default is a read-only database preflight. Use --apply to provision native accounts.
 AWS credentials use the normal SDK chain, or --aws-from-wsl on Windows.
 """
 import argparse
@@ -10,11 +10,7 @@ import os
 import secrets
 import subprocess
 import sys
-from http.cookiejar import CookieJar
 from pathlib import Path
-from urllib.error import HTTPError
-from urllib.parse import urlencode
-from urllib.request import HTTPCookieProcessor, build_opener
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "server" / "accounts"))
 import boto3
@@ -27,8 +23,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--aws-from-wsl", action="store_true")
-    parser.add_argument("--client-id", default="9bYdBkEd654k8ktx58UtDqDVL3TnEgJ8")
-    parser.add_argument("--issuer", default="https://dev-cmgmokiptmjiwjri.us.auth0.com/")
     args = parser.parse_args()
     settings = {k: v for k, v in os.environ.items() if k.startswith("NEKTRON_DB_")}
     required = ("HOST", "NAME", "USER", "PASSWORD")
@@ -44,25 +38,8 @@ def main():
             raise RuntimeError("The existing User table is required")
     print("Verified TLS database connection and existing User table.")
 
-    query = urlencode({"response_type": "code", "client_id": args.client_id,
-                       "redirect_uri": "https://nektron.ai/api/account/callback",
-                       "scope": "openid profile email", "state": secrets.token_urlsafe(32),
-                       "nonce": secrets.token_urlsafe(32),
-                       "code_challenge": secrets.token_urlsafe(32), "code_challenge_method": "S256"})
-    try:
-        opener = build_opener(HTTPCookieProcessor(CookieJar()))
-        with opener.open(args.issuer.rstrip("/") + "/authorize?" + query, timeout=15) as response:
-            if "/u/" not in response.url:
-                raise RuntimeError("Auth0 login redirect needs verification")
-    except HTTPError as error:
-        message = error.read().decode("utf-8", "replace")
-        if "Callback URL mismatch" in message:
-            raise RuntimeError("Auth0 rejected the redirect. Add https://nektron.ai/api/account/callback "
-                               "to the website client's Allowed Callback URLs.") from None
-        raise RuntimeError(f"Auth0 preflight failed with HTTP {error.code}; inspect the provider configuration.") from None
-    print("Auth0 callback reaches hosted login.")
     if not args.apply:
-        print("Preflight passed. --apply creates two website tables, a scoped DB user, a secret, and its instance-role grant.")
+        print("Preflight passed. --apply provisions account tables, a scoped DB user, a secret and verified email delivery.")
         return
 
     if args.aws_from_wsl:
@@ -89,6 +66,13 @@ def main():
         if error.response["Error"]["Code"] != "ResourceNotFoundException":
             raise
 
+    sender = "info@nektron.ai"
+    ses = aws.client("sesv2")
+    if not ses.get_email_identity(EmailIdentity=sender).get("VerifiedForSendingStatus"):
+        raise RuntimeError("The account email sender is not verified")
+    status = ses.get_account()
+    if not status.get("SendingEnabled") or not status.get("ProductionAccessEnabled"):
+        raise RuntimeError("Production email delivery is not enabled")
     admin.migrate()
     username = "nektron_website_auth"
     password = previous["NEKTRON_DB_PASSWORD"] if previous else secrets.token_urlsafe(48)
@@ -98,8 +82,10 @@ def main():
     if previous and (previous["NEKTRON_DB_USER"] != username or previous["NEKTRON_DB_NAME"] != database
                      or previous["NEKTRON_DB_HOST"] != settings["NEKTRON_DB_HOST"]):
         raise RuntimeError("Existing account secret targets differ; manual review required")
-    runtime = {**settings, "NEKTRON_DB_USER": username, "NEKTRON_DB_PASSWORD": password,
-               "NEKTRON_AUTH_ISSUER": args.issuer, "NEKTRON_AUTH_CLIENT_ID": args.client_id,
+    # Preserve prior provider settings for a safe application-version rollback.
+    # Native authentication does not use them or change any connector configuration.
+    runtime = {**(previous or {}), **settings, "NEKTRON_DB_USER": username, "NEKTRON_DB_PASSWORD": password,
+               "NEKTRON_AUTH_EMAIL_FROM": "Nektron <info@nektron.ai>", "NEKTRON_EMAIL_REGION": "us-east-2",
                "NEKTRON_SITE_ORIGIN": "https://nektron.ai", "NEKTRON_ACCOUNT_ENABLED": "true"}
     runtime.pop("NEKTRON_DB_CA_FILE", None)
     if not previous:
@@ -115,13 +101,16 @@ def main():
     authenticated.close()
     with admin.connection() as c, c.cursor() as cur:
         cur.execute(f"GRANT SELECT,INSERT,UPDATE ON `{database}`.`User` TO %s@'%%'", (username,))
-        for table in ("WebsiteSession", "WebsiteRateLimit"):
+        for table in ("WebsiteSession", "WebsiteRateLimit", "WebsiteActionToken"):
             cur.execute(f"GRANT SELECT,INSERT,UPDATE,DELETE ON `{database}`.`{table}` TO %s@'%%'", (username,))
     Store({**runtime, "NEKTRON_DB_CA_FILE": settings["NEKTRON_DB_CA_FILE"]}).read_session("0" * 64)
     aws.client("iam").put_role_policy(RoleName="aws-elasticbeanstalk-ec2-role",
                                      PolicyName="NektronWebsiteAccounts",
                                      PolicyDocument=json.dumps({"Version": "2012-10-17", "Statement": [{
-                                         "Effect": "Allow", "Action": ["secretsmanager:GetSecretValue"], "Resource": arn}]}))
+                                         "Effect": "Allow", "Action": ["secretsmanager:GetSecretValue"], "Resource": arn},
+                                         {"Effect": "Allow", "Action": ["ses:SendEmail"],
+                                          "Resource": f"arn:aws:ses:us-east-2:{account}:identity/info@nektron.ai",
+                                          "Condition": {"StringEquals": {"ses:FromAddress": "info@nektron.ai"}}}]}))
     print("Account storage and runtime secret are ready.")
     sm.put_secret_value(SecretId=arn, SecretString=json.dumps(runtime))
     print("Set NEKTRON_ACCOUNT_SECRET_ARN for the website deployment to: " + arn)

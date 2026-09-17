@@ -1,35 +1,31 @@
 import copy
 import hashlib
+import secrets
 import sys
 import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from urllib.parse import parse_qs, urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app import COOKIE, ServerSession, create_app
-from store import AccountUnavailable
-from joserfc import jwt
-from joserfc.jwk import RSAKey
+from app import COOKIE, create_app
+from credentials import credential_tag, password_hash, password_matches
 
 ORIGIN = "https://nektron.ai"
-ISSUER = "https://identity.example.test/"
-SETTINGS = {"NEKTRON_SITE_ORIGIN": ORIGIN, "NEKTRON_ACCOUNT_ENABLED": "true",
-            "NEKTRON_AUTH_ISSUER": ISSUER, "NEKTRON_AUTH_CLIENT_ID": "website-test"}
+EMAIL = "native-user@example.com"
+PASSWORD = "a unique test passphrase 123"
+NEW_PASSWORD = "a second unique passphrase 456"
+SETTINGS = {"NEKTRON_SITE_ORIGIN": ORIGIN, "NEKTRON_ACCOUNT_ENABLED": "true"}
 
 
 class MemoryStore:
     def __init__(self):
-        self.sessions = {}
-        self.user = None
+        self.sessions, self.users, self.tokens = {}, {}, {}
         self.allow = True
-        self.blocked = False
-        self.last_claims = None
 
     def read_session(self, digest):
-        value = self.sessions.get(digest)
-        return copy.deepcopy(value) if value and value[1] > time.time() else None
+        row = self.sessions.get(digest)
+        return copy.deepcopy(row) if row and row[1] > time.time() else None
 
     def save_session(self, digest, data, expires, new):
         if new or digest in self.sessions:
@@ -38,165 +34,234 @@ class MemoryStore:
     def delete_session(self, digest):
         self.sessions.pop(digest, None)
 
-    def allow_request(self, key):
+    def allow_request(self, key, **kwargs):
         return self.allow
 
-    def sync_profile(self, issuer, claims):
-        if self.blocked:
-            raise AccountUnavailable()
-        self.last_claims = dict(claims)
-        self.user = {"email": claims["email"], "firstName": "Test", "lastName": "Member",
-                     "emailVerified": True}
-        return "opaque-test-user"
+    def find_account(self, email):
+        return copy.deepcopy(self.users.get(email))
 
-    def get_user(self, user_id):
-        return None if self.blocked else self.user
+    def create_pending(self, email, hashed, first, last):
+        if email in self.users:
+            return False
+        self.users[email] = {"UserId": "native:" + secrets.token_hex(12), "Email": email,
+            "PasswordHash": hashed, "FirstName": first, "LastName": last,
+            "Role": "user", "AccountStatus": "pending", "EmailVerified": 0}
+        return True
+
+    def finish_login(self, user_id, expected):
+        user = next(u for u in self.users.values() if u["UserId"] == user_id)
+        if user["AccountStatus"] != "active" or not user["EmailVerified"] or user["PasswordHash"] != expected:
+            return None
+        return {"user_id": user_id, "auth_tag": credential_tag(expected)}
+
+    def issue_token(self, email, purpose):
+        user = self.users.get(email)
+        if not user or user["AccountStatus"] not in ("active", "pending"):
+            return None
+        if purpose == "verify" and user["EmailVerified"]:
+            return None
+        self.tokens = {k:v for k,v in self.tokens.items() if v["email"] != email or v["purpose"] != purpose}
+        raw = secrets.token_urlsafe(32)
+        self.tokens[hashlib.sha256(raw.encode()).hexdigest()] = {
+            "email":email,"purpose":purpose,"expires":time.time()+1800,
+            "tag":credential_tag(user["PasswordHash"])}
+        return {"email":email,"token":raw}
+
+    def mark_token_sent(self, raw):
+        self.tokens[hashlib.sha256(raw.encode()).hexdigest()]["sent"] = True
+
+    def consume_token(self, raw, purpose, new_hash=None):
+        key = hashlib.sha256(raw.encode()).hexdigest()
+        record = self.tokens.get(key)
+        if not record or record["purpose"] != purpose or record["expires"] <= time.time():
+            return False
+        user = self.users[record["email"]]
+        if user["AccountStatus"] not in ("active","pending") or record["tag"] != credential_tag(user["PasswordHash"]):
+            return False
+        user.update(EmailVerified=1, AccountStatus="active")
+        if purpose == "reset": user["PasswordHash"] = new_hash
+        self.tokens = {k:v for k,v in self.tokens.items() if v["email"] != user["Email"]}
+        self.sessions = {k:v for k,v in self.sessions.items() if v[0].get("user_id") != user["UserId"]}
+        return True
+
+    def get_user(self, user_id, auth_tag=None):
+        for user in self.users.values():
+            if user["UserId"] == user_id and user["AccountStatus"] == "active" and user["EmailVerified"] and auth_tag == credential_tag(user["PasswordHash"]):
+                return {"email":user["Email"],"firstName":user["FirstName"],"lastName":user["LastName"],"emailVerified":True}
+        return None
+
+
+class CaptureMailer:
+    def __init__(self): self.sent=[]
+    def send(self, email, purpose, token): self.sent.append((email,purpose,token))
 
 
 class AccountTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.key = RSAKey.generate_key(2048, parameters={"kid": "known"})
-        cls.unknown_key = RSAKey.generate_key(2048, parameters={"kid": "known"})
-
     def setUp(self):
-        self.store = MemoryStore()
-        self.app = create_app(SETTINGS, self.store)
+        self.store, self.mailer = MemoryStore(), CaptureMailer()
+        self.app = create_app(SETTINGS, self.store, self.mailer)
         self.app.testing = True
         self.client = self.app.test_client()
-        self.remote = self.app.extensions["authlib.integrations.flask_client"].create_client("identity")
-        metadata = {"issuer": ISSUER, "authorization_endpoint": ISSUER + "authorize",
-                    "token_endpoint": ISSUER + "oauth/token", "jwks_uri": ISSUER + "jwks",
-                    "id_token_signing_alg_values_supported": ["RS256"]}
-        self.metadata = patch.object(self.remote, "load_server_metadata", return_value=metadata)
-        self.jwks = patch.object(self.remote, "fetch_jwk_set",
-                                 return_value={"keys": [self.key.as_dict(private=False)]})
-        self.metadata.start()
-        self.jwks.start()
-        self.addCleanup(self.metadata.stop)
-        self.addCleanup(self.jwks.stop)
 
     def get(self, path):
-        return self.client.get(path, base_url=ORIGIN)
+        return self.client.get("/api/account/" + path, base_url=ORIGIN)
 
-    def begin(self, query=""):
-        response = self.get("/api/account/login" + query)
-        self.assertEqual(response.status_code, 302)
-        parameters = parse_qs(urlparse(response.location).query)
-        self.assertEqual(parameters["code_challenge_method"], ["S256"])
-        self.assertEqual(parameters["scope"], ["openid profile email"])
-        self.assertEqual(parameters["redirect_uri"], [ORIGIN + "/api/account/callback"])
-        self.assertNotIn("code_verifier", parameters)
-        return parameters
+    def post(self, path, data, headers=None):
+        csrf = self.get("csrf").json["csrfToken"]
+        actual = {"Origin":ORIGIN, "X-CSRF-Token":csrf} if headers is None else headers
+        return self.client.post("/api/account/" + path, json=data, headers=actual, base_url=ORIGIN)
 
-    def finish(self, parameters, changes=None, key=None, state=None):
-        claims = {"iss": ISSUER, "sub": "auth0|synthetic", "aud": "website-test",
-                  "exp": int(time.time()) + 300, "iat": int(time.time()),
-                  "nonce": parameters["nonce"][0], "email": "test@example.invalid",
-                  "email_verified": True}
-        claims.update(changes or {})
-        encoded = jwt.encode({"alg": "RS256", "kid": "known"}, claims, key or self.key)
-        token = {"access_token": "test-access-token", "token_type": "Bearer", "id_token": encoded}
-        with patch.object(self.remote, "fetch_access_token", return_value=token) as fetch:
-            response = self.get("/api/account/callback?code=synthetic&state=" + (state or parameters["state"][0]))
-        return response, fetch
+    def signup(self):
+        return self.post("signup", {"email":EMAIL, "password":PASSWORD, "firstName":"Test", "lastName":"Member"})
 
-    def test_anonymous_session_does_not_create_cookie(self):
-        response = self.get("/api/account/session")
-        self.assertEqual(response.json, {"authenticated": False})
-        self.assertNotIn("Set-Cookie", response.headers)
-        self.assertEqual(response.headers["Cache-Control"], "no-store")
+    def verified(self):
+        self.signup()
+        raw = self.mailer.sent[-1][2]
+        self.assertEqual(self.post("verify-email", {"token":raw}).status_code, 200)
 
-    def test_signup_uses_hosted_signup_and_safe_redirect(self):
-        p = self.begin("?mode=signup&returnTo=https://evil.example")
-        self.assertEqual(p["screen_hint"], ["signup"])
-        response, fetch = self.finish(p)
-        self.assertEqual(response.location, "/account.html")
-        self.assertTrue(fetch.call_args.kwargs.get("code_verifier"))
+    def login(self, password=PASSWORD, email=EMAIL):
+        return self.post("login", {"email":email,"password":password})
 
-    def test_verified_login_rotates_session_and_never_exposes_tokens(self):
-        p = self.begin()
-        old_cookie = self.client.get_cookie(COOKIE, domain="nektron.ai").value
-        response, _ = self.finish(p)
-        new_cookie = self.client.get_cookie(COOKIE, domain="nektron.ai").value
-        self.assertNotEqual(old_cookie, new_cookie)
-        self.assertNotIn(hashlib.sha256(old_cookie.encode()).hexdigest(), self.store.sessions)
-        for flag in ("Secure", "HttpOnly", "SameSite=Lax", "Path=/"):
-            self.assertIn(flag, response.headers["Set-Cookie"])
-        self.assertNotIn("Domain=", response.headers["Set-Cookie"])
-        profile = self.get("/api/account/session")
-        self.assertTrue(profile.json["authenticated"])
-        self.assertNotIn("access_token", profile.text)
-        self.assertNotIn("id_token", repr(self.store.sessions))
+    def test_signup_hashes_password_and_requires_email_verification(self):
+        response = self.signup()
+        self.assertEqual(response.status_code, 202)
+        row = self.store.users[EMAIL]
+        self.assertTrue(row["PasswordHash"].startswith("$argon2id$"))
+        self.assertTrue(password_matches(row["PasswordHash"],PASSWORD))
+        self.assertEqual((row["Role"],row["AccountStatus"],row["EmailVerified"]),("user","pending",0))
+        self.assertEqual(self.login().json["error"],"EMAIL_NOT_VERIFIED")
+        self.assertNotIn(PASSWORD,response.text)
+        self.assertNotIn(self.mailer.sent[-1][2],response.text)
 
-    def test_wrong_state_does_not_exchange_code(self):
-        p = self.begin()
-        response, fetch = self.finish(p, state="tampered")
-        self.assertEqual(response.location, "/login.html?error=signin_failed")
-        fetch.assert_not_called()
+    def test_verification_is_single_use_and_does_not_log_in_automatically(self):
+        self.signup()
+        raw = self.mailer.sent[-1][2]
+        self.assertNotIn(raw, self.store.tokens)
+        self.assertEqual(self.post("verify-email",{"token":raw}).status_code,200)
+        self.assertEqual(self.post("verify-email",{"token":raw}).status_code,400)
+        self.assertFalse(self.get("session").json["authenticated"])
 
-    def test_bad_signed_claims_are_rejected(self):
-        for changes in ({"nonce": "wrong"}, {"nonce": "wrong", "nonce_supported": False},
-                        {"aud": "other-client"}, {"iss": "https://wrong.example/"},
-                        {"exp": int(time.time()) - 90}, {"email_verified": False}):
-            with self.subTest(changes=changes):
-                p = self.begin()
-                response, _ = self.finish(p, changes)
-                self.assertTrue(response.location.startswith("/login.html?error="))
-                self.assertFalse(self.get("/api/account/session").json["authenticated"])
+    def test_login_rotates_cookie_and_returns_profile(self):
+        self.verified()
+        self.get("csrf")
+        previous=self.client.get_cookie(COOKIE,domain="nektron.ai").value
+        response=self.login()
+        self.assertEqual(response.status_code,200)
+        current=self.client.get_cookie(COOKIE,domain="nektron.ai").value
+        self.assertNotEqual(current,previous)
+        self.assertNotIn(hashlib.sha256(previous.encode()).hexdigest(),self.store.sessions)
+        for flag in ("Secure","HttpOnly","SameSite=Lax","Path=/"): self.assertIn(flag,response.headers["Set-Cookie"])
+        profile=self.get("session").json
+        self.assertTrue(profile["authenticated"])
+        self.assertEqual(profile["user"]["email"],EMAIL)
+        self.assertNotIn("PasswordHash",str(profile))
 
-    def test_unknown_signature_is_rejected(self):
-        response, _ = self.finish(self.begin(), key=self.unknown_key)
-        self.assertEqual(response.location, "/login.html?error=signin_failed")
+    def test_wrong_password_and_unknown_account_have_same_error(self):
+        self.verified()
+        self.assertEqual(self.login("wrong password").json,
+                         self.login("wrong password",email="unknown@example.com").json)
+        self.assertEqual(self.login("wrong password").status_code,401)
 
-    def test_replayed_callback_is_rejected(self):
-        p = self.begin()
-        self.finish(p)
-        response, fetch = self.finish(p)
-        self.assertEqual(response.location, "/login.html?error=expired")
-        fetch.assert_not_called()
-        self.assertTrue(self.get("/api/account/session").json["authenticated"])
+    def test_signup_cannot_assign_role_or_replace_existing_account(self):
+        self.verified()
+        before=copy.deepcopy(self.store.users[EMAIL])
+        self.assertEqual(self.post("signup",{"email":EMAIL,"password":NEW_PASSWORD,"role":"admin"}).status_code,400)
+        self.assertEqual(self.post("signup",{"email":EMAIL,"password":NEW_PASSWORD}).status_code,202)
+        self.assertEqual(self.store.users[EMAIL],before)
 
-    def test_cross_site_login_cannot_clear_session(self):
-        self.finish(self.begin())
-        response = self.client.get("/api/account/login", base_url=ORIGIN,
-                                    headers={"Sec-Fetch-Site": "cross-site"})
-        self.assertEqual(response.status_code, 403)
-        self.assertTrue(self.get("/api/account/session").json["authenticated"])
+    def test_csrf_origin_and_json_are_required(self):
+        for endpoint, body in (("signup",{"email":EMAIL,"password":PASSWORD}),("login",{"email":EMAIL,"password":PASSWORD}),("request-reset",{"email":EMAIL})):
+            self.assertEqual(self.post(endpoint,body,headers={}).status_code,403)
+            csrf=self.get("csrf").json["csrfToken"]
+            self.assertEqual(self.post(endpoint,body,headers={"Origin":"https://evil.example","X-CSRF-Token":csrf}).status_code,403)
+        csrf=self.get("csrf").json["csrfToken"]
+        r=self.client.post("/api/account/login",data="x",headers={"Origin":ORIGIN,"X-CSRF-Token":csrf},base_url=ORIGIN)
+        self.assertEqual(r.status_code,415)
 
-    def test_session_write_failure_never_reports_success(self):
-        p = self.begin()
-        with patch.object(self.store, "save_session", side_effect=RuntimeError("storage offline")):
-            response, _ = self.finish(p)
-        self.assertEqual(response.status_code, 503)
-        self.assertNotIn("Location", response.headers)
+    def test_repeated_pending_signup_requires_owner_to_choose_new_password(self):
+        self.signup()
+        previous_hash = self.store.users[EMAIL]["PasswordHash"]
+        self.assertEqual(self.post("signup", {"email":EMAIL,"password":NEW_PASSWORD}).status_code,202)
+        self.assertEqual(self.store.users[EMAIL]["PasswordHash"],previous_hash)
+        self.assertEqual(self.mailer.sent[-1][1],"reset")
+        token=self.mailer.sent[-1][2]
+        self.assertEqual(self.post("verify-email",{"token":token}).status_code,400)
+        self.assertEqual(self.post("reset-password",{"token":token,"password":NEW_PASSWORD}).status_code,200)
+        self.assertEqual(self.login().status_code,401)
+        self.assertEqual(self.login(NEW_PASSWORD).status_code,200)
 
-    def test_logout_requires_origin_and_csrf_then_revokes_session(self):
-        self.finish(self.begin())
-        csrf = self.get("/api/account/session").json["csrfToken"]
-        for headers in ({}, {"Origin": ORIGIN}, {"Origin": "https://evil.example", "X-CSRF-Token": csrf}):
-            self.assertEqual(self.client.post("/api/account/logout", base_url=ORIGIN, headers=headers).status_code, 403)
-        response = self.client.post("/api/account/logout", base_url=ORIGIN,
-                                    headers={"Origin": ORIGIN, "X-CSRF-Token": csrf})
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(self.get("/api/account/session").json["authenticated"])
-        self.assertFalse(self.store.sessions)
+    def test_reset_is_generic_single_use_and_revokes_old_sessions(self):
+        self.verified(); self.login()
+        old_cookie=self.client.get_cookie(COOKIE,domain="nektron.ai").value
+        found=self.post("request-reset",{"email":EMAIL})
+        missing=self.post("request-reset",{"email":"unknown@example.com"})
+        self.assertEqual(found.json,missing.json)
+        self.assertEqual(found.status_code,202)
+        raw=self.mailer.sent[-1][2]
+        self.assertEqual(self.post("verify-email",{"token":raw}).status_code,400)
+        self.assertEqual(self.post("reset-password",{"token":raw,"password":NEW_PASSWORD}).status_code,200)
+        self.assertEqual(self.post("reset-password",{"token":raw,"password":NEW_PASSWORD}).status_code,400)
+        self.client.set_cookie(COOKIE,old_cookie,domain="nektron.ai")
+        self.assertFalse(self.get("session").json["authenticated"])
+        self.assertEqual(self.login().status_code,401)
+        self.assertEqual(self.login(NEW_PASSWORD).status_code,200)
 
-    def test_account_disabled_after_login_is_rejected(self):
-        self.finish(self.begin())
-        self.store.blocked = True
-        self.assertFalse(self.get("/api/account/session").json["authenticated"])
+    def test_expired_token_fails(self):
+        self.signup(); raw=self.mailer.sent[-1][2]
+        self.store.tokens[hashlib.sha256(raw.encode()).hexdigest()]["expires"]=time.time()-1
+        self.assertEqual(self.post("verify-email",{"token":raw}).status_code,400)
 
-    def test_rate_limit_blocks_login(self):
-        self.store.allow = False
-        self.assertEqual(self.get("/api/account/login").status_code, 429)
+    def test_disabled_or_locked_accounts_cannot_login_or_reset(self):
+        self.verified()
+        for state in ("disabled","locked"):
+            self.store.users[EMAIL]["AccountStatus"]=state
+            self.assertEqual(self.login().status_code,401)
+            sent=len(self.mailer.sent)
+            self.post("request-reset",{"email":EMAIL})
+            self.assertEqual(len(self.mailer.sent),sent)
 
-    def test_unconfigured_service_is_explicit(self):
-        app = create_app({}, MemoryStore())
-        response = app.test_client().get("/api/account/session", base_url=ORIGIN)
-        self.assertEqual(response.status_code, 503)
-        self.assertEqual(response.json["error"], "ACCOUNT_UNAVAILABLE")
+    def test_prior_external_account_can_set_password_only_by_email_proof(self):
+        self.verified()
+        row=self.store.users[EMAIL]; before=row["UserId"]
+        row["PasswordHash"]="!external-auth:oidc"
+        self.assertEqual(self.login().status_code,401)
+        self.post("request-reset",{"email":EMAIL}); raw=self.mailer.sent[-1][2]
+        self.assertEqual(self.post("reset-password",{"token":raw,"password":NEW_PASSWORD}).status_code,200)
+        self.assertEqual(self.store.users[EMAIL]["UserId"],before)
+        self.assertEqual(self.login(NEW_PASSWORD).status_code,200)
+
+    def test_logout_revokes_session(self):
+        self.verified();self.login()
+        self.assertEqual(self.post("logout",{}).status_code,200)
+        self.assertFalse(self.get("session").json["authenticated"])
+
+    def test_short_password_invalid_email_and_bad_token_are_rejected(self):
+        self.assertEqual(self.post("signup",{"email":EMAIL,"password":"short"}).status_code,400)
+        self.assertEqual(self.post("signup",{"email":"not-an-email","password":PASSWORD}).status_code,400)
+        self.assertEqual(self.post("reset-password",{"token":"bad","password":NEW_PASSWORD}).status_code,400)
+
+    def test_rate_limit_stops_password_work(self):
+        csrf=self.get("csrf").json["csrfToken"];self.store.allow=False
+        response=self.client.post("/api/account/signup",base_url=ORIGIN,json={"email":EMAIL,"password":PASSWORD},
+                                  headers={"Origin":ORIGIN,"X-CSRF-Token":csrf})
+        self.assertEqual(response.status_code,429)
+        self.assertFalse(self.store.users)
+
+    def test_session_storage_failure_does_not_report_success(self):
+        self.verified()
+        csrf=self.get("csrf").json["csrfToken"]
+        with patch.object(self.store,"save_session",side_effect=RuntimeError("offline")):
+            r=self.client.post("/api/account/login",base_url=ORIGIN,json={"email":EMAIL,"password":PASSWORD},
+                               headers={"Origin":ORIGIN,"X-CSRF-Token":csrf})
+        self.assertEqual(r.status_code,503)
+
+    def test_legacy_routes_stay_on_nektron(self):
+        self.assertEqual(self.get("login?mode=signup").location,"/signup.html")
+        self.assertEqual(self.get("callback?code=old").location,"/login.html")
+
+    def test_email_failure_does_not_disclose_account_presence(self):
+        with patch.object(self.mailer,"send",side_effect=RuntimeError("SES unavailable")):
+            self.assertEqual(self.signup().json,{"accepted":True})
 
 
-if __name__ == "__main__":
-    unittest.main()
+if __name__ == "__main__": unittest.main()

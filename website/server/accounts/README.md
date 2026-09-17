@@ -1,76 +1,86 @@
 # Website accounts
 
-Auth0 performs signup, password authentication, email verification and recovery.
-The website requests only `openid profile email`. It does not request connector
-management access, create connector memberships or enable billing.
+Native email/password forms stay on nektron.ai. This backend uses the existing
+NektronDB `User` table, not Auth0 redirects. Database Connector's Auth0 configuration
+is separate and is not modified, nor does a website account grant connector access.
 
-## Identity and data
+## Identity and security
 
-- Uses the existing Auth0 tenant/website client, with Authorization Code + S256 PKCE.
-- Register `https://nektron.ai/api/account/callback` in the client's Allowed
-  Callback URLs, preserving all existing callbacks. Enable the existing database
-  connection for the client and allow signup in Auth0.
-- The existing application is **Database Connector Account** (public SPA client
-  `9bYdBkEd654k8ktx58UtDqDVL3TnEgJ8`), in tenant `dev-cmgmokiptmjiwjri`.
-- A verified issuer/subject maps to an opaque `User.UserId`. Never link by email.
-- New rows are `Role=user`, `AccountStatus=active`, `EmailVerified=1`.
-  Disabled, locked, or pending existing records are not reactivated.
-- `PasswordHash=!external-auth:oidc` explicitly marks an external identity; it is
-  not a password hash. Never add local password authentication for these rows.
-- The website cookie is Secure, HttpOnly, SameSite=Lax, path=/, host-only.
-  Session tokens are hashed in MySQL; sessions expire after eight hours.
-  OAuth state and PKCE material are server-side and expire after ten minutes.
-- Logout requires the exact website Origin and a per-session CSRF token.
-- The shared identity does not imply shared authorization between products.
-- Existing User emails are not silently replaced from later identity claims.
+- Signup creates `native:<uuid>` identities with `Role=user`, `AccountStatus=pending`
+  and `EmailVerified=0`. Duplicate signup never changes an existing password.
+  Repeated signup for a pending account emails a password-reset link, rather
+  than activating a potentially pre-registered password chosen by someone else.
+- Passwords are Argon2id hashes (64 MiB, three iterations, one lane). Passwords
+  must be 15-128 characters; no password is logged or returned by the API.
+- Email verification is required before login. Verification links last 24 hours;
+  password-reset links last 30 minutes. Tokens are random, hashed in the database,
+  credential-bound, and consumed transactionally once. Disabled/locked accounts
+  cannot log in or use these links to reactivate themselves.
+- Tokens use URL fragments, which are removed from browser history immediately.
+  Verification requires an explicit POST, not a link-scanner-triggerable GET.
+- All mutations require JSON, the exact site Origin, and a per-session CSRF token.
+  Login, signup and email requests have database-backed IP/email rate limits.
+- Unknown/existing email requests have generic responses and a timing floor.
+  Delivery errors log only the error class, never addresses, links or credentials.
+- Secure, HttpOnly, SameSite=Lax, host-only cookies contain opaque session tokens.
+  The database stores only their hashes. Login rotates the session; authenticated
+  sessions expire in eight hours. Logout deletes the session. Password changes
+  revoke all sessions and invalidate prior action tokens.
+- Previously created external-auth website rows can establish a native password
+  using the email-proven reset flow, preserving their UserId. This does not change
+  their Auth0 password or silently create a shared login with Database Connector.
 
 ## Configuration
 
-The EC2 instance role needs GetSecretValue for only the website account secret.
-Set the EB environment's `NEKTRON_ACCOUNT_SECRET_ARN` to that ARN. Its JSON contains:
+Set the EB environment's `NEKTRON_ACCOUNT_SECRET_ARN` to the website runtime secret.
+Its JSON contains:
 
 ```text
 NEKTRON_ACCOUNT_ENABLED=true
 NEKTRON_SITE_ORIGIN=https://nektron.ai
-NEKTRON_AUTH_ISSUER=https://dev-cmgmokiptmjiwjri.us.auth0.com/
-NEKTRON_AUTH_CLIENT_ID=<existing website client>
-NEKTRON_DB_HOST=<from authorized NEKTRON environment>
+NEKTRON_AUTH_EMAIL_FROM=Nektron <info@nektron.ai>
+NEKTRON_EMAIL_REGION=us-east-2
+NEKTRON_DB_HOST=<authorized database host>
 NEKTRON_DB_PORT=3306
-NEKTRON_DB_NAME=<from authorized NEKTRON environment>
+NEKTRON_DB_NAME=<existing database>
 NEKTRON_DB_USER=<account-scoped runtime user>
 NEKTRON_DB_PASSWORD=<secret>
 ```
 
-For a confidential Auth0 client also set NEKTRON_AUTH_CLIENT_SECRET; public clients
-use no client secret. Never copy either passwords or client secrets into assets.
+The EC2 role receives GetSecretValue for this secret and ses:SendEmail for the
+verified info@nektron.ai identity only. SES must have production sending enabled.
+No credentials belong in public assets. Old provider settings are retained only
+for application-version rollback; this backend does not read them.
 
-The CA bundle at `rds-ca.pem` is AWS's public RDS trust bundle. Connections always
-verify the server certificate and hostname. The environment SSL mode is not used
-to downgrade verification.
+The public AWS CA bundle at `rds-ca.pem` verifies the RDS certificate and hostname.
+The provisioner adds WebsiteSession, WebsiteRateLimit and WebsiteActionToken, not
+a replacement User table. Runtime grants are SELECT/INSERT/UPDATE on User, and
+SELECT/INSERT/UPDATE/DELETE on the three support tables, with no schema privileges.
 
-Apply schema.sql once using a deployment identity. It creates WebsiteSession and
-WebsiteRateLimit only; the existing User table is not recreated. Runtime database
-grants should be SELECT/INSERT/UPDATE on User, SELECT/INSERT/UPDATE/DELETE on the
-two website tables. Do not grant schema changes to the runtime user.
+Load the authorized NEKTRON_DB_* environment, then run from the repository root:
 
-With the authorized NEKTRON_DB_* environment loaded, run
-`python website/scripts/configure_accounts.py --aws-from-wsl` from the repository
-root for a read-only database and Auth0 preflight. Add `--apply` to provision the
-tables, dedicated database user, secret and role policy. No password is printed.
-Pass its returned ARN as NEKTRON_ACCOUNT_SECRET_ARN to deploy-eb-site.sh, which
-sets the environment reference and application version together.
+```sh
+python website/scripts/configure_accounts.py --aws-from-wsl
+python website/scripts/configure_accounts.py --aws-from-wsl --apply
+```
 
-The backend runs as a dedicated non-login user, bound to loopback behind nginx.
-The HTTPS hook blocks /server/. The account hook logs paths without query strings.
-No OAuth access tokens or ID tokens are retained after the callback.
+The first command is a read-only DB preflight. The second provisions the storage,
+scoped runtime identity, secret and email permissions. No passwords are printed.
+Pass the secret ARN to deploy-eb-site.sh. The service runs as a dedicated non-login
+user on loopback behind nginx. Public access to /server/ is blocked.
 
 ## Validation
 
-Run `python -m unittest discover -s tests -v` from this directory with the pinned
-requirements installed. Use a local mock identity provider or the injected test
-remote; tests must not create real Auth0 users or email real users.
+```sh
+python -m unittest discover -s website/server/accounts/tests -v
+node website/tests/account_browser.cjs
+```
 
-Before publication: verify the callback allowlist, TLS DB access, schema,
-least-privilege grants, health endpoint and the real signup/email verification/
-login/logout flow. A successful build is not proof that an identity-provider
-callback has been configured.
+Browser checks use a local static preview (REVIEW_URL, default port 8771) and
+mocked account endpoints. They never create users or send mail. Before deployment,
+also exercise transactions against controlled disposable DB rows, and verify SES
+delivery using its mailbox simulator. Do not email real users during tests.
+
+After deployment check health, secure cookies, forms on mobile and desktop, SES
+acceptance, and login/logout. Monitor account_email_delivery_failed and 5xx rates;
+a generic accepted response alone is not proof that an email was delivered.

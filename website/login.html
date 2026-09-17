@@ -13,7 +13,7 @@
   <script src="assets/site.js" defer></script>
   <script src="assets/account.js" defer></script>
 </head>
-<body class="atelier-site account-page">
+<body class="atelier-site account-page" data-account-screen="login">
   <a class="skip-link" href="#content">Skip to content</a>
   <div id="top"></div>
 <header>
@@ -56,18 +56,15 @@
     <div class="account-intro">
       <p class="section-kicker">Your Nektron account</p>
       <h1>Welcome back.</h1>
-      <p>Continue securely with your existing account. New to Nektron? Create an account to get started.</p>
-      <p class="account-note">Authentication is handled securely by Auth0. Your password is never stored by this website.</p>
+      <p>Log in to your Nektron account and pick up where you left off.</p>
     </div>
     <div class="account-card">
-      <div data-account-entry>
-        <h2>Log in to Nektron.</h2>
-        <a class="button primary" href="/api/account/login?mode=login" data-auth-start>Continue to login</a>
-        <p class="account-choice"><a href="signup.html">New to Nektron? Sign up.</a></p>
-        <p class="account-note">Email verification and password recovery are available in the secure sign-in flow. Signing up does not purchase a subscription or grant access to private databases.</p>
-      </div>
-
-      <p class="account-status" data-account-status role="status" aria-live="polite"></p>
+      <h2>Log in</h2>
+      <form class="account-form" data-auth-form="login" ><div class="account-fields"><div class="account-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com"></div><div class="account-field"><label for="password">Password</label><div class="account-password"><input id="password" name="password" type="password" autocomplete="current-password"  maxlength="128" required><button type="button" data-show-password="password" aria-controls="password" aria-pressed="false" aria-label="Show or hide password">Show</button></div></div></div><button class="button primary" type="submit" disabled>Log in</button></form>
+      <div class="account-success" data-auth-success tabindex="-1" hidden><p></p><a href="login.html">Continue to login</a></div>
+      <p class="account-status" data-account-status role="status" aria-live="polite" tabindex="-1"></p>
+      <div class="account-links"><a href="forgot-password.html">Forgot password?</a><a href="signup.html">Create an account</a><a href="verify-email.html">Resend verification email</a></div>
+      <noscript><p>Please enable JavaScript to use the secure account forms.</p></noscript>
     </div>
   </section>
 </main>

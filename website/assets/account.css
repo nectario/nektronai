@@ -16,10 +16,12 @@ body.account-page .account-card {
   padding: clamp(24px, 3vw, 40px);
   border: 1px solid var(--border);
   border-radius: 22px;
-  background: linear-gradient(130deg, var(--atelier-blue-start), var(--atelier-blue-end));
+  background: var(--atelier-paper);
+  box-shadow: 0 10px 28px var(--atelier-shadow);
 }
 body.account-page .account-card h2 { margin: 0 0 18px; font-family: "Sora", var(--font-sans); }
 body.account-page .account-card .button { width: 100%; margin-block: 8px; }
+body.account-page .account-card button.button { font-family: inherit; font-size: .95rem; font-weight: 600; }
 body.account-page .account-note { margin-top: 24px; font-size: .9rem; line-height: 1.7; }
 body.account-page .account-status { min-height: 1.6em; margin-top: 16px; }
 body.account-page .account-status[data-error] { color: var(--text); font-weight: 600; }
@@ -28,7 +30,33 @@ body.account-page .account-details dt { color: var(--muted2); font-size: .85rem;
 body.account-page .account-details dd { margin: 4px 0 0; overflow-wrap: anywhere; }
 body.account-page .account-choice { margin-top: 20px; }
 .account-nav-signup { border-color: var(--accent-border); }
-[data-auth-start][aria-disabled="true"] { opacity: .65; cursor: wait; }
+body.account-page .account-card h2 { font-size: 1.45rem; line-height: 1.3; }
+body.account-page .account-form { display: grid; gap: 20px; }
+body.account-page .account-fields { display: grid; gap: 20px; }
+body.account-page .account-field { display: grid; gap: 8px; min-width: 0; }
+body.account-page .account-field label { font-size: .9rem; font-weight: 600; }
+body.account-page .account-field input {
+  width: 100%; min-width: 0; padding: 13px 14px; border: 1px solid var(--border);
+  border-radius: 10px; background: var(--atelier-canvas); color: var(--text);
+  font: inherit; font-size: 16px; line-height: 1.4;
+}
+body.account-page .account-field input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+body.account-page .account-field input::placeholder { color: var(--muted2); opacity: .75; }
+body.account-page .account-field small { font-size: .8rem; line-height: 1.5; }
+body.account-page .account-names { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+body.account-page .account-password { position: relative; }
+body.account-page .account-password input { padding-right: 68px; }
+body.account-page .account-password button {
+  position: absolute; right: 4px; top: 4px; min-height: 40px; padding: 0 10px;
+  border: 0; border-radius: 8px; background: transparent; color: var(--accent); font: inherit;
+  font-size: .82rem; cursor: pointer;
+}
+body.account-page .account-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; margin-top: 20px; font-size: .85rem; }
+body.account-page .account-success { padding: 20px; border: 1px solid var(--accent-border); border-radius: 12px; background: var(--panel2); }
+body.account-page .account-success p { margin-bottom: 16px; }
+body.account-page .account-card [hidden] { display: none !important; }
+body.account-page button:disabled { cursor: wait; opacity: .65; }
+body.account-page .footer-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 12px; }
 @media (max-width: 860px) {
   body.account-page .account-shell { grid-template-columns: minmax(0, 1fr); gap: 24px; }
 }

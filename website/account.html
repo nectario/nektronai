@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <meta name="referrer" content="no-referrer">
-  <title>Account | NektronAI</title>
+  <title>Your profile | NektronAI</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/styles.css">
   <link rel="stylesheet" href="assets/atelier.css">
@@ -13,7 +13,7 @@
   <script src="assets/site.js" defer></script>
   <script src="assets/account.js" defer></script>
 </head>
-<body class="atelier-site account-page">
+<body class="atelier-site account-page" data-account-screen="account">
   <a class="skip-link" href="#content">Skip to content</a>
   <div id="top"></div>
 <header>
@@ -56,23 +56,15 @@
     <div class="account-intro">
       <p class="section-kicker">Your Nektron account</p>
       <h1>Your Nektron account.</h1>
-      <p>Manage your website session and explore Nektron products and research.</p>
-      <p class="account-note">Authentication is handled securely by Auth0. Your password is never stored by this website.</p>
+      <p>Your website profile and account, in one place.</p>
     </div>
     <div class="account-card">
-      <div data-account-guest>
-        <h2>Your profile, in one place.</h2>
-        <a class="button primary" href="/api/account/login?mode=login" data-auth-start>Log in</a>
-        <p class="account-choice"><a href="signup.html">Need an account? Sign up.</a></p>
-        <p class="account-note">Email verification and password recovery are available in the secure sign-in flow. Signing up does not purchase a subscription or grant access to private databases.</p>
-      </div>
-      <div data-account-profile hidden>
-        <h2 data-account-name>Nektron member</h2>
-        <dl class="account-details"><dt>Email</dt><dd data-account-email></dd><dt>Verification</dt><dd>Email verified</dd></dl>
-        <a class="button secondary" href="database-connector.html">Explore Database Connector</a>
-        <button class="button secondary" type="button" data-account-logout>Log out</button>
-      </div>
-      <p class="account-status" data-account-status role="status" aria-live="polite"></p>
+      <h2>Your profile</h2>
+      <div data-account-guest><p>Log in to view your profile.</p><a class="button primary" href="login.html">Log in</a><a class="button secondary" href="signup.html">Create an account</a></div><div data-account-profile hidden><h2 data-account-name>Nektron member</h2><dl class="account-details"><dt>Email</dt><dd data-account-email></dd><dt>Verification</dt><dd>Email verified</dd></dl><a class="button secondary" href="forgot-password.html">Reset password</a><button class="button secondary" type="button" data-account-logout>Log out</button></div>
+      <div class="account-success" data-auth-success tabindex="-1" hidden><p></p><a href="login.html">Continue to login</a></div>
+      <p class="account-status" data-account-status role="status" aria-live="polite" tabindex="-1"></p>
+      <div class="account-links"><a href="index.html#products">Explore Nektron products</a></div>
+      <noscript><p>Please enable JavaScript to use the secure account forms.</p></noscript>
     </div>
   </section>
 </main>
