@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="referrer" content="no-referrer"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore your MySQL database in ChatGPT with Database Connector by Nektron, Inc. Discover tables, ask questions, and follow the data with read-only SQL.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0b1521" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <title>Database Connector | NektronAI</title>
+  <link rel="canonical" href="https://nektron.ai/database-connector.html">
+  <meta property="og:title" content="Database Connector by Nektron, Inc."><meta property="og:description" content="Your database. A conversation away."><meta property="og:type" content="website">
+  <link rel="icon" href="assets/database-connector/icon-32.png" type="image/png">
+  <link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/atelier.css"><link rel="stylesheet" href="assets/database-connector.css">
+  <script src="assets/site.js" defer></script><script type="module" src="assets/database-connector.js"></script>
+</head>
+<body class="atelier-site dc-page">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header>
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="NektronAI home">
+        <span class="brand-mark dc-full-brand"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark-280.png" alt="NektronAI" width="280" height="63"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light-280.png" alt="NektronAI" width="280" height="63"></span>
+        <span class="dc-compact-brand"><img src="assets/favicon.svg" width="32" height="32" alt=""><span>NektronAI</span></span>
+      </a>
+      <nav id="primary-nav" aria-label="Database Connector navigation"><a href="#overview">Overview</a><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="#questions">Questions</a><a class="dc-nav-account" href="#account">Your account</a></nav>
+      <div class="nav-actions"><button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3 4.9 19.1M19.1 19.1l-1.8-1.8M6.7 6.7 4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
+    </div>
+  </header>
+  <main id="content">
+    <div class="container">
+      <div class="dc-breadcrumb"><a href="index.html#products">Nektron products</a><span aria-hidden="true">/</span><span>Database Connector</span></div>
+      <section class="dc-hero" id="overview" aria-labelledby="dc-title">
+        <div class="dc-hero-copy">
+          <div class="dc-product-lockup"><img src="assets/database-connector/icon-64.png" srcset="assets/database-connector/icon-64.png 1x, assets/database-connector/icon-128.png 2x" width="64" height="64" alt=""><div><p class="dc-eyebrow">DATABASE CONNECTOR</p><p class="dc-maker">By Nektron, Inc.</p></div></div>
+          <h1 id="dc-title">Your database.<br><span>A conversation away.</span></h1>
+          <p class="dc-lede">Ask ChatGPT about your data. It discovers your tables, writes its own read-only SQL, and follows the answers wherever your next question leads.</p>
+          <div class="dc-actions"><a class="button primary" href="#example" data-explore>Explore an example <span aria-hidden="true">↗︎</span></a><a class="button" href="#pricing">View plans</a></div>
+          <div class="dc-hero-notes"><span>One database free</span><span>Read-only by design</span><span>MySQL first</span></div>
+          <p class="dc-release"><span class="dc-status-dot" aria-hidden="true"></span>Private release available · Public launch in preparation</p>
+        </div>
+        <div class="dc-demo" id="example" aria-labelledby="demo-title">
+          <div class="dc-demo-heading"><div class="dc-demo-identity"><img src="assets/database-connector/icon-32.png" srcset="assets/database-connector/icon-32.png 1x, assets/database-connector/icon-64.png 2x" width="32" height="32" alt=""><span id="demo-title">A question becomes an answer.</span></div><span class="dc-sample-badge">SAMPLE DATA</span></div>
+          <div class="dc-scenarios" role="tablist" aria-label="Choose an example"><button role="tab" id="orders-tab" aria-selected="true" aria-controls="demo-panel" data-scenario="orders">Orders</button><button role="tab" id="support-tab" aria-selected="false" aria-controls="demo-panel" tabindex="-1" data-scenario="support">Support</button><button role="tab" id="operations-tab" aria-selected="false" aria-controls="demo-panel" tabindex="-1" data-scenario="operations">Operations</button></div>
+          <div id="demo-panel" role="tabpanel" aria-labelledby="orders-tab" tabindex="0">
+            <p class="dc-question" id="demo-question">Which products brought in the most revenue this month?</p>
+            <div class="dc-query-path" aria-label="Example process"><span>Discover schema</span><span aria-hidden="true">→</span><span>Read-only SQL</span><span aria-hidden="true">→</span><span>Results</span></div>
+            <p class="dc-answer" id="demo-answer">Here are the top products by revenue.</p>
+            <div class="dc-table-wrap"><table id="demo-table"><caption class="dc-sr-only">Illustrative product revenue, not a live query</caption><thead><tr><th scope="col">Product</th><th scope="col">Orders</th><th scope="col">Revenue</th></tr></thead><tbody><tr><th scope="row">Studio Desk</th><td>128</td><td>$38,400</td></tr><tr><th scope="row">Arc Lamp</th><td>204</td><td>$24,480</td></tr><tr><th scope="row">Oak Shelf</th><td>96</td><td>$17,280</td></tr></tbody></table></div>
+            <button class="dc-followup" id="demo-followup" type="button">And how does that compare with last month? <span aria-hidden="true">↗︎</span></button>
+            <div id="demo-followup-answer" class="dc-followup-answer" role="status" hidden></div>
+          </div>
+          <div class="dc-demo-footer"><span class="dc-status-dot" aria-hidden="true"></span><span>Interactive illustration. No database is connected.</span></div>
+        </div>
+      </section>
+      <section class="dc-principles" aria-label="Product principles"><div><span class="dc-index">01</span><div><h2>Your questions lead.</h2><p>Explore your own questions, then refine them with follow-ups.</p></div></div><div><span class="dc-index">02</span><div><h2>Your records stay intact.</h2><p>Restricted access and query controls keep SQL read-only.</p></div></div><div><span class="dc-index">03</span><div><h2>Your credentials stay private.</h2><p>Enter them in secure setup, outside your ChatGPT conversation.</p></div></div></section>
+
+      <section class="dc-section" id="how-it-works" aria-labelledby="workflow-title">
+        <div class="dc-section-heading"><div><p class="dc-eyebrow">A SMALL SETUP. ROOM TO EXPLORE.</p><h2 id="workflow-title">Connect once.<br>Keep the conversation going.</h2></div><p>From an unfamiliar schema to a useful answer, without preparing a report for every question.</p></div>
+        <div class="dc-workflow-grid">
+          <article class="dc-workflow-card dc-blue"><span class="dc-step">01 / CONNECT</span><h3>Add your database.</h3><p>Sign in, select Add database, and enter your connection details or paste a MySQL connection URL.</p><div class="dc-detail-list"><span>Host &amp; database</span><span>Read-only credentials</span><span>Connection check</span></div><button type="button" class="dc-text-button" data-open-setup>See the setup details <span aria-hidden="true">↗︎</span></button></article>
+          <article class="dc-workflow-card dc-warm"><span class="dc-step">02 / ASK</span><h3>Start with curiosity.</h3><p>Choose Database Connector in ChatGPT. Ask about a trend, find a record, or explore how your tables relate.</p><blockquote>“What changed in our order volume this week?”</blockquote><p class="dc-small">ChatGPT inspects your authorized schema before writing SQL.</p></article>
+          <article class="dc-workflow-card dc-slate"><span class="dc-step">03 / FOLLOW THROUGH</span><h3>Go one question deeper.</h3><p>Ask for a breakdown, compare another period, or follow a returned identifier into related records.</p><blockquote>“Now break that down by region.”</blockquote><p class="dc-small">Results include limits and source context so you can judge the answer.</p></article>
+        </div>
+      </section>
+
+      <section class="dc-boundaries dc-section" aria-labelledby="boundaries-title">
+        <div class="dc-section-heading"><div><p class="dc-eyebrow">USEFUL ACCESS. CLEAR BOUNDARIES.</p><h2 id="boundaries-title">Built for investigation.<br>Careful with your data.</h2></div><p>Access follows the database account you authorize. You stay in control of what the connector can reach.</p></div>
+        <div class="dc-boundary-grid"><article><h3>Read-only database access</h3><p>A restricted database account, SQL validation, and read-only transactions work together. The connector does not update your records.</p></article><article><h3>Credentials outside the chat</h3><p>Connection credentials are stored encrypted and are not returned to ChatGPT. Authorized query results are shared with ChatGPT to answer your questions.</p></article><article><h3>Bounded queries</h3><p>Time, concurrency, row, and response limits keep requests controlled. Truncated results and unknown coverage are identified.</p></article><article><h3>Network access stays explicit</h3><p>Verified TLS is required. The connector does not open database firewalls; private networks may need administrator setup.</p></article></div>
+        <div class="dc-compatibility"><div><span class="dc-compat-label">FIRST QUALIFIED ENGINE</span><strong>MySQL 8.4.5</strong></div><p>The architecture leaves room for additional engines. PostgreSQL, Oracle, and other versions are not available yet.</p><a href="mailto:info@nektron.ai?subject=Database%20Connector%20compatibility">Discuss your database <span aria-hidden="true">↗︎</span></a></div>
+      </section>
+
+      <section class="dc-section" id="pricing" aria-labelledby="pricing-title">
+        <div class="dc-section-heading"><div><p class="dc-eyebrow">ONE CONNECTION IS A GOOD START.</p><h2 id="pricing-title">Grow when you need to.</h2></div><p>Start with one database for free. Pro brings up to five database connections into the same account.</p></div>
+        <div class="dc-pricing-grid">
+          <article class="dc-plan"><div class="dc-plan-top"><h3>Free</h3><span>For your first database</span></div><p class="dc-price">$0<span> / month</span></p><p class="dc-plan-description">One saved database connection.</p><ul><li>Schema and table discovery</li><li>Read-only SQL investigation</li><li>Follow-up questions in ChatGPT</li><li>No payment needed to get started</li></ul><a class="button" href="#account" data-plan="free">Start with Free</a></article>
+          <article class="dc-plan dc-plan-pro"><div class="dc-plan-top"><h3>Pro</h3><span>For a wider view</span></div><p class="dc-price">$12<span> USD / month</span></p><p class="dc-plan-description">Up to five saved database connections total.</p><ul><li>Everything included in Free</li><li>More databases in one account</li><li>Monthly billing through Stripe</li><li>Manage billing on Nektron’s website</li></ul><a class="button primary" href="#account" data-plan="pro">Choose Pro</a></article>
+        </div><p class="dc-pricing-note">Launch pricing. Public subscriptions are not open yet. Query limits apply to both plans. Applicable taxes, if any, are shown before payment.</p>
+      </section>
+
+      <section class="dc-account-section" id="account" aria-labelledby="account-title">
+        <div class="dc-account-copy"><p class="dc-eyebrow">YOUR NEKTRON ACCOUNT</p><h2 id="account-title">Connections here.<br>Conversations in ChatGPT.</h2><p>Sign in on Nektron’s website to manage your databases and plan. Pro checkout, payment methods, and cancellation use Stripe’s hosted pages.</p><p class="dc-account-status" id="account-status" role="status">Account sign-in and billing will open with the public release.</p><p class="dc-small">Already testing the private connector? Your current connection is unaffected.</p></div>
+        <div class="dc-account-card"><div class="dc-account-card-header"><img src="assets/database-connector/icon-32.png" srcset="assets/database-connector/icon-32.png 1x, assets/database-connector/icon-64.png 2x" width="32" height="32" alt=""><div><h3>Database Connector</h3><p id="account-plan-label">Your plan and databases</p></div><span class="dc-account-badge" id="account-badge">PRE-LAUNCH</span></div><dl class="dc-account-summary"><div><dt>Selected plan</dt><dd id="selected-plan">Free</dd></div><div><dt>Database allowance</dt><dd id="selected-limit">1 database</dd></div><div><dt>Monthly price</dt><dd id="selected-price">$0</dd></div></dl><button class="button primary dc-full-width" type="button" id="account-signin" disabled>Sign-in opens at launch</button><div class="dc-account-actions" id="account-actions" hidden><button type="button" class="button" id="account-checkout">Continue to Stripe · $12/month</button><button type="button" class="button" id="account-portal">Manage billing</button><a class="button" id="account-setup">Manage databases</a></div><p class="dc-small dc-account-help">Need help? <a href="mailto:info@nektron.ai?subject=Database%20Connector">info@nektron.ai</a></p></div>
+      </section>
+
+      <section class="dc-section dc-faq-section" id="questions" aria-labelledby="questions-title"><div><p class="dc-eyebrow">A FEW GOOD QUESTIONS</p><h2 id="questions-title">Before you connect.</h2><p>Need a hand with your database?<br><a href="mailto:info@nektron.ai?subject=Database%20Connector">Talk to Nektron <span aria-hidden="true">↗︎</span></a></p></div><div class="dc-faq"><details><summary>What database details do I need?</summary><p>Your MySQL host, database name, username, and password—or a connection URL. Use a dedicated read-only account with direct table permissions and verified TLS. Network access must already be available or arranged by your administrator.</p></details><details><summary>Can it change or delete my data?</summary><p>The database tools execute read-only SQL and reject write statements. The service does maintain connection settings, operational audit metadata, and temporary concurrency records outside your database.</p></details><details><summary>Where does billing happen?</summary><p>On this Nektron product page after you sign in. Payments and subscription management open Stripe’s hosted pages. The ChatGPT connector uses the access included in your existing account.</p></details><details><summary>What happens when Pro ends?</summary><p>Your first saved database remains available under Free. Additional saved configurations are retained but unavailable until your account is entitled again. Customer database records are not deleted.</p></details><details><summary>Which databases and devices are supported?</summary><p>MySQL 8.4.5 is the first qualified engine. The private connector has been verified in ChatGPT on the web. Public listing and iPhone availability are still being prepared and tested; other database engines are not available yet.</p></details><details><summary>How should I judge an answer?</summary><p>Check the returned records, result limits, and source context. Separate queries are separate snapshots, and AI interpretations can be wrong. Verify important conclusions against your source data.</p></details></div></section>
+      <section class="dc-closing"><div><p class="dc-eyebrow">LESS DISTANCE BETWEEN YOU AND YOUR DATA.</p><h2>Your next question can start here.</h2></div><a class="button primary" href="#account">Explore your plan <span aria-hidden="true">↗︎</span></a></section>
+    </div>
+  </main>
+  <footer class="dc-footer"><div class="container"><div><strong>Database Connector</strong><p>A product of Nektron, Inc.</p></div><nav aria-label="Product footer"><a href="index.html">NektronAI</a><a href="privacy.html">Company privacy</a><a href="terms.html">Company terms</a><a href="mailto:info@nektron.ai">Support</a></nav><p>© 2026 Nektron, Inc. Product terms and privacy details are being finalized for public launch.</p></div></footer>
+  <dialog class="dc-setup-dialog" id="setup-dialog" aria-labelledby="setup-dialog-title"><form method="dialog"><button class="dc-close" aria-label="Close setup details" value="close">×</button></form><img src="assets/database-connector/icon-64.png" srcset="assets/database-connector/icon-64.png 1x, assets/database-connector/icon-128.png 2x" width="64" height="64" alt=""><p class="dc-eyebrow">READY WHEN YOUR DATABASE IS.</p><h2 id="setup-dialog-title">A few details.<br>A secure connection.</h2><p>When public setup opens, sign in and choose <strong>Add database</strong>. You can enter the details individually or paste a MySQL connection URL.</p><dl><div><dt>Connection</dt><dd>Host, port 3306, and database name</dd></div><div><dt>Access</dt><dd>A dedicated read-only username and password</dd></div><div><dt>Verification</dt><dd>Network access, TLS, supported version, and table permissions</dd></div></dl><p class="dc-small">Enter credentials only in the secure setup flow. Never paste them into a conversation or a support email.</p><form method="dialog"><button class="button primary dc-full-width" value="close">Got it</button></form></dialog>
+</body></html>

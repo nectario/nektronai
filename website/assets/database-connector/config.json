@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "issuer": "https://dev-cmgmokiptmjiwjri.us.auth0.com",
+  "clientId": "",
+  "audience": "https://3frqh3q39i.execute-api.us-east-2.amazonaws.com/mcp",
+  "apiBase": "https://3frqh3q39i.execute-api.us-east-2.amazonaws.com",
+  "redirectUri": "https://nektron.ai/database-connector.html",
+  "setupUrl": ""
+}

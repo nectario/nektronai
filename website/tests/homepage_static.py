@@ -52,6 +52,7 @@ class HomepageChecks(unittest.TestCase):
         self.assertTrue(all(a.get('aria-hidden')=='true' for a in arrows))
         self.assertEqual([a['src'] for t,a in self.doc.tags if t=='img'],[
             'assets/brand/wordmark-dark-320.png','assets/brand/wordmark-light-320.png',
+            'assets/database-connector/icon-64.png',
             'assets/brand/wordmark-dark-280.png','assets/brand/wordmark-light-280.png'])
     def test_accessible_states_are_explicit(self):
         for token in (':focus-visible','prefers-reduced-motion','forced-colors','home-nav-ready'):
