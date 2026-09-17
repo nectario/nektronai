@@ -6,6 +6,17 @@ is separate and is not modified, nor does a website account grant connector acce
 
 ## Identity and security
 
+- New signups require first name, last name and an explicitly selected country or
+  region, as well as email and password. Middle name and phone number are optional.
+  The country allowlist is `assets/account-countries.json`, shared with the static
+  form and tested for parity. Codes follow ISO 3166-1 plus the user-assigned XK code;
+  the source revision and license are included alongside the data.
+- `User.CountryCode` is nullable for existing accounts and other product clients.
+  Before deploying this version, run `python website/scripts/migrate_account_profile.py --apply`
+  with the authorized NEKTRON_DB_* deployment credentials. The migration is additive
+  and idempotent; it does not backfill or overwrite users. Runtime grants remain
+  unchanged. Country and phone are self-reported, not verified identity factors.
+
 - Signup creates `native:<uuid>` identities with `Role=user`, `AccountStatus=pending`
   and `EmailVerified=0`. Duplicate signup never changes an existing password.
   Repeated signup for a pending account emails a password-reset link, rather

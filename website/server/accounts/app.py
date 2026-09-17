@@ -17,6 +17,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from store import Store
 from credentials import normalize_email, password_hash, password_matches, password_valid
 from mail import Mailer
+from account_profile import signup_profile
 
 COOKIE = "__Host-nektron_session"
 
@@ -201,19 +202,17 @@ def create_app(settings=None, store=None, mailer=None):
     def signup():
         start = time.monotonic()
         try:
-            data = payload(("email", "password", "firstName", "lastName"))
+            data = payload(("email", "password", "firstName", "lastName", "middleName", "phoneNumber", "countryCode"))
             email = normalize_email(data.get("email"))
             password = data.get("password")
             if not password_valid(password):
                 raise ValueError("INVALID_PASSWORD")
-            names = [data.get(k, "") for k in ("firstName", "lastName")]
-            if any(not isinstance(n, str) or len(n) > 100 or any(ord(ch) < 32 for ch in n) for n in names):
-                raise ValueError("INVALID_NAME")
+            profile = signup_profile(data)
         except ValueError as error:
             return jsonify(error=str(error)), 400
         if limited("signup", email, limit=5, seconds=3600):
             return jsonify(error="TRY_LATER"), 429
-        created = backend.create_pending(email, password_hash(password), *(n.strip() for n in names))
+        created = backend.create_pending(email, password_hash(password), **profile)
         if created:
             send_link(email, "verify")
         else:

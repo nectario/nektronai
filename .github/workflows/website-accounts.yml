@@ -3,10 +3,10 @@ name: Website account security checks
 on:
   pull_request:
     branches: [main]
-    paths: ['website/server/accounts/**', 'website/scripts/configure_accounts.py', '.github/workflows/website-accounts.yml']
+    paths: ['website/server/accounts/**', 'website/assets/account*', 'website/signup.html', 'website/account.html', 'website/scripts/configure_accounts.py', 'website/scripts/migrate_account_profile.py', '.github/workflows/website-accounts.yml']
   push:
     branches: [main]
-    paths: ['website/server/accounts/**', 'website/scripts/configure_accounts.py', '.github/workflows/website-accounts.yml']
+    paths: ['website/server/accounts/**', 'website/assets/account*', 'website/signup.html', 'website/account.html', 'website/scripts/configure_accounts.py', 'website/scripts/migrate_account_profile.py', '.github/workflows/website-accounts.yml']
 
 permissions:
   contents: read

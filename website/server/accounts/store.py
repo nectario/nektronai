@@ -12,6 +12,7 @@ from pathlib import Path
 import pymysql
 
 from credentials import credential_tag
+from account_profile import COUNTRIES
 
 
 class Store:
@@ -44,6 +45,20 @@ class Store:
             for statement in Path(__file__).with_name("schema.sql").read_text().split(";"):
                 if statement.strip():
                     cur.execute(statement)
+        self.migrate_profile()
+
+    def migrate_profile(self):
+        with self.connection() as connection, connection.cursor() as cur:
+            cur.execute("SELECT DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,IS_NULLABLE FROM information_schema.COLUMNS "
+                        "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='User' AND COLUMN_NAME='CountryCode'")
+            column = cur.fetchone()
+            if not column:
+                # Existing accounts and other products may not have country information.
+                cur.execute("ALTER TABLE `User` ADD COLUMN CountryCode CHAR(2) "
+                            "CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL")
+            elif (column["DATA_TYPE"] != "char" or column["CHARACTER_MAXIMUM_LENGTH"] != 2
+                  or column["IS_NULLABLE"] != "YES"):
+                raise RuntimeError("Existing CountryCode definition differs; manual review required")
 
     def read_session(self, digest):
         with self.connection() as c, c.cursor() as cur:
@@ -84,13 +99,14 @@ class Store:
                         "FROM `User` WHERE Email=%s", (email,))
             return cur.fetchone()
 
-    def create_pending(self, email, hashed_password, first_name, last_name):
+    def create_pending(self, email, hashed_password, first_name, last_name, middle_name, country_code, phone_number):
         with self.connection() as c, c.cursor() as cur:
             try:
                 cur.execute(
-                    "INSERT INTO `User` (UserId,Email,PasswordHash,FirstName,LastName,Role,AccountStatus,EmailVerified) "
-                    "VALUES (%s,%s,%s,%s,%s,'user','pending',0)",
-                    ("native:" + str(uuid.uuid4()), email, hashed_password, first_name, last_name))
+                    "INSERT INTO `User` (UserId,Email,PasswordHash,FirstName,LastName,MiddleName,CountryCode,PhoneNumber,Role,AccountStatus,EmailVerified) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'user','pending',0)",
+                    ("native:" + str(uuid.uuid4()), email, hashed_password, first_name, last_name,
+                     middle_name or None, country_code, phone_number or None))
                 return True
             except pymysql.IntegrityError:
                 # A repeated signup never replaces an existing password or account state.
@@ -164,7 +180,7 @@ class Store:
 
     def get_user(self, user_id, auth_tag=None):
         with self.connection() as c, c.cursor() as cur:
-            cur.execute("SELECT UserId,Email,FirstName,LastName,EmailVerified,AccountStatus,PasswordHash "
+            cur.execute("SELECT UserId,Email,FirstName,LastName,MiddleName,CountryCode,PhoneNumber,EmailVerified,AccountStatus,PasswordHash "
                         "FROM `User` WHERE UserId=%s", (user_id,))
             row = cur.fetchone()
             if (not row or row["AccountStatus"] != "active" or row["EmailVerified"] != 1
@@ -172,4 +188,6 @@ class Store:
                     or not hmac.compare_digest(auth_tag, credential_tag(row["PasswordHash"]))):
                 return None
             return {"email": row["Email"], "firstName": row["FirstName"] or "",
-                    "lastName": row["LastName"] or "", "emailVerified": True}
+                    "lastName": row["LastName"] or "", "middleName": row["MiddleName"] or "",
+                    "countryCode": row["CountryCode"] or "", "country": COUNTRIES.get(row["CountryCode"], ""),
+                    "phoneNumber": row["PhoneNumber"] or "", "emailVerified": True}

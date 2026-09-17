@@ -10,12 +10,14 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import COOKIE, create_app
 from credentials import credential_tag, password_hash, password_matches
+from account_profile import COUNTRIES
 
 ORIGIN = "https://nektron.ai"
 EMAIL = "native-user@example.com"
 PASSWORD = "a unique test passphrase 123"
 NEW_PASSWORD = "a second unique passphrase 456"
 SETTINGS = {"NEKTRON_SITE_ORIGIN": ORIGIN, "NEKTRON_ACCOUNT_ENABLED": "true"}
+PROFILE = {"firstName":"Test", "lastName":"Member", "countryCode":"US"}
 
 
 class MemoryStore:
@@ -40,11 +42,12 @@ class MemoryStore:
     def find_account(self, email):
         return copy.deepcopy(self.users.get(email))
 
-    def create_pending(self, email, hashed, first, last):
+    def create_pending(self, email, hashed, first_name, last_name, middle_name, country_code, phone_number):
         if email in self.users:
             return False
         self.users[email] = {"UserId": "native:" + secrets.token_hex(12), "Email": email,
-            "PasswordHash": hashed, "FirstName": first, "LastName": last,
+            "PasswordHash": hashed, "FirstName": first_name, "LastName": last_name,
+            "MiddleName": middle_name or None, "CountryCode": country_code, "PhoneNumber": phone_number or None,
             "Role": "user", "AccountStatus": "pending", "EmailVerified": 0}
         return True
 
@@ -87,7 +90,10 @@ class MemoryStore:
     def get_user(self, user_id, auth_tag=None):
         for user in self.users.values():
             if user["UserId"] == user_id and user["AccountStatus"] == "active" and user["EmailVerified"] and auth_tag == credential_tag(user["PasswordHash"]):
-                return {"email":user["Email"],"firstName":user["FirstName"],"lastName":user["LastName"],"emailVerified":True}
+                return {"email":user["Email"],"firstName":user["FirstName"],"lastName":user["LastName"],
+                        "middleName":user.get("MiddleName") or "", "countryCode":user.get("CountryCode") or "",
+                        "country":COUNTRIES.get(user.get("CountryCode"), ""), "phoneNumber":user.get("PhoneNumber") or "",
+                        "emailVerified":True}
         return None
 
 
@@ -112,7 +118,7 @@ class AccountTests(unittest.TestCase):
         return self.client.post("/api/account/" + path, json=data, headers=actual, base_url=ORIGIN)
 
     def signup(self):
-        return self.post("signup", {"email":EMAIL, "password":PASSWORD, "firstName":"Test", "lastName":"Member"})
+        return self.post("signup", {"email":EMAIL, "password":PASSWORD, **PROFILE})
 
     def verified(self):
         self.signup()
@@ -166,7 +172,8 @@ class AccountTests(unittest.TestCase):
         self.verified()
         before=copy.deepcopy(self.store.users[EMAIL])
         self.assertEqual(self.post("signup",{"email":EMAIL,"password":NEW_PASSWORD,"role":"admin"}).status_code,400)
-        self.assertEqual(self.post("signup",{"email":EMAIL,"password":NEW_PASSWORD}).status_code,202)
+        self.assertEqual(self.post("signup",{"email":EMAIL,"password":NEW_PASSWORD,**PROFILE,
+                                              "middleName":"Other","phoneNumber":"+44 20 7946 0000","countryCode":"GB"}).status_code,202)
         self.assertEqual(self.store.users[EMAIL],before)
 
     def test_csrf_origin_and_json_are_required(self):
@@ -181,7 +188,7 @@ class AccountTests(unittest.TestCase):
     def test_repeated_pending_signup_requires_owner_to_choose_new_password(self):
         self.signup()
         previous_hash = self.store.users[EMAIL]["PasswordHash"]
-        self.assertEqual(self.post("signup", {"email":EMAIL,"password":NEW_PASSWORD}).status_code,202)
+        self.assertEqual(self.post("signup", {"email":EMAIL,"password":NEW_PASSWORD,**PROFILE}).status_code,202)
         self.assertEqual(self.store.users[EMAIL]["PasswordHash"],previous_hash)
         self.assertEqual(self.mailer.sent[-1][1],"reset")
         token=self.mailer.sent[-1][2]
@@ -242,7 +249,7 @@ class AccountTests(unittest.TestCase):
 
     def test_rate_limit_stops_password_work(self):
         csrf=self.get("csrf").json["csrfToken"];self.store.allow=False
-        response=self.client.post("/api/account/signup",base_url=ORIGIN,json={"email":EMAIL,"password":PASSWORD},
+        response=self.client.post("/api/account/signup",base_url=ORIGIN,json={"email":EMAIL,"password":PASSWORD,**PROFILE},
                                   headers={"Origin":ORIGIN,"X-CSRF-Token":csrf})
         self.assertEqual(response.status_code,429)
         self.assertFalse(self.store.users)
@@ -262,6 +269,66 @@ class AccountTests(unittest.TestCase):
     def test_email_failure_does_not_disclose_account_presence(self):
         with patch.object(self.mailer,"send",side_effect=RuntimeError("SES unavailable")):
             self.assertEqual(self.signup().json,{"accepted":True})
+
+    def test_required_profile_fields_cannot_be_omitted_or_blank(self):
+        for key in ("firstName", "lastName", "countryCode"):
+            for value in (None, "", "   ", 42, []):
+                with self.subTest(key=key, value=value):
+                    data={"email":EMAIL,"password":PASSWORD,**PROFILE}
+                    if value is None: data.pop(key)
+                    else: data[key]=value
+                    with patch("app.password_hash") as hashing:
+                        self.assertEqual(self.post("signup",data).status_code,400)
+                        hashing.assert_not_called()
+        self.assertFalse(self.store.users)
+
+    def test_all_profile_fields_are_normalized_saved_and_returned(self):
+        data={"email":EMAIL,"password":PASSWORD,**PROFILE,"firstName":"  Zo\u00eb ",
+              "lastName":" O'Connor-Smith ","middleName":" Mei ","countryCode":"GB","phoneNumber":" +44 (20) 7946-0000 "}
+        self.assertEqual(self.post("signup",data).status_code,202)
+        user=self.store.users[EMAIL]
+        self.assertEqual((user["FirstName"],user["MiddleName"],user["LastName"],user["CountryCode"],user["PhoneNumber"]),
+                         ("Zo\u00eb","Mei","O'Connor-Smith","GB","+44 (20) 7946-0000"))
+        self.post("verify-email",{"token":self.mailer.sent[-1][2]}); self.login()
+        profile=self.get("session").json["user"]
+        self.assertEqual(profile["country"],COUNTRIES["GB"])
+        self.assertEqual(profile["middleName"],"Mei")
+        self.assertEqual(profile["phoneNumber"],"+44 (20) 7946-0000")
+
+    def test_optional_fields_can_be_omitted(self):
+        self.assertEqual(self.signup().status_code,202)
+        self.assertIsNone(self.store.users[EMAIL]["MiddleName"])
+        self.assertIsNone(self.store.users[EMAIL]["PhoneNumber"])
+
+    def test_invalid_profile_values_are_rejected(self):
+        for field,value in (("countryCode","ZZ"),("countryCode","United States"),("countryCode","us"),
+                            ("middleName","x"*101),("firstName","Test\nName"),("firstName","\u200b"),
+                            ("phoneNumber","x"*31),("phoneNumber","call me"),("phoneNumber","+1\n2025550123"),
+                            ("middleName",[]),("phoneNumber",{})):
+            with self.subTest(field=field):
+                self.assertEqual(self.post("signup",{"email":EMAIL,"password":PASSWORD,**PROFILE,field:value}).status_code,400)
+        self.assertFalse(self.store.users)
+
+    def test_legacy_accounts_can_still_log_in_without_new_fields(self):
+        self.verified()
+        self.store.users[EMAIL].update(FirstName=None,LastName=None,CountryCode=None,MiddleName=None,PhoneNumber=None)
+        self.assertEqual(self.login().status_code,200)
+        self.assertEqual(self.get("session").json["user"]["country"],"")
+
+    def test_country_options_match_server_allowlist(self):
+        from html.parser import HTMLParser
+        class Countries(HTMLParser):
+            def __init__(self):
+                super().__init__(); self.options={}; self.code=None
+            def handle_starttag(self, tag, attrs):
+                if tag == "option": self.code=dict(attrs).get("value")
+            def handle_endtag(self, tag):
+                if tag == "option": self.code=None
+            def handle_data(self, value):
+                if self.code: self.options[self.code]=value
+        parser=Countries()
+        parser.feed((Path(__file__).resolve().parents[3]/"signup.html").read_text(encoding="utf-8"))
+        self.assertEqual(parser.options,COUNTRIES)
 
 
 if __name__ == "__main__": unittest.main()

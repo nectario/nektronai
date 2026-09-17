@@ -32,8 +32,10 @@
     if (data.authenticated) {
       document.querySelectorAll('[data-account-email]').forEach(n => { n.textContent = data.user.email; });
       document.querySelectorAll('[data-account-name]').forEach(n => {
-        n.textContent = [data.user.firstName, data.user.lastName].filter(Boolean).join(' ') || 'Nektron member';
+        n.textContent = [data.user.firstName, data.user.middleName, data.user.lastName].filter(Boolean).join(' ') || 'Nektron member';
       });
+      document.querySelectorAll('[data-account-country]').forEach(n => { n.textContent = data.user.country || 'Not provided'; });
+      document.querySelectorAll('[data-account-phone]').forEach(n => { n.textContent = data.user.phoneNumber || 'Not provided'; });
       if (screen === 'account') status('You are signed in.');
     } else if (screen === 'account') status('Log in to view your account.');
   }
@@ -42,7 +44,10 @@
     EMAIL_NOT_VERIFIED: 'Please verify your email before logging in. Use the verification link below if you need a new email.',
     INVALID_EMAIL: 'Enter a valid email address.',
     INVALID_PASSWORD: 'Use a password of 15 to 128 characters.',
-    INVALID_NAME: 'Names must be no longer than 100 characters.',
+    NAME_REQUIRED: 'Please enter your first and last name.',
+    INVALID_NAME: 'Enter a valid name of no more than 100 characters.',
+    INVALID_COUNTRY: 'Please select your country or region.',
+    INVALID_PHONE: 'Enter a phone number using digits, spaces, +, parentheses, or hyphens (up to 30 characters).',
     INVALID_INPUT: 'Please check the form and try again.',
     INVALID_LINK: 'This link has expired or has already been used. Request a new email below.',
     INVALID_CSRF: 'Your form session expired. Please try again.',
@@ -98,6 +103,14 @@
     event.preventDefault();
     if (busy || !csrf || !form.reportValidity()) return;
     const data = Object.fromEntries(new FormData(form));
+    if (form.dataset.authForm === 'signup') {
+      for (const field of ['firstName', 'lastName', 'middleName', 'phoneNumber']) data[field] = (data[field] || '').trim();
+      if (!data.firstName || !data.lastName) {
+        status(messages.NAME_REQUIRED, true);
+        form.elements.namedItem(!data.firstName ? 'firstName' : 'lastName').focus();
+        return;
+      }
+    }
     if ('passwordConfirm' in data && data.passwordConfirm !== data.password) {
       status('The passwords do not match.', true);
       return;
