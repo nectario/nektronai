@@ -229,7 +229,7 @@ def create_app(settings=None, store=None, mailer=None):
             data = payload(("email", "password"))
             email = normalize_email(data.get("email"))
             password = data.get("password")
-            if not isinstance(password, str) or not 1 <= len(password) <= 128:
+            if not password_valid(password):
                 raise ValueError("INVALID_INPUT")
         except ValueError:
             return jsonify(error="INVALID_CREDENTIALS"), 401

@@ -65,7 +65,7 @@ fs.mkdirSync(out, {recursive:true});
       }
       await page.goto(base+'/signup.html');
       await page.locator('#email').fill('test@example.com');
-      await page.locator('#password').fill('a unique long passphrase');
+      await page.locator('#password').fill('short');
       assert.equal(await page.locator('form').evaluate(f=>f.checkValidity()),false,'names/country required');
       await page.locator('#first-name').fill('Test');
       await page.locator('#last-name').fill('Member');
@@ -79,6 +79,7 @@ fs.mkdirSync(out, {recursive:true});
       await page.getByRole('button',{name:'Create account',exact:true}).click();
       await page.locator('[data-auth-success]').waitFor({state:'visible'});
       assert.equal(calls.at(-1).action,'signup');
+      assert.equal(calls.at(-1).body.password,'short');
       assert.equal(calls.at(-1).body.countryCode,'US');
       assert.equal(calls.at(-1).body.middleName,'Sample');
       assert.equal(calls.at(-1).body.phoneNumber,'+1 202 555 0123');

@@ -8,11 +8,16 @@ from email_validator import EmailNotValidError, validate_email
 
 HASHER = PasswordHasher(time_cost=3, memory_cost=65536, parallelism=1, type=Type.ID)
 DUMMY_HASH = HASHER.hash(secrets.token_urlsafe(32))
+MAX_PASSWORD_BYTES = 1024  # Resource safety bound, not a minimum-strength rule.
 
 
 def password_valid(value):
-    return (isinstance(value, str) and 15 <= len(value) <= 128
-            and len(value.encode("utf-8")) <= 512 and bool(value.strip()))
+    if not isinstance(value, str) or not value.strip():
+        return False
+    try:
+        return len(value.encode("utf-8")) <= MAX_PASSWORD_BYTES
+    except UnicodeEncodeError:
+        return False
 
 
 def password_hash(value):

@@ -242,10 +242,51 @@ class AccountTests(unittest.TestCase):
         self.assertEqual(self.post("logout",{}).status_code,200)
         self.assertFalse(self.get("session").json["authenticated"])
 
-    def test_short_password_invalid_email_and_bad_token_are_rejected(self):
-        self.assertEqual(self.post("signup",{"email":EMAIL,"password":"short"}).status_code,400)
+    def test_empty_password_invalid_email_and_bad_token_are_rejected(self):
+        for password in ("", "   ", None, 123):
+            self.assertEqual(self.post("signup",{"email":EMAIL,"password":password,**PROFILE}).status_code,400)
         self.assertEqual(self.post("signup",{"email":"not-an-email","password":PASSWORD}).status_code,400)
         self.assertEqual(self.post("reset-password",{"token":"bad","password":NEW_PASSWORD}).status_code,400)
+
+    def test_short_password_can_sign_up_log_in_and_reset(self):
+        self.assertEqual(self.post("signup",{"email":EMAIL,"password":"x",**PROFILE}).status_code,202)
+        self.assertEqual(self.post("verify-email",{"token":self.mailer.sent[-1][2]}).status_code,200)
+        self.assertEqual(self.login("x").status_code,200)
+        self.post("request-reset",{"email":EMAIL})
+        self.assertEqual(self.post("reset-password",{"token":self.mailer.sent[-1][2],"password":"new"}).status_code,200)
+        self.assertEqual(self.login("new").status_code,200)
+        self.assertEqual(self.login("x").status_code,401)
+
+    def test_long_password_is_not_truncated_and_can_log_in(self):
+        password="a"*1023+"z"
+        self.assertEqual(self.post("signup",{"email":EMAIL,"password":password,**PROFILE}).status_code,202)
+        self.post("verify-email",{"token":self.mailer.sent[-1][2]})
+        self.assertEqual(self.login(password).status_code,200)
+        self.assertEqual(self.login(password[:-1]+"y").status_code,401)
+
+    def test_oversized_passwords_are_rejected_before_hashing(self):
+        for password in ("a"*1025, "\u00e9"*513, "\ud800"):
+            with self.subTest(length=len(password)), patch("app.password_hash") as hashing:
+                self.assertEqual(self.post("signup",{"email":EMAIL,"password":password,**PROFILE}).status_code,400)
+                hashing.assert_not_called()
+                self.assertEqual(self.login(password).status_code,401)
+
+    def test_password_forms_have_no_length_attributes_or_requirement_copy(self):
+        from html.parser import HTMLParser
+        class PasswordInputs(HTMLParser):
+            def __init__(self): super().__init__(); self.fields=[]
+            def handle_starttag(self,tag,attrs):
+                values=dict(attrs)
+                if tag=='input' and values.get('type')=='password': self.fields.append(values)
+        for name in ('signup.html','login.html','reset-password.html'):
+            html=(Path(__file__).resolve().parents[3]/name).read_text(encoding='utf-8')
+            parser=PasswordInputs(); parser.feed(html)
+            self.assertTrue(parser.fields)
+            for field in parser.fields:
+                self.assertNotIn('minlength',field)
+                self.assertNotIn('maxlength',field)
+                self.assertIn('required',field)
+            self.assertNotIn('15 or more characters',html)
 
     def test_rate_limit_stops_password_work(self):
         csrf=self.get("csrf").json["csrfToken"];self.store.allow=False

@@ -43,7 +43,7 @@
     INVALID_CREDENTIALS: 'The email or password is incorrect.',
     EMAIL_NOT_VERIFIED: 'Please verify your email before logging in. Use the verification link below if you need a new email.',
     INVALID_EMAIL: 'Enter a valid email address.',
-    INVALID_PASSWORD: 'Use a password of 15 to 128 characters.',
+    INVALID_PASSWORD: 'Please enter a valid password.',
     NAME_REQUIRED: 'Please enter your first and last name.',
     INVALID_NAME: 'Enter a valid name of no more than 100 characters.',
     INVALID_COUNTRY: 'Please select your country or region.',

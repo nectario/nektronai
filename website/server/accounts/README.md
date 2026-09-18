@@ -22,7 +22,9 @@ is separate and is not modified, nor does a website account grant connector acce
   Repeated signup for a pending account emails a password-reset link, rather
   than activating a potentially pre-registered password chosen by someone else.
 - Passwords are Argon2id hashes (64 MiB, three iterations, one lane). Passwords
-  must be 15-128 characters; no password is logged or returned by the API.
+  have no minimum length beyond being non-empty and not entirely whitespace.
+  A server-side 1,024-byte resource-safety cap applies consistently to signup,
+  reset and login; passwords are never truncated. No password is logged or returned.
 - Email verification is required before login. Verification links last 24 hours;
   password-reset links last 30 minutes. Tokens are random, hashed in the database,
   credential-bound, and consumed transactionally once. Disabled/locked accounts
