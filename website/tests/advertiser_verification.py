@@ -14,6 +14,14 @@ def read(name):
     return (ROOT / name).read_text(encoding='utf-8')
 
 class AdvertiserChecks(unittest.TestCase):
+    def test_venture_order(self):
+        for page in ('index.html','about.html'):
+            text=read(page)
+            # In About, inspect the portfolio rather than the founder's biography.
+            if page=='about.html':text=text.split('The current portfolio includes',1)[1]
+            self.assertLess(text.index('DeepTrading.ai'),text.index('TagMySpend.com'))
+            self.assertLess(text.index('TagMySpend.com'),text.index('InterviewHelperAI'))
+
     def test_visible_company_information(self):
         for page in ('support.html','privacy.html','terms.html'):
             text=unescape(re.sub('<[^>]+>', ' ', read(page)))
@@ -60,7 +68,11 @@ class AdvertiserChecks(unittest.TestCase):
                 self.assertTrue((ROOT/relative).is_file(),str(relative))
                 if hashlib.sha256(old.read_bytes()).digest()!=hashlib.sha256((ROOT/relative).read_bytes()).digest():changed.add(relative.as_posix())
         self.assertLessEqual(changed,allowed)
-        self.assertEqual(re.search(r'<body\b.*',read('index.html'),re.S).group(),re.search(r'<body\b.*',(baseline/'index.html').read_text(encoding='utf-8'),re.S).group())
+        old_home=(baseline/'index.html').read_text(encoding='utf-8')
+        # The owner subsequently requested this one ordering change.
+        old_home=old_home.replace('<code>DeepTrading.ai</code>, <code>InterviewHelperAI</code>, <code>TagMySpend.com</code>',
+                                  '<code>DeepTrading.ai</code>, <code>TagMySpend.com</code>, <code>InterviewHelperAI</code>')
+        self.assertEqual(re.search(r'<body\b.*',read('index.html'),re.S).group(),re.search(r'<body\b.*',old_home,re.S).group())
         for page in ('index.html','about.html','support.html','privacy.html','terms.html'):
             old=(baseline/page).read_text(encoding='utf-8');new=read(page)
             self.assertEqual(re.findall(r'(?:class|style)="[^"]*"',new),re.findall(r'(?:class|style)="[^"]*"',old),page)

@@ -22,6 +22,12 @@ fs.mkdirSync(out,{recursive:true});
     for(const img of await page.locator('img[loading=lazy]').all()) {await img.scrollIntoViewIfNeeded();await img.evaluate(el=>el.decode());}
     await page.evaluate(()=>scrollTo(0,0));
    }
+   // Align only the owner's subsequently approved venture ordering.
+   await before.locator('.home-meta-row .meta-pill').evaluateAll(nodes=>{
+    const facts=nodes.find(n=>n.textContent.trim().startsWith('Independent brands:'));
+    const codes=facts?.querySelectorAll('code');
+    if(codes?.length===3){codes[1].textContent='TagMySpend.com';codes[2].textContent='InterviewHelperAI';}
+   });
    const old=await before.screenshot({fullPage:true});
    const current=await after.screenshot({fullPage:true,path:path.join(out,`home-${theme}-${width}.png`)});
    assert.ok(old.equals(current),`Homepage pixels changed: ${theme}/${width}`);
