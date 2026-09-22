@@ -30,7 +30,10 @@ is separate and is not modified, nor does a website account grant connector acce
   credential-bound, and consumed transactionally once. Disabled/locked accounts
   cannot log in or use these links to reactivate themselves.
 - Tokens use URL fragments, which are removed from browser history immediately.
-  Verification requires an explicit POST, not a link-scanner-triggerable GET.
+  Opening a valid verification link automatically submits a CSRF-protected POST
+  from the browser; no email re-entry or second confirmation click is needed.
+  A plain GET does not consume the token. JavaScript-capable email scanners can
+  complete this flow too, but verification never signs anyone in automatically.
 - All mutations require JSON, the exact site Origin, and a per-session CSRF token.
   Login, signup and email requests have database-backed IP/email rate limits.
 - Unknown/existing email requests have generic responses and a timing floor.
@@ -51,7 +54,7 @@ Its JSON contains:
 ```text
 NEKTRON_ACCOUNT_ENABLED=true
 NEKTRON_SITE_ORIGIN=https://nektron.ai
-NEKTRON_AUTH_EMAIL_FROM=Nektron <info@nektron.ai>
+NEKTRON_AUTH_EMAIL_FROM=NektronAI <info@nektron.ai>
 NEKTRON_EMAIL_REGION=us-east-2
 NEKTRON_DB_HOST=<authorized database host>
 NEKTRON_DB_PORT=3306

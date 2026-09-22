@@ -26,49 +26,70 @@ byId('demo-followup').addEventListener('click',()=>{const output=byId('demo-foll
 document.querySelector('[data-explore]').addEventListener('click',()=>{tabs.find(t=>t.dataset.scenario===selectedScenario).focus({preventScroll:true});});
 document.querySelectorAll('[data-open-setup]').forEach(button=>button.addEventListener('click',()=>byId('setup-dialog').showModal()));
 
+// Native account/billing section appended to the existing product-page visuals.
 let selectedPlan='free', config=null, accessToken=null, expiresAt=0, pending=false, currentAccount=null;
 const status=(text)=>{byId('account-status').textContent=text;};
+const messages={AUTH_REQUIRED:'Sign in to manage your account.',EMAIL_VERIFICATION_REQUIRED:'Verify your NektronAI email, then sign in again.',SETUP_UNAVAILABLE:'Account setup is not open yet.',BILLING_UNAVAILABLE:'Billing is not available right now. Your existing access is unchanged.',SUBSCRIPTION_EXISTS:'You already have a subscription. Choose Manage billing to review it.',BILLING_REVIEW_REQUIRED:'Please contact info@nektron.ai before retrying this billing request.'};
 function updateCheckout(){byId('account-checkout').hidden=!currentAccount?.billing_available||currentAccount.plan==='pro'||selectedPlan!=='pro';}
 function choosePlan(plan){selectedPlan=plan;const pro=plan==='pro';byId('selected-plan').textContent=pro?'Pro':'Free';byId('selected-limit').textContent=pro?'Up to 5 databases':'1 database';byId('selected-price').textContent=pro?'$12 USD / month':'$0';updateCheckout();if(!accessToken)status(`${pro?'Pro':'Free'} selected. ${config?.enabled?'Sign in to continue.':'Account sign-in and billing will open with the public release.'}`);}
 document.querySelectorAll('[data-plan]').forEach(link=>link.addEventListener('click',()=>choosePlan(link.dataset.plan)));
-const base64url=(bytes)=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
-const random=()=>base64url(crypto.getRandomValues(new Uint8Array(32)));
-const messages={AUTH_REQUIRED:'Sign in again to manage your account.',EMAIL_VERIFICATION_REQUIRED:'Verify your email using the message from Database Connector, then sign in again.',SETUP_UNAVAILABLE:'Account setup is not open yet.',BILLING_UNAVAILABLE:'Billing is not available right now. Your existing access is unchanged.',SUBSCRIPTION_EXISTS:'You already have a subscription. Choose Manage billing to review it.',BILLING_REVIEW_REQUIRED:'This request needs reconciliation. Please contact info@nektron.ai before trying again.'};
+async function nativeToken(){
+  const csrfResponse=await fetch('/api/account/csrf',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});
+  if(!csrfResponse.ok)throw new Error('Account access is temporarily unavailable.');
+  const csrf=(await csrfResponse.json()).csrfToken;
+  if(!csrf)throw new Error(messages.AUTH_REQUIRED);
+  const response=await fetch('/api/account/connector-token',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:'{}',signal:AbortSignal.timeout(10000)});
+  if(!response.ok){accessToken=null;expiresAt=0;throw new Error(response.status===401?messages.AUTH_REQUIRED:'Account access is temporarily unavailable.');}
+  const value=await response.json();
+  if(value.token_type!=='Bearer'||!value.access_token||!Number.isFinite(value.expires_in)||value.expires_in<=0||value.expires_in>300)throw new Error('Account access could not be verified.');
+  accessToken=value.access_token;expiresAt=Date.now()+value.expires_in*1000;
+}
 async function api(action){
-  if(!accessToken || expiresAt<=Date.now()+5000)throw new Error(messages.AUTH_REQUIRED);
-  const path=action==='account'?'/setup/api/account':`/billing/api/${action}`;
-  const response=await fetch(`${config.apiBase}${path}`,{method:'POST',credentials:'omit',headers:{'Content-Type':'application/json',Authorization:`Bearer ${accessToken}`},body:'{}',signal:AbortSignal.timeout(29000)});
-  const result=await response.json();if(!response.ok)throw new Error(messages[typeof result.error==='string'?result.error:result.error?.code]||'The request could not be completed. Try again in a moment.');return result;
+  if(!accessToken||expiresAt<=Date.now()+5000)await nativeToken();
+  const route=action==='account'?'/setup/api/account':`/billing/api/${action}`;
+  const response=await fetch(`${config.apiBase}${route}`,{method:'POST',credentials:'omit',headers:{'Content-Type':'application/json',Authorization:`Bearer ${accessToken}`},body:'{}',signal:AbortSignal.timeout(29000)});
+  const result=await response.json();
+  if(!response.ok)throw new Error(messages[typeof result.error==='string'?result.error:result.error?.code]||'The request could not be completed.');
+  return result;
 }
-async function signIn(){
-  if(!config?.enabled)return;
-  const state=random(),verifier=random();sessionStorage.setItem('nektron.database.pkce',JSON.stringify({state,verifier,created:Date.now(),plan:selectedPlan}));
-  const url=new URL(`${config.issuer}/authorize`);url.search=new URLSearchParams({response_type:'code',client_id:config.clientId,redirect_uri:config.redirectUri,scope:'openid database-connector/manage',audience:config.audience,resource:config.audience,state,code_challenge:base64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier))),code_challenge_method:'S256'});location.assign(url);
+async function signIn(){if(config?.enabled)location.assign('/login.html?returnTo=connector-billing');}
+function clearSession(){accessToken=null;expiresAt=0;currentAccount=null;byId('account-actions').hidden=true;if(config?.enabled){byId('account-signin').textContent='Sign in to your account';byId('account-badge').textContent='YOUR ACCOUNT';byId('account-plan-label').textContent='Your plan and databases';}}
+async function signOut(){
+  const csrfResponse=await fetch('/api/account/csrf',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});
+  if(!csrfResponse.ok)throw new Error('Sign out could not be completed.');
+  const csrf=(await csrfResponse.json()).csrfToken;
+  const response=await fetch('/api/account/logout',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:'{}',signal:AbortSignal.timeout(10000)});
+  if(!response.ok)throw new Error('Sign out could not be completed.');
+  clearSession();status('Signed out.');
 }
-async function finishSignIn(){
-  const params=new URLSearchParams(location.search);if(!params.has('code')&&!params.has('error'))return;
-  const raw=sessionStorage.getItem('nektron.database.pkce');sessionStorage.removeItem('nektron.database.pkce');history.replaceState(null,'',location.pathname+'#account');
-  let saved;try{saved=JSON.parse(raw);}catch{throw new Error('Sign-in could not be verified. Please sign in again.');}
-  if(params.has('error')||!saved||params.get('state')!==saved.state||Date.now()-saved.created>600000||Date.now()<saved.created)throw new Error('Sign-in could not be verified. Please sign in again.');
-  const response=await fetch(`${config.issuer}/oauth/token`,{method:'POST',credentials:'omit',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',client_id:config.clientId,code:params.get('code'),redirect_uri:config.redirectUri,code_verifier:saved.verifier,resource:config.audience}),signal:AbortSignal.timeout(15000)});
-  const result=await response.json();if(!response.ok||!result.access_token||result.token_type?.toLowerCase()!=='bearer')throw new Error('Sign-in could not be completed. Please try again.');
-  accessToken=result.access_token;expiresAt=Date.now()+Number(result.expires_in||0)*1000;choosePlan(saved.plan==='pro'?'pro':'free');
-  const account=await api('account');currentAccount=account;byId('account-signin').textContent='Sign out';byId('account-badge').textContent='SIGNED IN';byId('account-plan-label').textContent=`${account.plan==='pro'?'Pro':account.plan==='free'?'Free':'Private'} account · ${account.saved_connections} saved database${account.saved_connections===1?'':'s'}`;
+function renderAccount(account){
+  currentAccount=account;
+  if(account.plan==='pro')choosePlan('pro');
+  byId('account-signin').textContent='Sign out';byId('account-badge').textContent=config.testBilling&&account.billing_available?'TEST BILLING':'SIGNED IN';
+  byId('account-plan-label').textContent=`${account.plan==='pro'?'Pro':account.plan==='free'?'Free':'Private'} account · ${account.saved_connections} saved database${account.saved_connections===1?'':'s'}`;
   byId('account-actions').hidden=false;updateCheckout();byId('account-portal').hidden=!account.has_billing_customer;
-  const setup=byId('account-setup');if(config.setupUrl)setup.href=config.setupUrl;else setup.hidden=true;
-  status('Signed in. Manage your databases here, or continue to Stripe for billing.');
+  byId('account-setup').href=config.setupUrl;
+  byId('account-checkout').textContent=config.testBilling?'Open Stripe test checkout':'Continue to Stripe · $12/month';
+  status(config.testBilling&&account.billing_available?'Payment testing is enabled for this approved account. Use Stripe test payment details only; no real payment will be taken.':'Signed in. Manage your database connections below.');
 }
-function clearSession(){accessToken=null;expiresAt=0;currentAccount=null;byId('account-actions').hidden=true;if(config?.enabled){byId('account-signin').textContent='Sign in to your account';byId('account-badge').textContent='SIGNED OUT';byId('account-plan-label').textContent='Your plan and databases';}}
-byId('account-signin').addEventListener('click',()=>{if(accessToken){clearSession();status('Signed out.');}else signIn().catch(()=>status('Sign-in could not be started. Please try again.'));});
-async function billingAction(action){if(pending)return;pending=true;const button=byId(action==='checkout'?'account-checkout':'account-portal');button.disabled=true;status('Opening secure Stripe billing…');try{const result=await api(action);const url=new URL(result.url);const expected=action==='checkout'?'checkout.stripe.com':'billing.stripe.com';if(url.protocol!=='https:'||url.hostname!==expected||url.username||url.password||url.port)throw new Error('The billing destination could not be verified.');location.assign(url);}catch(e){status(e.name==='TimeoutError'?'The request is still being checked. Sign in again before retrying.':e.message);}finally{pending=false;button.disabled=false;}}
+byId('account-signin').addEventListener('click',()=>{(accessToken?signOut():signIn()).catch(error=>status(error.message));});
+async function billingAction(action){
+  if(pending||!currentAccount?.billing_available)return;
+  pending=true;const button=byId(action==='checkout'?'account-checkout':'account-portal');button.disabled=true;
+  status(config.testBilling?'Opening Stripe test billing…':'Opening secure Stripe billing…');
+  try{const result=await api(action);const url=new URL(result.url);const expected=action==='checkout'?'checkout.stripe.com':'billing.stripe.com';if(url.protocol!=='https:'||url.hostname!==expected||url.username||url.password||url.port)throw new Error('The billing destination could not be verified.');location.assign(url.href);}
+  catch(error){status(error.name==='TimeoutError'?'The request is still being checked. Reload your account before retrying.':error.message);}
+  finally{pending=false;button.disabled=false;}
+}
 byId('account-checkout').addEventListener('click',()=>billingAction('checkout'));byId('account-portal').addEventListener('click',()=>billingAction('portal'));
 window.addEventListener('pagehide',clearSession);
 async function start(){
-  try{const response=await fetch('assets/database-connector/config.json',{credentials:'omit',cache:'no-store'});if(!response.ok)return;config=await response.json();
+  try{
+    const response=await fetch('assets/database-connector/config.json',{credentials:'omit',cache:'no-store'});if(!response.ok)return;config=await response.json();
     if(!config.enabled)return;
-    if(!config.clientId||config.issuer!=='https://dev-cmgmokiptmjiwjri.us.auth0.com'||config.apiBase!=='https://3frqh3q39i.execute-api.us-east-2.amazonaws.com'||config.audience!==config.apiBase+'/mcp'||config.redirectUri!==location.origin+location.pathname||config.redirectUri!=='https://nektron.ai/database-connector.html')throw new Error('Account sign-in is not configured for this page.');
-    if(config.setupUrl && config.setupUrl!==config.apiBase+'/setup')throw new Error('Database setup destination is not configured.');
-    byId('account-signin').disabled=false;byId('account-signin').textContent='Sign in to your account';byId('account-badge').textContent='YOUR ACCOUNT';status('Sign in with the account you use for Database Connector in ChatGPT.');await finishSignIn();
-  }catch(e){status(e.message||'Account sign-in is temporarily unavailable.');}
+    if(location.origin!=='https://nektron.ai'||location.pathname!=='/database-connector.html'||config.mode!=='nektron-native'||config.apiBase!=='https://3frqh3q39i.execute-api.us-east-2.amazonaws.com'||config.setupUrl!=='https://nektron.ai/database-connector-setup.html')throw new Error('Account access is not configured for this page.');
+    byId('account-signin').disabled=false;byId('account-signin').textContent='Sign in to your account';byId('account-badge').textContent='YOUR ACCOUNT';
+    renderAccount(await api('account'));
+  }catch(error){status(error.message||'Account access is temporarily unavailable.');}
 }
 start();

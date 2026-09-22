@@ -184,8 +184,8 @@ server {
     # Account backend code is deployed here for systemd, never served as files.
     location ^~ /server/ { return 404; }
 
-    # Keep the site live, but discourage indexing until public launch.
-    add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+    # Permit advertiser inspection without enabling public search indexing.
+    add_header X-Robots-Tag "noindex" always;
 
     location = /coming-soon.html {
         add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
@@ -224,7 +224,7 @@ server {
 
     location ~* \.html$ {
         __PRIVATE_AUTH__
-        add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+        add_header X-Robots-Tag "noindex" always;
         add_header Cache-Control "no-cache, no-store, must-revalidate" always;
         expires -1;
         try_files $uri =404;
@@ -272,7 +272,7 @@ if coming_soon_enabled:
 else:
     root_auth = f"{private_auth}\n        " if private_auth else ""
     root_location = f"""location = / {{
-        {root_auth}add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+        {root_auth}add_header X-Robots-Tag "noindex" always;
         add_header Cache-Control "no-cache, no-store, must-revalidate" always;
         expires -1;
         try_files /index.html =404;

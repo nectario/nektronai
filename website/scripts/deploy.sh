@@ -27,106 +27,87 @@ pick_first_existing() {
   return 1
 }
 
-# Optional: if a brand/logo folder exists next to the site repo, copy assets in.
-# This lets you drop new logo files without editing the site code.
-BRAND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../logo" 2>/dev/null && pwd || true)"
-if [[ -n "${BRAND_DIR}" && -d "${BRAND_DIR}" ]]; then
-  BRAND_OUT_DIR="${SITE_DIR}/assets/brand"
-  mkdir -p "${BRAND_OUT_DIR}"
+# OneDrive is the canonical logo source. Override this only when intentionally
+# deploying from another synchronized copy.
+BRAND_DIR="${NEKTRON_LOGO_DIR:-/c/Users/nektarios/OneDrive/Documents/Nektron/logo}"
+if [[ ! -d "${BRAND_DIR}" ]]; then
+  echo "ERROR: Canonical brand directory not found: ${BRAND_DIR}"
+  echo "Set NEKTRON_LOGO_DIR to an alternate logo directory if needed."
+  exit 1
+fi
 
-  # Support both old and new logo folder layouts.
+BRAND_DIR="$(cd "${BRAND_DIR}" && pwd)"
+BRAND_OUT_DIR="${SITE_DIR}/assets/brand"
+mkdir -p "${BRAND_OUT_DIR}"
+echo "Brand source: ${BRAND_DIR}"
+
+  # Use only finalized assets so a deploy cannot silently fall back to an
+  # archived or working logo.
   WORDMARK_DARK_320_SRC="$(
     pick_first_existing \
       "${BRAND_DIR}/final/320w/NektronAI_Dark_320.png" \
-      "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Dark.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_dark.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_dark.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_2048w_dark.png" \
-      "${BRAND_DIR}/Original Logo/Icon & Social Media/Black.png" \
-      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Black.png" \
-      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
       || true
   )"
   WORDMARK_LIGHT_320_SRC="$(
     pick_first_existing \
       "${BRAND_DIR}/final/320w/NektronAI_Light_320.png" \
-      "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Light.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_light.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_light.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_2048w_light.png" \
-      "${BRAND_DIR}/Original Logo/Icon & Social Media/White.png" \
-      "${BRAND_DIR}/Original Logo/JPGs & PNGs/White.png" \
-      "${BRAND_DIR}/Original Logo/Artwork Files/1x/Artboard 1.png" \
-      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
       || true
   )"
   WORDMARK_DARK_280_SRC="$(
     pick_first_existing \
       "${BRAND_DIR}/final/280w/NektronAI_Dark_280.png" \
-      "${BRAND_DIR}/final/320w/NektronAI_Dark_320.png" \
-      "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Dark.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_dark.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_dark.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_2048w_dark.png" \
-      "${BRAND_DIR}/Original Logo/Icon & Social Media/Black.png" \
-      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Black.png" \
-      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
       || true
   )"
   WORDMARK_LIGHT_280_SRC="$(
     pick_first_existing \
       "${BRAND_DIR}/final/280w/NektronAI_Light_280.png" \
-      "${BRAND_DIR}/final/320w/NektronAI_Light_320.png" \
-      "${BRAND_DIR}/Original Logo/Artwork/1x/NektronAI_Light.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_512w_light.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_1024w_light.png" \
-      "${BRAND_DIR}/NektronAI_Logo_PNG_Package/NektronAI_logo_2048w_light.png" \
-      "${BRAND_DIR}/Original Logo/Icon & Social Media/White.png" \
-      "${BRAND_DIR}/Original Logo/JPGs & PNGs/White.png" \
-      "${BRAND_DIR}/Original Logo/Artwork Files/1x/Artboard 1.png" \
-      "${BRAND_DIR}/Original Logo/JPGs & PNGs/Logo.png" \
       || true
   )"
   ICON_SRC="$(
     pick_first_existing \
-      "${BRAND_DIR}/Icon & Social Media/Icon.png" \
-      "${BRAND_DIR}/Original Logo/Icon & Social Media/Icon.png" \
-      "${BRAND_DIR}/Original Logo/Artwork Files/NektronAI_Icon_1024.png" \
+      "${BRAND_DIR}/final/icon.png" \
+      "${BRAND_DIR}/final/Icon.png" \
+      "${BRAND_DIR}/final/icons/1x/icon_NektronAI_Dark.png" \
+      "${BRAND_DIR}/final/icons/1x/icon_NektronAI_Light.png" \
       || true
   )"
   FAVICON_SRC="$(
     pick_first_existing \
-      "${BRAND_DIR}/Favicon.png" \
-      "${BRAND_DIR}/Original Logo/Favicon.png" \
+      "${BRAND_DIR}/final/favicon.png" \
+      "${BRAND_DIR}/final/Favicon.png" \
+      "${BRAND_DIR}/final/icons/0.1x/icon_NektronAI_Dark@0.1x.png" \
+      "${BRAND_DIR}/final/icons/0.1x/icon_NektronAI_Light@0.1x.png" \
+      || true
+  )"
+  FAVICON_SVG_SRC="$(
+    pick_first_existing \
+      "${BRAND_DIR}/final/favicon.svg" \
+      "${BRAND_DIR}/final/Favicon.svg" \
+      "${BRAND_DIR}/final/icons/SVG/icon_NektronAI_Dark.svg" \
+      "${BRAND_DIR}/final/icons/SVG/icon_NektronAI_Light.svg" \
       || true
   )"
   SVG_SRC="$(
     pick_first_existing \
-      "${BRAND_DIR}/logo.svg" \
-      "${BRAND_DIR}/Original Logo/logo.svg" \
-      "${BRAND_DIR}/Old Logo/NektronAI_Logo_Lockup.svg" \
+      "${BRAND_DIR}/final/SVG/NektronAI_Dark.svg" \
+      "${BRAND_DIR}/final/SVG/NektronAI_Light.svg" \
       || true
   )"
 
-  if [[ -z "${WORDMARK_DARK_320_SRC}" && -n "${WORDMARK_LIGHT_320_SRC}" ]]; then
-    WORDMARK_DARK_320_SRC="${WORDMARK_LIGHT_320_SRC}"
-  fi
-  if [[ -z "${WORDMARK_LIGHT_320_SRC}" && -n "${WORDMARK_DARK_320_SRC}" ]]; then
-    WORDMARK_LIGHT_320_SRC="${WORDMARK_DARK_320_SRC}"
-  fi
+  MISSING_BRAND_ASSETS=()
+  [[ -n "${WORDMARK_DARK_320_SRC}" ]] || MISSING_BRAND_ASSETS+=("final dark 320px wordmark")
+  [[ -n "${WORDMARK_LIGHT_320_SRC}" ]] || MISSING_BRAND_ASSETS+=("final light 320px wordmark")
+  [[ -n "${WORDMARK_DARK_280_SRC}" ]] || MISSING_BRAND_ASSETS+=("final dark 280px wordmark")
+  [[ -n "${WORDMARK_LIGHT_280_SRC}" ]] || MISSING_BRAND_ASSETS+=("final light 280px wordmark")
+  [[ -n "${ICON_SRC}" ]] || MISSING_BRAND_ASSETS+=("final PNG icon")
+  [[ -n "${FAVICON_SRC}" ]] || MISSING_BRAND_ASSETS+=("final PNG favicon")
+  [[ -n "${FAVICON_SVG_SRC}" ]] || MISSING_BRAND_ASSETS+=("final SVG favicon")
+  [[ -n "${SVG_SRC}" ]] || MISSING_BRAND_ASSETS+=("final SVG wordmark")
 
-  if [[ -z "${WORDMARK_DARK_280_SRC}" && -n "${WORDMARK_DARK_320_SRC}" ]]; then
-    WORDMARK_DARK_280_SRC="${WORDMARK_DARK_320_SRC}"
-  fi
-  if [[ -z "${WORDMARK_LIGHT_280_SRC}" && -n "${WORDMARK_LIGHT_320_SRC}" ]]; then
-    WORDMARK_LIGHT_280_SRC="${WORDMARK_LIGHT_320_SRC}"
-  fi
-
-  if [[ -z "${WORDMARK_DARK_280_SRC}" && -n "${WORDMARK_LIGHT_280_SRC}" ]]; then
-    WORDMARK_DARK_280_SRC="${WORDMARK_LIGHT_280_SRC}"
-  fi
-  if [[ -z "${WORDMARK_LIGHT_280_SRC}" && -n "${WORDMARK_DARK_280_SRC}" ]]; then
-    WORDMARK_LIGHT_280_SRC="${WORDMARK_DARK_280_SRC}"
+  if (( ${#MISSING_BRAND_ASSETS[@]} > 0 )); then
+    echo "ERROR: Canonical logo source is incomplete:"
+    printf '  - %s\n' "${MISSING_BRAND_ASSETS[@]}"
+    exit 1
   fi
 
   if [[ -n "${WORDMARK_DARK_320_SRC}" ]]; then
@@ -153,15 +134,12 @@ if [[ -n "${BRAND_DIR}" && -d "${BRAND_DIR}" ]]; then
   if [[ -n "${FAVICON_SRC}" ]]; then
     cp -f "${FAVICON_SRC}" "${SITE_DIR}/assets/favicon.png"
   fi
+  if [[ -n "${FAVICON_SVG_SRC}" ]]; then
+    cp -f "${FAVICON_SVG_SRC}" "${SITE_DIR}/assets/favicon.svg"
+  fi
   if [[ -n "${SVG_SRC}" ]]; then
     cp -f "${SVG_SRC}" "${BRAND_OUT_DIR}/logo.svg"
   fi
-
-  if [[ -z "${WORDMARK_DARK_320_SRC}" && -z "${WORDMARK_LIGHT_320_SRC}" && -z "${WORDMARK_DARK_280_SRC}" && -z "${WORDMARK_LIGHT_280_SRC}" && -z "${ICON_SRC}" && -z "${FAVICON_SRC}" && -z "${SVG_SRC}" ]]; then
-    echo "WARN: No matching brand assets found in ${BRAND_DIR}; keeping existing site assets."
-  fi
-
-fi
 
 aws s3 sync "${SITE_DIR}/" "s3://${BUCKET_NAME}/" --delete --region "${BUCKET_REGION}" \
   --exclude ".git/*" \

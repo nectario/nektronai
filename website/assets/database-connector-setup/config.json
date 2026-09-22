@@ -1,9 +1,1 @@
-{
-  "preview": false,
-  "configured": true,
-  "issuer": "https://dev-cmgmokiptmjiwjri.us.auth0.com",
-  "client_id": "9bYdBkEd654k8ktx58UtDqDVL3TnEgJ8",
-  "audience": "https://3frqh3q39i.execute-api.us-east-2.amazonaws.com/mcp",
-  "scope": "openid database-connector/manage",
-  "redirect_uri": "https://nektron.ai/database-connector-setup.html"
-}
+{"mode":"nektron-native"}

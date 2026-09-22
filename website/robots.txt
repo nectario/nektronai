@@ -1,2 +1,7 @@
+User-agent: OAI-AdsBot
+Disallow: /api/
+Disallow: /server/
+Allow: /
+
 User-agent: *
 Disallow: /

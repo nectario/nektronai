@@ -1,47 +1,48 @@
+import '/assets/connector-journey.js?v=4cee55db351b';
 const $ = (id) => document.getElementById(id);
 let config, accessToken = null, tokenExpires = 0, inputMode = 'details', busy = false;
 const dialog = $('database-dialog');
+const connectingChatGPT = new URLSearchParams(location.search).get('returnTo') === 'connector-authorize';
 const message = (text) => { $('page-message').textContent = text; };
 const error = (text) => { $('form-error').textContent = text; $('form-error').hidden = !text; };
 const random = () => { const bytes = crypto.getRandomValues(new Uint8Array(32)); return btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=',''); };
 const base64 = (bytes) => btoa(String.fromCharCode(...new Uint8Array(bytes))).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
 
 async function signIn() {
-  if (config.preview) return;
-  if (!config.configured) { message('Database setup is not configured yet. Your existing ChatGPT connection is unaffected.'); return; }
-  const state = random(), verifier = random();
-  sessionStorage.setItem('connector.pkce', JSON.stringify({state, verifier, created: Date.now()}));
-  const challenge = base64(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
-  const url = new URL(`${config.issuer}/authorize`);
-  url.search = new URLSearchParams({response_type:'code', client_id:config.client_id, redirect_uri:config.redirect_uri,
-    scope:config.scope, audience:config.audience, resource:config.audience, state, code_challenge:challenge, code_challenge_method:'S256'});
-  location.assign(url);
+  if(!config?.configured)return;
+  location.assign(connectingChatGPT?'/login.html?returnTo=connector-authorize':'/login.html?returnTo=connector');
 }
 
-async function finishSignIn() {
-  const params = new URLSearchParams(location.search);
-  if (!params.has('code') && !params.has('error')) return;
-  const raw = sessionStorage.getItem('connector.pkce');
-  sessionStorage.removeItem('connector.pkce');
-  history.replaceState(null, '', '/database-connector-setup.html'); // Remove codes before any subsequent navigation.
-  let pending;
-  try { pending = JSON.parse(raw); } catch { throw new Error('Sign-in could not be verified. Please sign in again.'); }
-  if (params.has('error') || !pending || params.get('state') !== pending.state || Date.now()-pending.created > 600000 || Date.now()<pending.created) {
-    throw new Error('Sign-in could not be verified. Please sign in again.');
-  }
-  const response = await fetch(`${config.issuer}/oauth/token`, {method:'POST', credentials:'omit',
-    headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:new URLSearchParams({grant_type:'authorization_code', client_id:config.client_id, code:params.get('code'),
-      redirect_uri:config.redirect_uri, code_verifier:pending.verifier, resource:config.audience})});
-  const result = await response.json();
-  if (!response.ok || !result.access_token || result.token_type?.toLowerCase() !== 'bearer') throw new Error('Sign-in could not be completed. Please try again.');
-  accessToken = result.access_token; // Memory only: no token/password browser storage.
-  tokenExpires = Date.now() + Number(result.expires_in || 0)*1000;
-  $('signin').textContent = 'Sign out';
+async function acquireNativeToken() {
+  if(!config?.configured)throw new Error('Open database setup on nektron.ai.');
+  const headers={'Content-Type':'application/json'};
+  const csrfResponse=await fetch('/api/account/csrf',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});
+  if(!csrfResponse.ok)throw new Error('Account access is temporarily unavailable.');
+  const csrf=(await csrfResponse.json()).csrfToken;
+  if(!csrf)throw new Error('Sign in to your NektronAI account to continue.');
+  headers['X-CSRF-Token']=csrf;
+  const response=await fetch('/api/account/connector-token',{method:'POST',credentials:'same-origin',headers,body:'{}',signal:AbortSignal.timeout(10000)});
+  if(!response.ok){accessToken=null;tokenExpires=0;$('signin').textContent='Sign in';
+    const failure=new Error(response.status===401?'Sign in to your NektronAI account to manage your databases.':'Database account access is temporarily unavailable.');if(response.status===401)failure.code='NEKTRON_SIGNIN_REQUIRED';throw failure;}
+  const result=await response.json();
+  if(result.token_type!=='Bearer'||!result.access_token||result.expires_in!==300)throw new Error('Account access could not be verified.');
+  accessToken=result.access_token;tokenExpires=Date.now()+result.expires_in*1000;
+  $('signin').textContent='Sign out';
+}
+
+async function nativeSignOut() {
+  const response=await fetch('/api/account/csrf',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});
+  if(!response.ok)throw new Error('Sign out could not be completed. Try again.');
+  const csrf=(await response.json()).csrfToken;
+  const logout=await fetch('/api/account/logout',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:'{}',signal:AbortSignal.timeout(10000)});
+  if(!logout.ok)throw new Error('Sign out could not be completed. Try again.');
+  accessToken=null;tokenExpires=0;clearCredentials();$('connections').replaceChildren();
+  $('signin').textContent='Sign in';$('empty').hidden=false;$('add').disabled=false;
+  message('Signed out of your NektronAI account.');
 }
 
 async function api(path, options = {}) {
-  if (!config.preview && (!accessToken || tokenExpires <= Date.now()+5000)) throw new Error('Your session has expired. Sign in again before connecting.');
+  if (!accessToken || tokenExpires <= Date.now()+5000) await acquireNativeToken();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 29000);
   try {
@@ -64,7 +65,7 @@ function renderConnections(result) {
     const name = document.createElement('h2'); name.textContent = connection.display_name;
     const details = document.createElement('p'); details.textContent = `${connection.engine.toUpperCase()} · ${connection.database}`;
     const permission = document.createElement('span'); permission.className='badge'; permission.textContent='Read-only';
-    card.append(status, name, details, permission); list.append(card);
+    card.append(status, name, details, permission);if(typeof result.account_ref==='string'&&/^[a-f0-9]{64}$/.test(result.account_ref)){const remove=document.createElement('button');remove.textContent='Remove';remove.className='secondary';remove.style.display='flex';remove.style.marginTop='18px';remove.onclick=()=>location.assign('/database-connector-remove.html?connection='+encodeURIComponent(connection.connection_id)+'&account='+result.account_ref);card.append(remove);}list.append(card);
   }
   $('empty').hidden = result.connections.length > 0;
   const full = result.enabled_count >= result.enabled_limit || result.saved_count >= result.saved_limit;
@@ -73,7 +74,9 @@ function renderConnections(result) {
   else message('');
 }
 
-async function refreshConnections() { renderConnections(await api('connections')); }
+async function refreshConnections() { const result=await api('connections');renderConnections(result);return result; }
+function continueConnection(result){if(connectingChatGPT&&result.connections.length){clearCredentials();location.assign('/api/account/oauth/resume');return true;}return false;}
+async function cancelConnection(){if(busy)return;clearCredentials();const csrf=await fetch('/api/account/csrf',{credentials:'same-origin',cache:'no-store'});if(!csrf.ok)throw Error('Unable to cancel. Please try again.');const token=(await csrf.json()).csrfToken;const response=await fetch('/api/account/oauth/cancel-setup',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':token},body:'{}'});const result=await response.json();if(!response.ok)throw Error('This connection request expired. Return to ChatGPT.');const target=new URL(result.redirect);if(target.origin!=='https://chatgpt.com'||target.pathname!=='/connector_platform_oauth_redirect')throw Error('Unexpected return address.');location.assign(target.href);}
 function clearCredentials() { $('password').value=''; $('connection-string').value=''; $('password').type='password'; $('show-password').textContent='Show'; $('show-password').setAttribute('aria-label','Show database password'); }
 function setBusy(value) { busy=value; $('connect').disabled=value; $('progress').hidden=!value; $('cancel').disabled=value; $('close').disabled=value; }
 function closeDialog() { if (busy) return; clearCredentials(); $('database-form').reset(); dialog.close(); $('add').focus(); }
@@ -113,7 +116,7 @@ function connected(result) {
   sessionStorage.removeItem('connector.pending');
   clearCredentials(); $('database-form').hidden=true; $('success').hidden=false;
   $('success-message').textContent=`${result.connection.display_name} is ready in Database Connector.`;
-  setBusy(false); $('done').focus(); refreshConnections().catch(e=>message(e.message));
+  setBusy(false); $('done').focus(); refreshConnections().then(continueConnection).catch(e=>message(e.message));
 }
 async function pollRequest(id) {
   for (let attempt=0; attempt<8; attempt++) {
@@ -146,24 +149,14 @@ for(const id of ['close','cancel','done']) $(id).addEventListener('click',closeD
 dialog.addEventListener('cancel',event=>{event.preventDefault(); closeDialog();});
 $('show-password').addEventListener('click',()=>{const reveal=$('password').type==='password'; $('password').type=reveal?'text':'password'; $('show-password').textContent=reveal?'Hide':'Show'; $('show-password').setAttribute('aria-label',`${reveal?'Hide':'Show'} database password`);});
 for(const mode of ['details','string']) { $(`${mode}-tab`).addEventListener('click',()=>setMode(mode)); $(`${mode}-tab`).addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault(); const next=inputMode==='details'?'string':'details'; setMode(next); $(`${next}-tab`).focus();}}); }
-$('signin').addEventListener('click',()=>{if(accessToken){accessToken=null;tokenExpires=0;clearCredentials();$('signin').textContent='Sign in';$('connections').replaceChildren();$('empty').hidden=false;$('add').disabled=false;message('Signed out of database setup.');}else signIn();});
+$('signin').addEventListener('click',()=>{(accessToken?nativeSignOut():signIn()).catch(e=>message(e.message));});
 window.addEventListener('pagehide',clearCredentials);
 async function start() {
-  try {
-    const response=await fetch('/assets/database-connector-setup/config.json',{credentials:'omit',cache:'no-store'}); if(!response.ok) throw new Error('Database setup is temporarily unavailable.');
-    config=await response.json();
-    if(location.origin !== 'https://nektron.ai' || location.pathname !== '/database-connector-setup.html' ||
-       config.preview !== false || config.configured !== true ||
-       config.issuer !== 'https://dev-cmgmokiptmjiwjri.us.auth0.com' || config.client_id !== '9bYdBkEd654k8ktx58UtDqDVL3TnEgJ8' ||
-       config.audience !== 'https://3frqh3q39i.execute-api.us-east-2.amazonaws.com/mcp' || config.scope !== 'openid database-connector/manage' ||
-       config.redirect_uri !== 'https://nektron.ai/database-connector-setup.html') {
-      config.configured=false;
-      throw new Error('Database setup is not configured for this address. Open https://nektron.ai/database-connector-setup.html.');
-    }
-    if(config.preview){$('preview-note').hidden=false;$('signin').textContent='Preview';$('signin').disabled=true;await refreshConnections();return;}
-    await finishSignIn();
-    if(accessToken){await api('account',{method:'POST',body:'{}'});await refreshConnections();const pending=sessionStorage.getItem('connector.pending');if(pending){await openDialog();setBusy(true);try{await pollRequest(pending);}finally{setBusy(false);}}}
-    else message(config.configured?'Sign in with the same account you use for Database Connector in ChatGPT.':'Database setup is not configured yet. Your existing ChatGPT connection is unaffected.');
-  } catch(e){message(e.message);}
+  try{const pending=JSON.parse(sessionStorage.getItem('connector.removal')||'null');if(pending?.resume===true&&pending.expires>Date.now()&&pending.expires<=Date.now()+600000){location.replace('/database-connector-remove.html');return;}}catch{}
+  config={preview:false,configured:location.origin==='https://nektron.ai'&&location.pathname==='/database-connector-setup.html'};
+  if(!config.configured){message('Open database setup on https://nektron.ai.');return;}
+  if(connectingChatGPT){const returning=$('return-chatgpt');returning.href='/api/account/oauth/resume';returning.textContent='Continue to ChatGPT';const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel connection';cancel.addEventListener('click',()=>cancelConnection().catch(e=>message(e.message)));returning.after(cancel);}
+  try {await acquireNativeToken();await api('account',{method:'POST',body:'{}'});const result=await refreshConnections();if(continueConnection(result))return;if((connectingChatGPT||location.hash==='#add')&&!$('add').disabled)await openDialog();}
+  catch(e){if(location.hash==='#add'&&e.code==='NEKTRON_SIGNIN_REQUIRED'){await signIn();return;}message(e.message);}
 }
 start();

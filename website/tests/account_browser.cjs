@@ -26,6 +26,7 @@ fs.mkdirSync(out, {recursive:true});
         assert.equal(request.headers()['x-csrf-token'],'test-csrf');
         calls.push({action,body:request.postDataJSON()});
         if (failure) return route.fulfill({status:401,json:{error:failure}});
+        if (action === 'verify-email') return route.fulfill({json:{verified:true}});
         if (action === 'login') authenticated = true;
         if (action === 'logout') authenticated = false;
         return route.fulfill({status:['signup','request-reset','request-verification'].includes(action)?202:200,json:{accepted:true}});
@@ -104,12 +105,38 @@ fs.mkdirSync(out, {recursive:true});
       await page.locator('[data-account-guest]').waitFor({state:'visible'});
       assert.equal(calls.at(-1).action,'logout');
 
-      await page.goto(base+'/verify-email.html#token='+'b'.repeat(43));
       const previous = calls.length;
-      await page.getByRole('button',{name:'Verify email',exact:true}).click();
+      await page.goto(base+'/verify-email.html#token='+'b'.repeat(43));
       await page.locator('[data-auth-success]').waitFor({state:'visible'});
       assert.equal(calls.length,previous+1);
       assert.equal(calls.at(-1).body.token,'b'.repeat(43));
+      assert.equal(await page.locator('input[type=email]:visible').count(),0,'No email re-entry for a valid link');
+      assert.equal(await page.locator('[data-verify-token]:visible').count(),0,'No second confirmation click');
+      await Promise.all([
+        page.waitForResponse(r=>r.url().endsWith('/api/account/csrf')),
+        page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow'))),
+      ]);
+      assert.equal(calls.length,previous+1,'Restoring the page must not replay verification');
+
+      failure='ACCOUNT_UNAVAILABLE';
+      await page.goto(base+'/verify-email.html#token='+'c'.repeat(43));
+      await page.getByRole('button',{name:'Try verification again'}).waitFor({state:'visible'});
+      assert.equal(await page.locator('input[type=email]:visible').count(),0);
+      failure='';
+      await page.getByRole('button',{name:'Try verification again'}).click();
+      await page.locator('[data-auth-success]').waitFor({state:'visible'});
+      assert.equal(calls.at(-1).body.token,'c'.repeat(43),'Retry retains token only in page memory');
+
+      failure='INVALID_LINK';
+      await page.goto(base+'/verify-email.html#token='+'d'.repeat(43));
+      await page.locator('[data-account-status][data-error]').waitFor();
+      assert.equal(await page.locator('[data-auth-success]:visible').count(),0);
+      assert.equal(await page.locator('input[type=email]:visible').count(),0);
+      failure='';
+      const beforeMissing=calls.length;
+      await page.goto(base+'/verify-email.html');
+      await page.locator('[data-verify-request]').waitFor({state:'visible'});
+      assert.equal(calls.length,beforeMissing,'Missing links do not submit verification');
       await page.goto(base+'/reset-password.html');
       assert.equal(await page.locator('form:visible').count(),0);
       assert.deepEqual(errors,[]);

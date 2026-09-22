@@ -85,7 +85,7 @@ def main():
     # Preserve prior provider settings for a safe application-version rollback.
     # Native authentication does not use them or change any connector configuration.
     runtime = {**(previous or {}), **settings, "NEKTRON_DB_USER": username, "NEKTRON_DB_PASSWORD": password,
-               "NEKTRON_AUTH_EMAIL_FROM": "Nektron <info@nektron.ai>", "NEKTRON_EMAIL_REGION": "us-east-2",
+               "NEKTRON_AUTH_EMAIL_FROM": "NektronAI <info@nektron.ai>", "NEKTRON_EMAIL_REGION": "us-east-2",
                "NEKTRON_SITE_ORIGIN": "https://nektron.ai", "NEKTRON_ACCOUNT_ENABLED": "true"}
     runtime.pop("NEKTRON_DB_CA_FILE", None)
     if not previous:

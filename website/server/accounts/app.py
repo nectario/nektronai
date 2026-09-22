@@ -113,6 +113,9 @@ def create_app(settings=None, store=None, mailer=None):
             return jsonify(error="ACCOUNT_UNAVAILABLE"), 503
         if session.failed:
             return jsonify(error="ACCOUNT_UNAVAILABLE"), 503
+        # OAuth server-to-server endpoints use code/PKCE or refresh credentials, never browser cookies.
+        if request.endpoint in {"connector_oauth.token", "connector_oauth.revoke"}:
+            return None
         if request.method not in ("GET", "HEAD", "OPTIONS"):
             if request.headers.get("Origin") != origin:
                 return jsonify(error="INVALID_ORIGIN"), 403
@@ -244,7 +247,10 @@ def create_app(settings=None, store=None, mailer=None):
         identity = backend.finish_login(account["UserId"], account["PasswordHash"])
         if not identity:
             return jsonify(error="INVALID_CREDENTIALS"), 401
+        pending_oauth = session.get("connector_oauth_pending")
         app.session_interface.rotate(session)
+        if isinstance(pending_oauth, dict) and 0 <= time.time()-pending_oauth.get("created",0) <= 600:
+            session["connector_oauth_pending"] = pending_oauth
         session.update(identity)
         session["csrf"] = secrets.token_urlsafe(32)
         return jsonify(authenticated=True, redirect="/account.html")
@@ -319,4 +325,7 @@ def create_app(settings=None, store=None, mailer=None):
     def old_callback():
         return redirect("/login.html")
 
+    if settings.get("NEKTRON_CONNECTOR_OAUTH_ENABLED") == "true":
+        from connector_oauth import register_connector_oauth
+        register_connector_oauth(app, settings, backend)
     return app

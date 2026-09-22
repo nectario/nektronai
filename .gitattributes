@@ -1,0 +1,9 @@
+# Preserve design-source and asset bytes on Windows checkouts.
+*.ai binary
+*.pdf binary
+*.psd binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary

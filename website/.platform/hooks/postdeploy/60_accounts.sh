@@ -57,6 +57,13 @@ anchor = "    root /var/app/current;\n"
 if text.count(anchor) != 1:
     raise SystemExit("Expected one site root")
 location = """
+    location = /.well-known/oauth-authorization-server {
+        access_log /var/log/nginx/access.log nektron_accounts_safe;
+        proxy_pass http://127.0.0.1:8768;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
     location ^~ /api/account/ {
         access_log /var/log/nginx/access.log nektron_accounts_safe;
         proxy_pass http://127.0.0.1:8768;

@@ -9,11 +9,24 @@
   const guest = document.querySelector('[data-account-guest]');
   const success = document.querySelector('[data-auth-success]');
   const forms = [...document.querySelectorAll('[data-auth-form]')];
+  const verificationForm = document.querySelector('[data-verify-token]');
+  const verificationRequest = document.querySelector('[data-verify-request]');
   const rawToken = new URLSearchParams(location.hash.slice(1)).get('token') || '';
   const token = /^[A-Za-z0-9_-]{43}$/.test(rawToken) ? rawToken : '';
   if (screen && location.hash) history.replaceState(null, '', location.pathname);
+  // Opening another email link in this same tab can be a fragment-only navigation.
+  if (screen === 'verify' || screen === 'reset') window.addEventListener('hashchange', () => {
+    if (new URLSearchParams(location.hash.slice(1)).has('token')) location.reload();
+  });
+  // Only fixed product destinations survive login; never accept arbitrary return URLs.
+  const connectorDestinations = {connector:'/database-connector-setup.html',
+    'connector-billing':'/database-connector.html#account',
+    'connector-authorize':'/api/account/oauth/resume'};
+  const requestedReturn = new URLSearchParams(location.search).get('returnTo');
+  if (Object.hasOwn(connectorDestinations, requestedReturn)) sessionStorage.setItem('nektron.account.return', requestedReturn);
   let csrf = '';
   let busy = false;
+  let verificationStarted = false;
 
   function status(message, error = false) {
     if (!stateNode) return;
@@ -32,7 +45,7 @@
     if (data.authenticated) {
       document.querySelectorAll('[data-account-email]').forEach(n => { n.textContent = data.user.email; });
       document.querySelectorAll('[data-account-name]').forEach(n => {
-        n.textContent = [data.user.firstName, data.user.middleName, data.user.lastName].filter(Boolean).join(' ') || 'Nektron member';
+        n.textContent = [data.user.firstName, data.user.middleName, data.user.lastName].filter(Boolean).join(' ') || 'NektronAI member';
       });
       document.querySelectorAll('[data-account-country]').forEach(n => { n.textContent = data.user.country || 'Not provided'; });
       document.querySelectorAll('[data-account-phone]').forEach(n => { n.textContent = data.user.phoneNumber || 'Not provided'; });
@@ -72,10 +85,15 @@
         await refreshCsrf();
         forms.forEach(f => { f.querySelector('[type="submit"]').disabled = false; });
       }
+      if (screen === 'verify' && token) await verifyFromLink();
     } catch {
       if (profile) profile.hidden = true;
       if (guest) guest.hidden = false;
-      status('Account access is temporarily unavailable. Please reload this page to try again.', true);
+      if (screen === 'verify' && token) {
+        verificationForm.hidden = false;
+        verificationForm.querySelector('[type="submit"]').disabled = false;
+        status('Verification is temporarily unavailable. Please try again below.', true);
+      } else status('Account access is temporarily unavailable. Please reload this page to try again.', true);
     }
   }
   async function post(action, body) {
@@ -92,8 +110,37 @@
   }
 
   if (screen === 'verify') {
-    document.querySelector('[data-verify-token]').hidden = !token;
-    document.querySelector('[data-verify-request]').hidden = Boolean(token);
+    verificationRequest.hidden = Boolean(rawToken);
+    if (token) status('Verifying your email...');
+    else if (rawToken) status(messages.INVALID_LINK, true);
+  }
+  async function verifyFromLink(retry = false) {
+    if (!token || busy || (verificationStarted && !retry)) return;
+    verificationStarted = true;
+    busy = true;
+    verificationForm.hidden = true;
+    status('Verifying your email...');
+    try {
+      if (!csrf) await refreshCsrf();
+      const result = await post('verify-email', {token});
+      if (result.verified !== true) throw new Error('ACCOUNT_UNAVAILABLE');
+      const text = 'Your email is verified. You can now log in.';
+      success.querySelector('p').textContent = text;
+      success.hidden = false;
+      success.focus();
+      status(text);
+    } catch (error) {
+      status(error.message === 'INVALID_LINK'
+        ? 'This verification link has expired or has already been used. If you already verified your email, log in; otherwise request a new link below.'
+        : messages[error.message] || 'We could not verify your email. Please try again below.', true);
+      if (error.message !== 'INVALID_LINK') {
+        verificationForm.hidden = false;
+        verificationForm.querySelector('[type="submit"]').disabled = false;
+      }
+      stateNode?.focus();
+    } finally {
+      busy = false;
+    }
   }
   if (screen === 'reset' && !token) {
     forms.forEach(f => { f.hidden = true; });
@@ -101,6 +148,10 @@
   }
   forms.forEach(form => form.addEventListener('submit', async event => {
     event.preventDefault();
+    if (form === verificationForm) {
+      await verifyFromLink(true);
+      return;
+    }
     if (busy || !csrf || !form.reportValidity()) return;
     const data = Object.fromEntries(new FormData(form));
     if (form.dataset.authForm === 'signup') {
@@ -128,7 +179,9 @@
       await post(action, data);
       form.reset();
       if (action === 'login') {
-        location.assign('account.html');
+        const returnKey = sessionStorage.getItem('nektron.account.return');
+        sessionStorage.removeItem('nektron.account.return');
+        location.assign(Object.hasOwn(connectorDestinations, returnKey) ? connectorDestinations[returnKey] : 'account.html');
         return;
       }
       const text = action === 'signup'

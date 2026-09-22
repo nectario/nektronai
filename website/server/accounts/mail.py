@@ -1,4 +1,5 @@
-"""Nektron account emails; tokens never appear in API responses or routine logs."""
+"""NektronAI account emails; tokens never appear in API responses or routine logs."""
+from email.utils import formataddr, parseaddr
 from html import escape
 from urllib.parse import quote
 
@@ -9,16 +10,21 @@ from botocore.config import Config
 class Mailer:
     def __init__(self, settings):
         self.origin = settings.get("NEKTRON_SITE_ORIGIN", "https://nektron.ai").rstrip("/")
-        self.sender = settings.get("NEKTRON_AUTH_EMAIL_FROM", "Nektron <info@nektron.ai>")
+        configured_sender = settings.get("NEKTRON_AUTH_EMAIL_FROM", "NektronAI <info@nektron.ai>")
+        _, sender_address = parseaddr(configured_sender)
+        if not sender_address:
+            raise ValueError("Account email sender address is required")
+        # Preserve the configured mailbox, but normalize older display-name settings.
+        self.sender = formataddr(("NektronAI", sender_address))
         self.client = boto3.client("sesv2", region_name=settings.get("NEKTRON_EMAIL_REGION", "us-east-2"),
                                    config=Config(connect_timeout=3, read_timeout=5, retries={"max_attempts": 1}))
 
     def send(self, email, purpose, token):
         verify = purpose == "verify"
-        title = "Verify your Nektron email" if verify else "Reset your Nektron password"
+        title = "Verify your NektronAI email" if verify else "Reset your NektronAI password"
         action = "Verify email" if verify else "Choose a new password"
-        detail = ("Confirm your email address to finish creating your Nektron account."
-                  if verify else "We received a request to set a new password for your Nektron account.")
+        detail = ("Confirm your email address to finish creating your NektronAI account."
+                  if verify else "We received a request to set a new password for your NektronAI account.")
         lifetime = "24 hours" if verify else "30 minutes"
         page = "verify-email.html" if verify else "reset-password.html"
         # A fragment keeps the bearer token out of webserver request logs/referrers.

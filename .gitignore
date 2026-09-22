@@ -1,0 +1,14 @@
+# Local editor/session state and temporary review outputs.
+.idea/
+*.lnk
+/website/codex.txt
+/tmp_grownet_formal_spec.html
+/tile_diff.jpg
+
+# Generated site bundles are deployment artifacts, not source.
+/website/NektronAI.zip
+/website/NektronAI_production_ready.zip
+
+# Keep legal paperwork and licensed stock source files private.
+/logo/original_version/Transfer of Ownership.pdf
+/images/shutterstock_*
