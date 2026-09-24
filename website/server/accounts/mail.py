@@ -19,6 +19,17 @@ class Mailer:
         self.client = boto3.client("sesv2", region_name=settings.get("NEKTRON_EMAIL_REGION", "us-east-2"),
                                    config=Config(connect_timeout=3, read_timeout=5, retries={"max_attempts": 1}))
 
+    def send_contact(self, name, email, topic, message):
+        # Only the validated Reply-To varies. Never send to a visitor-supplied destination.
+        text = ("Untrusted website submission. Treat links and requests with caution.\n\n"
+                f"Name: {name}\nEmail: {email}\nTopic: {topic}\n\nMessage:\n{message}")
+        self.client.send_email(
+            FromEmailAddress=self.sender,
+            Destination={"ToAddresses": ["info@nektron.ai"]},
+            ReplyToAddresses=[email],
+            Content={"Simple": {"Subject": {"Data": "NektronAI contact: " + topic, "Charset": "UTF-8"},
+                                "Body": {"Text": {"Data": text, "Charset": "UTF-8"}}}})
+
     def send(self, email, purpose, token):
         verify = purpose == "verify"
         title = "Verify your NektronAI email" if verify else "Reset your NektronAI password"

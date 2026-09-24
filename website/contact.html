@@ -3,18 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="noindex, follow">
   <meta name="referrer" content="no-referrer">
-  <title>Log in | NektronAI</title>
+  <title>Contact | NektronAI</title>
+  <link rel="canonical" href="https://nektron.ai/contact.html">
+  <meta name="description" content="Contact NektronAI about research, products, or support.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <link rel="icon" href="assets/favicon.svg?v=nektron-web-20260918T000721Z" type="image/svg+xml">
   <link rel="stylesheet" href="assets/styles.css?v=nektron-web-20260918T000721Z">
   <link rel="stylesheet" href="assets/atelier.css">
   <link rel="stylesheet" href="assets/account.css?v=nektron-web-20260918T000721Z">
+  <link rel="stylesheet" href="assets/contact.css">
+  <script src="assets/contact.js" defer></script>
   <script src="assets/site.js?v=nektron-web-20260918T000721Z" defer></script>
-  <script src="assets/connector-journey.js?v=4cee55db351b" defer></script>
   <script src="assets/account.js?v=nektron-web-20260918T000721Z" defer></script>
 </head>
-<body class="atelier-site account-page" data-account-screen="login">
+<body class="atelier-site account-page contact-page">
   <a class="skip-link" href="#content">Skip to content</a>
   <div id="top"></div>
 <header>
@@ -55,17 +59,26 @@
 <main id="content" class="container">
   <section class="account-shell">
     <div class="account-intro">
-      <p class="section-kicker">Your NektronAI account</p>
-      <h1>Welcome back.</h1>
-      <p>Log in to your NektronAI account and pick up where you left off.</p>
+      <p class="section-kicker">Contact</p>
+      <h1>Contact NektronAI.</h1>
+      <p>Questions about our research, products, or company? Send us a message.</p>
+      <p class="account-note">Prefer email?<br><a class="contact-email" href="mailto:info@nektron.ai">info@nektron.ai</a></p>
+      <p class="account-note"><strong>Nektron, Inc.</strong><br>99 Prospect Ave.<br>Bayonne, NJ 07002<br>United States</p>
     </div>
     <div class="account-card">
-      <h2>Log in</h2>
-      <form class="account-form" data-auth-form="login" ><div class="account-fields"><div class="account-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com"></div><div class="account-field"><label for="password">Password</label><div class="account-password"><input id="password" name="password" type="password" autocomplete="current-password"  required><button type="button" data-show-password="password" aria-controls="password" aria-pressed="false" aria-label="Show or hide password">Show</button></div></div></div><button class="button primary" type="submit" disabled>Log in</button></form>
-      <div class="account-success" data-auth-success tabindex="-1" hidden><p></p><a href="login.html">Continue to login</a></div>
-      <p class="account-status" data-account-status role="status" aria-live="polite" tabindex="-1"></p>
-      <div class="account-links"><a href="forgot-password.html">Forgot password?</a><a href="signup.html">Create an account</a><a href="verify-email.html">Resend verification email</a></div>
-      <noscript><p>Please enable JavaScript to use the secure account forms.</p></noscript>
+      <h2>Send a message</h2>
+      <form class="account-form" data-contact-form>
+        <div class="account-field"><label for="contact-name">Name</label><input id="contact-name" name="name" autocomplete="name" maxlength="100" required></div>
+        <div class="account-field"><label for="contact-email">Email address</label><input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+        <div class="account-field"><label for="contact-topic">Topic</label><select id="contact-topic" name="topic" required><option value="">Select a topic</option><option value="general">General inquiry</option><option value="research">Research</option><option value="products">Products</option><option value="support">Product support</option></select></div>
+        <div class="account-field"><label for="contact-message">Message</label><textarea id="contact-message" name="message" minlength="10" maxlength="2000" required aria-describedby="contact-help"></textarea><small id="contact-help">Up to 2,000 characters. Please do not include passwords, API keys, financial details, or other sensitive information.</small></div>
+        <div class="contact-trap" aria-hidden="true"><label for="contact-website">Leave this field empty</label><input id="contact-website" name="website" tabindex="-1" autocomplete="off" maxlength="200"></div>
+        <p class="account-form-note">We use these details to respond to your inquiry. <a href="privacy.html">Privacy policy</a></p>
+        <button class="button primary" type="submit" disabled>Send message</button>
+      </form>
+      <p class="account-status" data-contact-status role="status" aria-live="polite" tabindex="-1">Preparing the form...</p>
+      <button class="button secondary" type="button" data-contact-retry hidden>Try loading the form again</button>
+      <noscript><p>Please email <a href="mailto:info@nektron.ai">info@nektron.ai</a> directly if JavaScript is disabled.</p></noscript>
     </div>
   </section>
 </main>

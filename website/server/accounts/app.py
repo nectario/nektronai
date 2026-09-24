@@ -325,6 +325,9 @@ def create_app(settings=None, store=None, mailer=None):
     def old_callback():
         return redirect("/login.html")
 
+    from contact import register_contact
+    register_contact(app, backend, delivery)
+
     if settings.get("NEKTRON_CONNECTOR_OAUTH_ENABLED") == "true":
         from connector_oauth import register_connector_oauth
         register_connector_oauth(app, settings, backend)

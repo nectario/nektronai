@@ -36,7 +36,7 @@ class SitewideChecks(unittest.TestCase):
         self.assertEqual(html.count('data-added-products="nektron-family"'),1)
         block=html.split('data-added-products="nektron-family">',1)[1].split('<div class="callout home-product-note"',1)[0]
         for name in ('Nektron Write','Nektron Mail','Nektron Moments'):self.assertIn('<h3>'+name+'</h3>',block)
-        self.assertEqual(re.findall(r'href="([^"]+)"',block),['#contact','#contact','#contact'])
+        self.assertEqual(re.findall(r'href="([^"]+)"',block),['contact.html','contact.html','contact.html'])
         self.assertNotRegex(block.lower(),r'coming soon|download|available now|macos|windows|subscription')
         for name in ('DeepTrading.ai','InterviewHelperAI','TagMySpend.com'):self.assertIn(name,html)
         self.assertLess(html.index('data-added-products='),html.index('<section id="ventures"'))

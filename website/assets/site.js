@@ -3,7 +3,7 @@
 (() => {
   const routes = new Set(['/', '/index.html', '/about.html', '/docs.html', '/downloads.html',
     '/changelog.html', '/grownet.html', '/grownet-formal-spec.html', '/privacy.html', '/terms.html', '/support.html',
-    '/login.html', '/signup.html', '/account.html', '/forgot-password.html', '/reset-password.html', '/verify-email.html']);
+    '/login.html', '/signup.html', '/account.html', '/forgot-password.html', '/reset-password.html', '/verify-email.html', '/contact.html']);
   const scriptUrl = document.currentScript?.src;
   if (!scriptUrl) return;
   const siteRoot = new URL('../', scriptUrl);

@@ -90,11 +90,11 @@ class VisionChecks(unittest.TestCase):
         self.assertIn('Nektron product family', self.text)
         self.assertEqual(sum(a.get('class') == 'card product-card' for t, a in self.page.tags), 6)
         anchors = [a.get('href') for t, a in self.page.tags if t == 'a']
-        for destination in ('grownet.html', '#products', '#contact', 'https://www.deeptrading.ai',
+        for destination in ('grownet.html', '#products', 'contact.html', 'https://www.deeptrading.ai',
                             'https://www.interviewhelper.ai', 'https://tagmyspend.com'):
             self.assertIn(destination, anchors)
         family = self.html.split('data-added-products="nektron-family">', 1)[1].split('<div class="callout home-product-note"', 1)[0]
-        self.assertEqual(re.findall(r'href="([^"]+)"', family), ['#contact', '#contact', '#contact'])
+        self.assertEqual(re.findall(r'href="([^"]+)"', family), ['contact.html', 'contact.html', 'contact.html'])
 
     def test_social_text_matches_the_mission_without_changing_image_or_canonical(self):
         meta = {a.get('name', a.get('property')): a.get('content') for t, a in self.page.tags if t == 'meta'}

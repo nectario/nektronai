@@ -50,7 +50,7 @@ class AdvertiserChecks(unittest.TestCase):
 
     def test_ads_crawl_allowed_without_opening_other_crawlers(self):
         robots=RobotFileParser();robots.parse(read('robots.txt').splitlines())
-        for path in ('/','/index.html#contact','/index.html#products','/about.html','/support.html','/privacy.html','/terms.html','/assets/styles.css'):
+        for path in ('/','/index.html#contact','/contact.html','/index.html#products','/about.html','/support.html','/privacy.html','/terms.html','/assets/styles.css'):
             self.assertTrue(robots.can_fetch('OAI-AdsBot',path),path)
         self.assertFalse(robots.can_fetch('OAI-AdsBot','/api/account/session'))
         self.assertFalse(robots.can_fetch('OAI-AdsBot','/server/accounts/app.py'))

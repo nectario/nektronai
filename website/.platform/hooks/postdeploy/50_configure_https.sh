@@ -187,6 +187,17 @@ server {
     # Permit advertiser inspection without enabling public search indexing.
     add_header X-Robots-Tag "noindex" always;
 
+    location = /contact.html {
+        __PRIVATE_AUTH__
+        add_header X-Robots-Tag "noindex" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Content-Security-Policy "frame-ancestors 'none'" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "no-referrer" always;
+        add_header Cache-Control "no-store" always;
+        try_files $uri =404;
+    }
+
     location = /coming-soon.html {
         add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
         add_header Cache-Control "no-cache, no-store, must-revalidate" always;
