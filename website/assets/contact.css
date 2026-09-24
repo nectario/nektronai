@@ -4,9 +4,14 @@ body.contact-page .account-intro {
   padding: clamp(24px, 3vw, 34px);
   border: 1px solid var(--border);
   border-radius: 22px;
-  background: linear-gradient(125deg, var(--atelier-thesis-start), var(--atelier-thesis-end));
+  background: var(--atelier-paper);
   box-shadow: inset 0 1px 0 var(--atelier-rim), 0 8px 22px var(--atelier-shadow);
 }
+body.contact-page .account-card {
+  background: linear-gradient(125deg, var(--atelier-thesis-start), var(--atelier-thesis-end));
+}
+body.contact-page .account-intro h1 { font-size: clamp(28px, 3vw, 40px); line-height: 1.2; }
+body.contact-page .account-intro .section-kicker { font-size: 14px; }
 body.contact-page .account-intro .account-note {
   padding: 20px;
   border: 1px solid var(--border2);
@@ -18,6 +23,7 @@ body.contact-page .account-intro .account-note {
 body.contact-page .account-intro .account-note:last-child { margin-bottom: 0; }
 @media (forced-colors: active) {
   body.contact-page .account-intro,
+  body.contact-page .account-card,
   body.contact-page .account-intro .account-note { background: Canvas; color: CanvasText; border-color: CanvasText; box-shadow: none; }
 }
 body.contact-page .account-field textarea {

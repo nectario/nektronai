@@ -25,9 +25,11 @@ const out=path.resolve(__dirname,'../dist/contact-review');fs.mkdirSync(out,{rec
    await page.waitForFunction(()=>!document.querySelector('[type=submit]').disabled);
    await page.evaluate(()=>document.fonts.ready);
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
-   assert.ok(await page.locator('.account-intro').evaluate(el=>getComputedStyle(el).backgroundImage.includes('linear-gradient')));
+   assert.equal(await page.locator('.account-intro').evaluate(el=>getComputedStyle(el).backgroundImage),'none');
+   assert.ok(await page.locator('.account-card').evaluate(el=>getComputedStyle(el).backgroundImage.includes('linear-gradient')));
    assert.equal(await page.locator('.account-intro .account-note').count(),2);
-   assert.equal(await page.getByRole('heading',{level:1,name:'Contact NektronAI.'}).count(),1);
+   assert.equal(await page.getByRole('heading',{level:1,name:'Questions about GrowNet, the company, or our products?'}).count(),1);
+   assert.equal(await page.locator('.account-intro .section-kicker').innerText(),'CONTACT NEKTRONAI');
    assert.ok(await page.locator('a[href="mailto:info@nektron.ai"]').count());
    assert.equal(await page.locator('input[type=file]').count(),0);
    const report=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
