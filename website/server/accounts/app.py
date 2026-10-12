@@ -116,7 +116,7 @@ def create_app(settings=None, store=None, mailer=None):
         if session.failed:
             return jsonify(error="ACCOUNT_UNAVAILABLE"), 503
         # OAuth server-to-server endpoints use code/PKCE or refresh credentials, never browser cookies.
-        if request.endpoint in {"connector_oauth.token", "connector_oauth.revoke"}:
+        if request.endpoint in {"connector_oauth.token", "connector_oauth.revoke", "mail_oauth.token", "mail_oauth.revoke"}:
             return None
         if request.method not in ("GET", "HEAD", "OPTIONS"):
             if request.headers.get("Origin") != origin:
@@ -269,13 +269,20 @@ def create_app(settings=None, store=None, mailer=None):
         identity = backend.finish_login(account["UserId"], account["PasswordHash"])
         if not identity:
             return jsonify(error="INVALID_CREDENTIALS"), 401
-        pending_oauth = session.get("connector_oauth_pending")
+        pending_oauth = {key: session.get(key) for key in ("connector_oauth_pending", "mail_oauth_pending")}
         app.session_interface.rotate(session)
-        if isinstance(pending_oauth, dict) and 0 <= time.time()-pending_oauth.get("created",0) <= 600:
-            session["connector_oauth_pending"] = pending_oauth
+        for key, pending in pending_oauth.items():
+            if isinstance(pending, dict) and 0 <= time.time()-pending.get("created",0) <= 600:
+                session[key] = pending
         session.update(identity)
         session["csrf"] = secrets.token_urlsafe(32)
-        return jsonify(authenticated=True, redirect="/account.html")
+        # Verification/recovery links can open in a new browser tab, where the
+        # original tab's sessionStorage is absent. Only a validated pending Mail
+        # request may provide this fixed fallback; never accept a return URL.
+        destination = ("/api/account/mail-oauth/resume"
+                       if "mail_oauth_pending" in session and "connector_oauth_pending" not in session
+                       else "/account.html")
+        return jsonify(authenticated=True, redirect=destination)
 
     @app.post("/api/account/request-verification")
     def request_verification():
@@ -361,4 +368,7 @@ def create_app(settings=None, store=None, mailer=None):
     if settings.get("NEKTRON_CONNECTOR_OAUTH_ENABLED") == "true":
         from connector_oauth import register_connector_oauth
         register_connector_oauth(app, settings, backend)
+    if settings.get("NEKTRON_MAIL_OAUTH_ENABLED") == "true":
+        from mail_oauth import register_mail_oauth
+        register_mail_oauth(app, settings, backend)
     return app

@@ -229,3 +229,18 @@ class Store:
                     "lastName": row["LastName"] or "", "middleName": row["MiddleName"] or "",
                     "countryCode": row["CountryCode"] or "", "country": COUNTRIES.get(row["CountryCode"], ""),
                     "phoneNumber": row["PhoneNumber"] or "", "emailVerified": True}
+
+    def get_mail_profile(self, user_id):
+        """Minimal current profile after Mail bearer-token validation, not login.
+
+        Deliberately separate from get_user: browser/code/refresh authentication
+        still requires the credential tag, which must never enter a JWT/profile.
+        """
+        with self.connection() as c, c.cursor() as cur:
+            cur.execute("SELECT Email,FirstName,MiddleName,LastName,EmailVerified,AccountStatus "
+                        "FROM `User` WHERE UserId=%s", (user_id,))
+            row = cur.fetchone()
+            if not row or row["AccountStatus"] != "active" or row["EmailVerified"] != 1:
+                return None
+            return {"email": row["Email"], "display_name": " ".join(
+                row[field] for field in ("FirstName", "MiddleName", "LastName") if row[field]) or "NektronAI member"}

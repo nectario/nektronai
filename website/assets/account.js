@@ -37,11 +37,23 @@
     if (new URLSearchParams(location.hash.slice(1)).has('token')) location.reload();
   });
   // Only fixed product destinations survive login; never accept arbitrary return URLs.
-  const connectorDestinations = {connector:'/database-connector-setup.html',
+  const accountDestinations = {connector:'/database-connector-setup.html',
     'connector-billing':'/database-connector.html#account',
-    'connector-authorize':'/api/account/oauth/resume'};
+    'connector-authorize':'/api/account/oauth/resume',
+    'mail-authorize':'/api/account/mail-oauth/resume'};
   const requestedReturn = new URLSearchParams(location.search).get('returnTo');
-  if (Object.hasOwn(connectorDestinations, requestedReturn)) sessionStorage.setItem('nektron.account.return', requestedReturn);
+  if (Object.hasOwn(accountDestinations, requestedReturn)) sessionStorage.setItem('nektron.account.return', requestedReturn);
+  // Keep Mail's fixed intent on form links too. Connector has its own longer-lived
+  // journey helper; a recent Connector visit must not replace a new Mail signup.
+  if (sessionStorage.getItem('nektron.account.return') === 'mail-authorize') {
+    document.querySelectorAll('a[href]').forEach(link => {
+      const target = new URL(link.getAttribute('href'), location.href);
+      if (target.origin === location.origin && /^\/(login|signup|verify-email|forgot-password|reset-password)\.html$/.test(target.pathname)) {
+        target.searchParams.set('returnTo', 'mail-authorize');
+        link.href = target.pathname + target.search + target.hash;
+      }
+    });
+  }
   let csrf = '';
   let busy = false;
   let verificationStarted = false;
@@ -241,12 +253,18 @@
     button.textContent = 'Please wait...';
     status('');
     try {
-      await post(action, data);
+      const result = await post(action, data);
       form.reset();
       if (action === 'login') {
         const returnKey = sessionStorage.getItem('nektron.account.return');
         sessionStorage.removeItem('nektron.account.return');
-        location.assign(Object.hasOwn(connectorDestinations, returnKey) ? connectorDestinations[returnKey] : 'account.html');
+        const fallback = result.redirect === accountDestinations['mail-authorize']
+          ? accountDestinations['mail-authorize'] : 'account.html';
+        // A fresh server-side Mail request also survives verification in a new tab.
+        // An explicit URL destination still wins; stale unrelated local journey
+        // state cannot override the server's fixed, validated Mail fallback.
+        location.assign(fallback === accountDestinations['mail-authorize'] && !Object.hasOwn(accountDestinations, requestedReturn)
+          ? fallback : Object.hasOwn(accountDestinations, returnKey) ? accountDestinations[returnKey] : fallback);
         return;
       }
       const text = action === 'signup'

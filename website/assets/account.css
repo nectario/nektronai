@@ -34,6 +34,7 @@ body.account-page .account-card {
   box-shadow: 0 10px 28px var(--atelier-shadow);
 }
 body.account-page .account-card h2 { margin: 0 0 18px; font-family: "Sora", var(--font-sans); }
+body.account-page .account-consent-identity { overflow-wrap: anywhere; }
 body.account-page .account-card .button { width: 100%; margin-block: 8px; }
 body.account-page .account-card button.button { font-family: inherit; font-size: .95rem; font-weight: 600; }
 body.account-page .account-note { margin-top: 24px; font-size: .9rem; line-height: 1.7; }

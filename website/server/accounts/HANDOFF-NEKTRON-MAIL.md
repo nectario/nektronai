@@ -2,6 +2,12 @@
 
 Prepared October 12, 2026 for the Nektron Mail implementation agent.
 
+Source update later on October 12: the isolated, disabled-by-default native Mail
+authorization flow is now implemented. See [README-mail-oauth.md](README-mail-oauth.md)
+for the exact client/resource/scope contract, tests, and remaining production
+rollout gates. The historical baseline and proposed integration below describe
+the handoff before that implementation; they are not evidence of deployment.
+
 Reuse the existing NektronAI account identity rather than creating a separate
 password database for Nektron Mail. Signup, verification, password recovery and
 website login already exist. Signing a desktop app or a separately hosted web app
