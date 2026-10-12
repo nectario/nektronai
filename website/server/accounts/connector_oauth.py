@@ -61,7 +61,8 @@ def has_connector_database(token):
 
 class Client(ClientMixin):
     def __init__(self, callback, client_id=CHATGPT_CLIENT):
-        self.callback, self.client_id = callback, client_id
+        self.callbacks = (callback,) if isinstance(callback, str) else tuple(callback)
+        self.client_id = client_id
 
     def get_client_id(self):
         return self.client_id
@@ -73,7 +74,7 @@ class Client(ClientMixin):
         return READ if scope == READ else ''
 
     def check_redirect_uri(self, value):
-        return value == self.callback
+        return value in self.callbacks
 
     def check_client_secret(self, value):
         return False
@@ -115,8 +116,9 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
         return
     if settings.get('NEKTRON_SITE_ORIGIN') != ISSUER:
         raise ValueError('Native connector OAuth requires the canonical Nektron origin')
-    callback = settings['NEKTRON_CONNECTOR_CHATGPT_CALLBACK']
-    if not re.fullmatch(r'https://chatgpt\.com/(connector/oauth/[A-Za-z0-9_-]+|connector_platform_oauth_redirect)', callback):
+    callbacks = (settings['NEKTRON_CONNECTOR_CHATGPT_CALLBACK'],
+                 'https://chatgpt.com/connector/oauth/kVjP5GNmpRmp')
+    if not all(re.fullmatch(r'https://chatgpt\.com/(connector/oauth/[A-Za-z0-9_-]+|connector_platform_oauth_redirect)', value) for value in callbacks):
         raise ValueError('Use the exact callback shown by ChatGPT')
     key = load_pem_private_key(settings['NEKTRON_CONNECTOR_SIGNING_PEM'].encode(), password=None)
     if getattr(key, 'key_size', 0) < 2048 or not hasattr(key.public_key(), 'public_numbers'):
@@ -127,7 +129,7 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
         raise ValueError('Invalid signing key identifier')
     public.update(kid=kid, use='sig', alg='RS256')
     store = oauth_store or OAuthStore(accounts)
-    client = Client(callback)
+    client = Client(callbacks)
     blueprint = Blueprint('connector_oauth', __name__)
 
     def current_user():
@@ -272,7 +274,8 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
         if not location:
             return response
         parsed = urlsplit(location)
-        if urlunsplit((parsed.scheme,parsed.netloc,parsed.path,'','')) != callback:
+        if (urlunsplit((parsed.scheme,parsed.netloc,parsed.path,'','')) != params.get('redirect_uri')
+                or params.get('redirect_uri') not in callbacks):
             return jsonify(error='invalid_request'), 400
         pairs = parse_qsl(parsed.query, keep_blank_values=True)
         location = urlunsplit((parsed.scheme,parsed.netloc,parsed.path,urlencode(pairs+[('iss',ISSUER)]),''))
@@ -305,6 +308,9 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
         if (request.get_json(silent=True) != {} or not user or not pending
                 or pending.get('user_id') != user.user_id
                 or not 0 <= time.time()-pending.get('created', 0) <= 600):
+            return jsonify(error='invalid_request'), 400
+        callback = pending.get('params', {}).get('redirect_uri')
+        if callback not in callbacks:
             return jsonify(error='invalid_request'), 400
         session.pop('connector_oauth_pending', None)
         return jsonify(redirect=callback+'?'+urlencode({'error':'access_denied',

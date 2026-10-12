@@ -9,6 +9,24 @@
   const guest = document.querySelector('[data-account-guest]');
   const success = document.querySelector('[data-auth-success]');
   const forms = [...document.querySelectorAll('[data-auth-form]')];
+  const mailActions = new Set(['signup', 'request-reset', 'request-verification']);
+  const challenges = new Map();
+  let challengeScript;
+  let turnstileSiteKey = '';
+  forms.filter(form => mailActions.has(form.dataset.authForm)).forEach(form => {
+    const trap = document.createElement('div');
+    trap.className = 'account-honeypot';
+    trap.setAttribute('aria-hidden', 'true');
+    const label = document.createElement('label');
+    label.textContent = 'Leave this field empty';
+    const input = document.createElement('input');
+    input.name = 'website';
+    input.tabIndex = -1;
+    input.autocomplete = 'off';
+    label.append(input);
+    trap.append(label);
+    form.append(trap);
+  });
   const verificationForm = document.querySelector('[data-verify-token]');
   const verificationRequest = document.querySelector('[data-verify-request]');
   const rawToken = new URLSearchParams(location.hash.slice(1)).get('token') || '';
@@ -66,13 +84,55 @@
     INVALID_CSRF: 'Your form session expired. Please try again.',
     TRY_LATER: 'Too many attempts. Please wait before trying again.',
     ACCOUNT_UNAVAILABLE: 'Account access is temporarily unavailable. Please try again shortly.',
+    HUMAN_VERIFICATION_REQUIRED: 'Please complete the security check and try again.',
   };
 
   async function refreshCsrf() {
     const r = await fetch('/api/account/csrf', {credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});
     if (!r.ok) throw new Error('ACCOUNT_UNAVAILABLE');
-    csrf = (await r.json()).csrfToken;
+    const data = await r.json();
+    csrf = data.csrfToken;
     if (!csrf) throw new Error('ACCOUNT_UNAVAILABLE');
+    turnstileSiteKey = data.turnstileSiteKey || '';
+    await prepareChallenges();
+  }
+  async function prepareChallenges() {
+    const mailForms = forms.filter(form => mailActions.has(form.dataset.authForm) && !form.hidden);
+    if (!turnstileSiteKey || !mailForms.length) return;
+    if (!challengeScript) challengeScript = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async = true;
+      const timer = setTimeout(() => reject(new Error('ACCOUNT_UNAVAILABLE')), 10000);
+      script.onload = () => { clearTimeout(timer); resolve(); };
+      script.onerror = () => { clearTimeout(timer); reject(new Error('ACCOUNT_UNAVAILABLE')); };
+      document.head.append(script);
+    });
+    await challengeScript;
+    mailForms.forEach(form => {
+      if (challenges.has(form)) return;
+      const container = document.createElement('div');
+      container.className = 'account-security-check';
+      form.querySelector('[type="submit"]').before(container);
+      const check = {token: '', id: null};
+      challenges.set(form, check);
+      check.id = window.turnstile.render(container, {
+        sitekey: turnstileSiteKey, action: form.dataset.authForm,
+        theme: document.documentElement.dataset.theme || 'auto', size: 'flexible',
+        'response-field': false,
+        callback: token => { check.token = token; form.querySelector('[type="submit"]').disabled = busy; },
+        'expired-callback': () => {
+          check.token = '';
+          form.querySelector('[type="submit"]').disabled = true;
+          window.turnstile.reset(check.id);
+        },
+        'error-callback': () => {
+          check.token = '';
+          form.querySelector('[type="submit"]').disabled = true;
+          status(messages.HUMAN_VERIFICATION_REQUIRED, true);
+        },
+      });
+    });
   }
   async function load() {
     try {
@@ -83,7 +143,7 @@
       showSession(data);
       if (forms.length) {
         await refreshCsrf();
-        forms.forEach(f => { f.querySelector('[type="submit"]').disabled = false; });
+        forms.forEach(f => { f.querySelector('[type="submit"]').disabled = Boolean(challenges.has(f) && !challenges.get(f).token); });
       }
       if (screen === 'verify' && token) await verifyFromLink();
     } catch {
@@ -168,6 +228,11 @@
     }
     delete data.passwordConfirm;
     const action = form.dataset.authForm;
+    if (mailActions.has(action) && turnstileSiteKey) {
+      const check = challenges.get(form);
+      if (!check?.token) { status(messages.HUMAN_VERIFICATION_REQUIRED, true); return; }
+      data.turnstileToken = check.token;
+    }
     if (action === 'verify-email' || action === 'reset-password') data.token = token;
     busy = true;
     const button = form.querySelector('[type="submit"]');
@@ -187,9 +252,9 @@
       const text = action === 'signup'
         ? 'Check your inbox for the next step. If you already have an account, log in or reset your password.'
         : action === 'request-reset'
-        ? 'If this email has an eligible account, a password-reset link is on its way.'
+        ? 'If this email has an eligible account, check your inbox for a password-reset link. If you recently requested an email, wait a minute before requesting another.'
         : action === 'request-verification'
-        ? 'If verification is needed, a fresh link is on its way. Please check your inbox.'
+        ? 'If verification is needed, check your inbox for a link. If you recently requested an email, wait a minute before requesting another.'
         : action === 'verify-email'
         ? 'Your email is verified. You can now log in.'
         : 'Your password is updated. Log in with your new password.';
@@ -202,7 +267,9 @@
       stateNode?.focus();
     } finally {
       busy = false;
-      button.disabled = false;
+      const check = challenges.get(form);
+      button.disabled = Boolean(check);
+      if (check) { check.token = ''; window.turnstile.reset(check.id); }
       button.textContent = original;
     }
   }));

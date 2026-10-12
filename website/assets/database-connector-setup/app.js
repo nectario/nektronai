@@ -79,7 +79,7 @@ function continueConnection(result){if(connectingChatGPT&&result.connections.len
 async function cancelConnection(){if(busy)return;clearCredentials();const csrf=await fetch('/api/account/csrf',{credentials:'same-origin',cache:'no-store'});if(!csrf.ok)throw Error('Unable to cancel. Please try again.');const token=(await csrf.json()).csrfToken;const response=await fetch('/api/account/oauth/cancel-setup',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':token},body:'{}'});const result=await response.json();if(!response.ok)throw Error('This connection request expired. Return to ChatGPT.');const target=new URL(result.redirect);if(target.origin!=='https://chatgpt.com'||target.pathname!=='/connector_platform_oauth_redirect')throw Error('Unexpected return address.');location.assign(target.href);}
 function clearCredentials() { $('password').value=''; $('connection-string').value=''; $('password').type='password'; $('show-password').textContent='Show'; $('show-password').setAttribute('aria-label','Show database password'); }
 function setBusy(value) { busy=value; $('connect').disabled=value; $('progress').hidden=!value; $('cancel').disabled=value; $('close').disabled=value; }
-function closeDialog() { if (busy) return; clearCredentials(); $('database-form').reset(); dialog.close(); $('add').focus(); }
+function closeDialog() { if (busy) return; clearCredentials(); $('database-form').reset(); $('schema-fields').hidden=true;$('schema-name').required=false;$('database-caption').textContent='Database'; dialog.close(); $('add').focus(); }
 async function openDialog() {
   if (!config) return;
   if (!config.preview && !accessToken) { await signIn(); return; }
@@ -91,25 +91,48 @@ function setMode(mode) {
   for (const name of ['details','string']) { const active=mode===name; $(`${name}-tab`).setAttribute('aria-selected',String(active)); $(`${name}-tab`).tabIndex=active?0:-1; $(`${name}-panel`).hidden=!active; }
   error('');
 }
+const enginePorts={mysql:3306,postgresql:5432,sqlserver:1433,oracle:2484,mongodb:27017};
+$('engine').addEventListener('change',()=>{clearCredentials();$('port').value=enginePorts[$('engine').value];$('schema-name').value='';$('schema-fields').hidden=['mysql','mongodb'].includes($('engine').value);$('schema-name').required=$('engine').value==='oracle';$('schema-caption').textContent=$('engine').value==='oracle'?'Table owner / schema':'Schema (optional)';$('database-caption').textContent=$('engine').value==='oracle'?'Service name':'Database';});
+function invalidConnectionField(id, message) {
+  const input=$(id);
+  input.setAttribute('aria-invalid','true');
+  input.focus();
+  throw new Error(message);
+}
 function getDetails() {
-  const name=$('name').value.trim();
+  const fieldIds=['engine','host','port','database','username','password','connection-string','schema-name','name'];
+  for(const id of fieldIds) $(id).removeAttribute('aria-invalid');
+  const engine=$('engine').value,port=enginePorts[engine],name=$('name').value.trim();
+  if(!Object.hasOwn(enginePorts,engine)) invalidConnectionField('engine','Select a supported database engine.');
+  if(!$('name').checkValidity()) invalidConnectionField('name','Use a connection name of 100 characters or fewer.');
   let details;
-  if (inputMode==='string') {
+  if(inputMode==='string') {
+    const input=$('connection-string');
+    if(!input.checkValidity()||!input.value.trim()) invalidConnectionField('connection-string','Enter a connection URL with host, database, username and password.');
     let url;
-    try { url=new URL($('connection-string').value.trim()); } catch { throw new Error('Enter a MySQL connection URL with a host, database, username and password.'); }
-    if (url.protocol!=='mysql:' || url.search || url.hash || url.pathname.slice(1).includes('/') || !url.hostname) throw new Error('Use mysql://user:password@host:3306/database without extra options. TLS is always enabled.');
-    try { details={host:url.hostname,port:Number(url.port||3306),database:decodeURIComponent(url.pathname.slice(1)),username:decodeURIComponent(url.username),password:decodeURIComponent(url.password)}; }
-    catch { throw new Error('Check the connection URL encoding.'); }
+    try { url=new URL(input.value.trim()); }
+    catch { invalidConnectionField('connection-string','Enter a connection URL with host, database, username and password.'); }
+    if(url.protocol!==engine+':'||url.search||url.hash||!url.hostname||url.pathname.slice(1).includes('/'))
+      invalidConnectionField('connection-string','Use the selected engine scheme without extra options or SRV discovery.');
+    try {
+      details={host:url.hostname,port:Number(url.port||port),database:decodeURIComponent(url.pathname.slice(1)),username:decodeURIComponent(url.username),password:decodeURIComponent(url.password)};
+    } catch { invalidConnectionField('connection-string','Check the connection URL encoding.'); }
+    if(!details.database||!details.username||!details.password) invalidConnectionField('connection-string','Enter a connection URL with host, database, username and password.');
+    if(details.port!==port) invalidConnectionField('connection-string','Use port '+port+' for this engine.');
   } else {
-    for (const id of ['host','port','database','username','password']) {
-      const input=$(id); input.removeAttribute('aria-invalid');
-      if (!input.checkValidity() || !input.value) { input.setAttribute('aria-invalid','true'); input.focus(); throw new Error(id==='port' ? 'This release uses MySQL port 3306.' : `Enter your database ${id}.`); }
+    for(const id of ['host','port','database','username','password']) {
+      const input=$(id),value=id==='password'?input.value:input.value.trim();
+      if(!input.checkValidity()||!value) invalidConnectionField(id,id==='port'?'Use port '+port+' for this engine.':`Enter your database ${id}.`);
     }
     details={host:$('host').value.trim(),port:Number($('port').value),database:$('database').value.trim(),username:$('username').value.trim(),password:$('password').value};
+    if(details.port!==port) invalidConnectionField('port','Use port '+port+' for this engine.');
   }
-  if (!details.database || !details.username || !details.password || details.port!==3306) throw new Error('Enter all connection details. This release uses MySQL port 3306.');
-  if (/[\s/@\\?#]/.test(details.host)) throw new Error('Enter a database hostname, without a URL scheme or path.');
-  return {...details,name,engine:'mysql',request_id:crypto.randomUUID()};
+  if(/[\s/@\\?#]/.test(details.host)) invalidConnectionField(inputMode==='string'?'connection-string':'host','Enter a database hostname without a URL path.');
+  const schema_name=$('schema-name').value.trim()||null;
+  if(['mysql','mongodb'].includes(engine)&&schema_name) invalidConnectionField('engine','For '+(engine==='mysql'?'MySQL':'MongoDB')+', use the database field and leave schema empty.');
+  if(engine==='oracle'&&!schema_name) invalidConnectionField('schema-name','Enter the Oracle table owner/schema; the database field is the service name.');
+  if(!$('schema-name').checkValidity()) invalidConnectionField('schema-name','Enter a valid database schema of 128 characters or fewer.');
+  return {...details,name,engine,schema_name,request_id:crypto.randomUUID()};
 }
 
 function connected(result) {

@@ -36,6 +36,20 @@ is separate and is not modified, nor does a website account grant connector acce
   complete this flow too, but verification never signs anyone in automatically.
 - All mutations require JSON, the exact site Origin, and a per-session CSRF token.
   Login, signup and email requests have database-backed IP/email rate limits.
+- Signup, verification resends and password-reset requests also share atomic
+  database-backed budgets across all workers and endpoints. Per recipient: one
+  request per minute, three per hour and six per day. Per IP: three per ten
+  minutes, ten per hour and thirty per day. Site-wide: ten per minute, thirty per
+  hour and one hundred per day. Windows start on first use; each request reserves
+  all budgets together, before account lookup or creation. Unknown addresses use
+  the same budgets. Recipient throttles retain generic accepted responses;
+  IP/site throttles return `TRY_LATER`. No schema migration is required.
+- Repeated or failed email delivery does not invalidate earlier unexpired links.
+  Using a link still consumes all of that user's action tokens atomically.
+- Account-mail forms include an off-screen honeypot. Known email-to-SMS gateways
+  are rejected; add other domains with `NEKTRON_ACCOUNT_BLOCKED_EMAIL_DOMAINS`
+  (comma-separated). These checks and rate limits reduce abuse, but cannot prove
+  a visitor is human or prevent every low-volume automated signup.
 - Unknown/existing email requests have generic responses and a timing floor.
   Delivery errors log only the error class, never addresses, links or credentials.
 - Secure, HttpOnly, SameSite=Lax, host-only cookies contain opaque session tokens.
@@ -62,6 +76,50 @@ NEKTRON_DB_NAME=<existing database>
 NEKTRON_DB_USER=<account-scoped runtime user>
 NEKTRON_DB_PASSWORD=<secret>
 ```
+
+## Human verification
+
+For stronger bot protection, create a **Managed** Cloudflare Turnstile widget
+with allowed hostname `nektron.ai` (account pages redirect the other domains there).
+Turnstile does not require moving DNS or hosting to Cloudflare. Store BOTH keys in
+the existing `nektron/website/accounts` AWS Secrets Manager JSON, preserving all
+other settings:
+
+1. Sign in to the Cloudflare dashboard, open **Turnstile**, and choose **Add widget**.
+2. Name it `NektronAI accounts`, add hostname `nektron.ai`, and select **Managed**.
+3. Copy the site key and secret key into the two fields below in AWS Secrets
+   Manager (region `us-east-2`, secret `nektron/website/accounts`). Edit the
+   existing JSON; do not replace its database, email or OAuth settings.
+4. Redeploy the account backend to load the keys. Confirm the security check
+   appears on signup, forgot-password and verification-resend forms, and test
+   those flows with an address you own. Login should remain unchanged.
+
+```text
+NEKTRON_TURNSTILE_SITE_KEY=<public widget site key>
+NEKTRON_TURNSTILE_SECRET_KEY=<private widget secret key>
+```
+
+Restart `nektron-accounts` or redeploy the patched backend to load the settings.
+Never commit or paste the secret key into frontend files. The CSRF endpoint
+returns only the public site key, and the shared account script renders the widget
+on signup, verification resend and reset-request forms. Login and emailed-link
+consumption do not require the widget. The server calls Siteverify and checks
+success, exact hostname and action before creating accounts or issuing emails.
+Missing/invalid/replayed tokens are rejected; service failures fail closed.
+Partial key configuration fails startup rather than silently disabling checks.
+With neither key configured, the baseline protections remain active but CAPTCHA
+is **not enabled**. Use Cloudflare's documented test keys only locally, never in
+production. Official setup and validation documentation:
+
+- https://developers.cloudflare.com/turnstile/get-started/
+- https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
+
+SES currently forwards delivery failures to the sender. Those notifications
+should not be disabled merely to hide abuse. Review hard-bounce recipients and
+SES suppression settings separately; mailbox-full/rate-limit failures alone do
+not establish that an address is permanently invalid.
+
+## Runtime permissions
 
 The EC2 role receives GetSecretValue for this secret and ses:SendEmail for the
 verified info@nektron.ai identity only. SES must have production sending enabled.
@@ -90,6 +148,7 @@ user on loopback behind nginx. Public access to /server/ is blocked.
 ```sh
 python -m unittest discover -s website/server/accounts/tests -v
 node website/tests/account_browser.cjs
+node website/tests/account_abuse_browser.cjs
 ```
 
 Browser checks use a local static preview (REVIEW_URL, default port 8771) and

@@ -18,6 +18,7 @@ from store import Store
 from credentials import normalize_email, password_hash, password_matches, password_valid
 from mail import Mailer
 from account_profile import signup_profile
+from abuse import MailAbuseGuard
 
 COOKIE = "__Host-nektron_session"
 
@@ -105,6 +106,7 @@ def create_app(settings=None, store=None, mailer=None):
         raise ValueError("HTTPS site origin is required")
     backend = store or (Store(settings) if enabled else None)
     delivery = mailer or (Mailer(settings) if enabled else None)
+    mail_guard = MailAbuseGuard(settings)
     app.session_interface = DatabaseSessions(backend)
 
     @app.before_request
@@ -174,6 +176,22 @@ def create_app(settings=None, store=None, mailer=None):
             time.sleep(max(0, 1.0 - (time.monotonic() - start)))
         return jsonify(accepted=True), 202
 
+    def guard_mail(data, email, action, start):
+        if data.get("website"):
+            return accepted(start)
+        if mail_guard.blocked_recipient(email):
+            return jsonify(error="INVALID_EMAIL"), 400
+        if not mail_guard.verify(data.get("turnstileToken"), action, request.remote_addr or ""):
+            return jsonify(error="HUMAN_VERIFICATION_REQUIRED"), 400
+        blocked = backend.allow_account_email(email, request.remote_addr or "unknown")
+        if blocked:
+            app.logger.warning("account_email_limited scope=%s", blocked)
+            # Check budgets before looking up the account, including unknown emails.
+            if blocked == "recipient":
+                return accepted(start)
+            return jsonify(error="TRY_LATER"), 429
+        return None
+
     @app.get("/api/account/health")
     def health():
         if enabled:
@@ -188,7 +206,7 @@ def create_app(settings=None, store=None, mailer=None):
             return jsonify(error="TRY_LATER"), 429
         if "csrf" not in session:
             session["csrf"] = secrets.token_urlsafe(32)
-        return jsonify(csrfToken=session["csrf"])
+        return jsonify(csrfToken=session["csrf"], turnstileSiteKey=mail_guard.site_key)
 
     @app.get("/api/account/session")
     def current_user():
@@ -205,7 +223,8 @@ def create_app(settings=None, store=None, mailer=None):
     def signup():
         start = time.monotonic()
         try:
-            data = payload(("email", "password", "firstName", "lastName", "middleName", "phoneNumber", "countryCode"))
+            data = payload(("email", "password", "firstName", "lastName", "middleName", "phoneNumber", "countryCode",
+                            "website", "turnstileToken"))
             email = normalize_email(data.get("email"))
             password = data.get("password")
             if not password_valid(password):
@@ -215,6 +234,9 @@ def create_app(settings=None, store=None, mailer=None):
             return jsonify(error=str(error)), 400
         if limited("signup", email, limit=5, seconds=3600):
             return jsonify(error="TRY_LATER"), 429
+        blocked = guard_mail(data, email, "signup", start)
+        if blocked is not None:
+            return blocked
         created = backend.create_pending(email, password_hash(password), **profile)
         if created:
             send_link(email, "verify")
@@ -259,11 +281,15 @@ def create_app(settings=None, store=None, mailer=None):
     def request_verification():
         start = time.monotonic()
         try:
-            email = normalize_email(payload(("email",)).get("email"))
+            data = payload(("email", "website", "turnstileToken"))
+            email = normalize_email(data.get("email"))
         except ValueError:
             return jsonify(error="INVALID_EMAIL"), 400
         if limited("verify_request", email, limit=3, seconds=3600):
             return jsonify(error="TRY_LATER"), 429
+        blocked = guard_mail(data, email, "request-verification", start)
+        if blocked is not None:
+            return blocked
         send_link(email, "verify")
         return accepted(start)
 
@@ -271,11 +297,15 @@ def create_app(settings=None, store=None, mailer=None):
     def request_reset():
         start = time.monotonic()
         try:
-            email = normalize_email(payload(("email",)).get("email"))
+            data = payload(("email", "website", "turnstileToken"))
+            email = normalize_email(data.get("email"))
         except ValueError:
             return jsonify(error="INVALID_EMAIL"), 400
         if limited("reset_request", email, limit=3, seconds=3600):
             return jsonify(error="TRY_LATER"), 429
+        blocked = guard_mail(data, email, "request-reset", start)
+        if blocked is not None:
+            return blocked
         send_link(email, "reset")
         return accepted(start)
 

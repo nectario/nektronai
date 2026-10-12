@@ -14,8 +14,33 @@ def digest(raw):
 class OAuthStore:
     def __init__(self, account_store):
         self.accounts = account_store
+        self._next_cleanup = 0
+
+    def purge_expired(self, client_id, *, now=None, limit=100):
+        """Remove only this client's grant families expired at least 30 days ago."""
+        if type(limit) is not int or not 1 <= limit <= 100:
+            raise ValueError('Bounded cleanup required')
+        cutoff = int(time.time() if now is None else now) - 30*86400
+        with self.accounts.connection() as c, c.cursor() as cur:
+            cur.execute('SELECT GrantId FROM WebsiteOAuthGrant WHERE ClientId=%s AND ExpiresAt<%s '
+                        'ORDER BY ExpiresAt,GrantId LIMIT %s FOR UPDATE', (client_id, cutoff, limit))
+            ids = [row['GrantId'] for row in cur.fetchall()]
+            if not ids:
+                return 0
+            marks = ','.join(['%s']*len(ids))
+            cur.execute('DELETE FROM WebsiteOAuthCredential WHERE GrantId IN ('+marks+')', tuple(ids))
+            cur.execute('DELETE FROM WebsiteOAuthGrant WHERE ClientId=%s AND ExpiresAt<%s '
+                        'AND GrantId IN ('+marks+')', (client_id, cutoff, *ids))
+            return len(ids)
 
     def create_code(self, raw, data):
+        # Bounded housekeeping during normal service use; failures do not break login.
+        if time.monotonic() >= self._next_cleanup:
+            self._next_cleanup = time.monotonic()+3600
+            try:
+                self.purge_expired(data['client_id'])
+            except Exception:
+                self._next_cleanup = time.monotonic()+60
         now = int(time.time())
         family = secrets.token_hex(24)
         data = dict(data, family=family)

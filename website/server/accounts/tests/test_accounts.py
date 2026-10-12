@@ -39,6 +39,9 @@ class MemoryStore:
     def allow_request(self, key, **kwargs):
         return self.allow
 
+    def allow_account_email(self, email, ip):
+        return None
+
     def find_account(self, email):
         return copy.deepcopy(self.users.get(email))
 
@@ -63,7 +66,6 @@ class MemoryStore:
             return None
         if purpose == "verify" and user["EmailVerified"]:
             return None
-        self.tokens = {k:v for k,v in self.tokens.items() if v["email"] != email or v["purpose"] != purpose}
         raw = secrets.token_urlsafe(32)
         self.tokens[hashlib.sha256(raw.encode()).hexdigest()] = {
             "email":email,"purpose":purpose,"expires":time.time()+1800,

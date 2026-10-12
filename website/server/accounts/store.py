@@ -99,6 +99,43 @@ class Store:
                         "FROM `User` WHERE Email=%s", (email,))
             return cur.fetchone()
 
+    def allow_account_email(self, email, ip):
+        rules = (
+            ("recipient", email, 1, 60), ("recipient", email, 3, 3600),
+            ("recipient", email, 6, 86400),
+            ("ip", ip, 3, 600), ("ip", ip, 10, 3600), ("ip", ip, 30, 86400),
+            ("site", "all", 10, 60), ("site", "all", 30, 3600), ("site", "all", 100, 86400),
+        )
+        buckets = sorted((hashlib.sha256(f"account-mail:{scope}:{identity}:{seconds}".encode()).hexdigest(),
+                          scope, limit, seconds) for scope, identity, limit, seconds in rules)
+        # Every worker locks the same site bucket first. The no-op upsert takes
+        # an exclusive lock, avoiding INSERT IGNORE's shared-lock upgrade deadlock.
+        buckets.sort(key=lambda bucket: (bucket[1] != "site", bucket[0]))
+        for retry in range(3):
+            now = int(time.time())
+            try:
+                with self.connection() as c, c.cursor() as cur:
+                    # All budgets are reserved together, with windows starting on
+                    # first use rather than resetting at fixed clock boundaries.
+                    rows = []
+                    for key, scope, limit, seconds in buckets:
+                        cur.execute("INSERT INTO WebsiteRateLimit (BucketKey,Attempts,ExpiresAt) VALUES (%s,0,%s) "
+                                    "ON DUPLICATE KEY UPDATE BucketKey=BucketKey", (key, now + seconds))
+                        cur.execute("SELECT Attempts,ExpiresAt FROM WebsiteRateLimit WHERE BucketKey=%s FOR UPDATE", (key,))
+                        row = cur.fetchone()
+                        attempts = row["Attempts"] if row["ExpiresAt"] > now else 0
+                        if attempts >= limit:
+                            return scope
+                        rows.append((key, attempts + 1, row["ExpiresAt"] if attempts else now + seconds))
+                    for key, attempts, expires in rows:
+                        cur.execute("UPDATE WebsiteRateLimit SET Attempts=%s,ExpiresAt=%s WHERE BucketKey=%s",
+                                    (attempts, expires, key))
+                return None
+            except pymysql.OperationalError as error:
+                if error.args[0] not in (1205, 1213) or retry == 2:
+                    raise
+                time.sleep(0.02 * (2 ** retry))
+
     def create_pending(self, email, hashed_password, first_name, last_name, middle_name, country_code, phone_number):
         with self.connection() as c, c.cursor() as cur:
             try:
@@ -137,7 +174,8 @@ class Store:
             raw = secrets.token_urlsafe(32)
             digest = hashlib.sha256(raw.encode()).hexdigest()
             expiry = now + (86400 if purpose == "verify" else 1800)
-            cur.execute("DELETE FROM WebsiteActionToken WHERE UserId=%s AND Purpose=%s", (row["UserId"], purpose))
+            # A resend (or failed delivery) must not invalidate a link already
+            # in the owner's inbox. Consumption still revokes every user token.
             cur.execute("INSERT INTO WebsiteActionToken (TokenHash,UserId,Purpose,CredentialTag,ExpiresAt) "
                         "VALUES (%s,%s,%s,%s,%s)",
                         (digest, row["UserId"], purpose, credential_tag(row["PasswordHash"]), expiry))
