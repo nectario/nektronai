@@ -19,17 +19,19 @@ from credentials import normalize_email, password_hash, password_matches, passwo
 from mail import Mailer
 from account_profile import signup_profile
 from abuse import MailAbuseGuard
+from mail_native import NATIVE_SESSION_PATH
 
 COOKIE = "__Host-nektron_session"
 
 
 class ServerSession(SecureCookieSession):
-    def __init__(self, data=None, token=None, expires=None):
+    def __init__(self, data=None, token=None, expires=None, *, isolated=False):
         super().__init__(data or {})
         self.token = token or secrets.token_urlsafe(32)
         self.expires = expires or int(time.time()) + 600
         self.new = token is None
         self.failed = False
+        self.isolated = isolated
 
     @property
     def digest(self):
@@ -41,6 +43,10 @@ class DatabaseSessions(SessionInterface):
         self.store = store
 
     def open_session(self, app, req):
+        # The first-party native endpoint never reads ambient browser credentials,
+        # including malformed/denied requests carrying an existing session cookie.
+        if req.path == NATIVE_SESSION_PATH:
+            return ServerSession(isolated=True)
         token = req.cookies.get(COOKIE, "")
         if re.fullmatch(r"[A-Za-z0-9_-]{43}", token):
             try:
@@ -54,7 +60,7 @@ class DatabaseSessions(SessionInterface):
         return ServerSession()
 
     def save_session(self, app, current, response):
-        if current.failed:
+        if current.failed or current.isolated:
             return
         if not current:
             if not current.new:
@@ -115,8 +121,10 @@ def create_app(settings=None, store=None, mailer=None):
             return jsonify(error="ACCOUNT_UNAVAILABLE"), 503
         if session.failed:
             return jsonify(error="ACCOUNT_UNAVAILABLE"), 503
-        # OAuth server-to-server endpoints use code/PKCE or refresh credentials, never browser cookies.
-        if request.endpoint in {"connector_oauth.token", "connector_oauth.revoke", "mail_oauth.token", "mail_oauth.revoke"}:
+        # These exact native routes use explicit credentials, never browser cookies.
+        # The first-party password route additionally rejects all browser context.
+        if request.endpoint in {"connector_oauth.token", "connector_oauth.revoke", "mail_oauth.token", "mail_oauth.revoke",
+                                "mail_native.create_session"}:
             return None
         if request.method not in ("GET", "HEAD", "OPTIONS"):
             if request.headers.get("Origin") != origin:
@@ -370,5 +378,6 @@ def create_app(settings=None, store=None, mailer=None):
         register_connector_oauth(app, settings, backend)
     if settings.get("NEKTRON_MAIL_OAUTH_ENABLED") == "true":
         from mail_oauth import register_mail_oauth
-        register_mail_oauth(app, settings, backend)
+        register_mail_oauth(app, settings, backend,
+                            login_limited=lambda email: limited("login", email, limit=30))
     return app

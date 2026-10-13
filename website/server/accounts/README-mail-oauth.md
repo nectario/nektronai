@@ -38,10 +38,14 @@ controlled desktop sign-in before calling the end-to-end pilot validated.
 
 ## Product boundary
 
-The Windows app uses the system browser to sign into the existing NektronAI
-account. It never collects a website password, copies a browser cookie, embeds a
-client secret, or receives database/AWS/Connector credentials. The stable subject
-is the existing opaque `UserId`, not an email address.
+The original Windows flow uses the system browser to sign into the existing
+NektronAI account. A separately implemented **first-party native sign-in** route
+now supports the owner's requested in-app email/password dialog. The source
+changes described below are not evidence of a deployed native endpoint; the
+production acceptance above covers the earlier browser/PKCE deployment only.
+Neither flow copies browser cookies, embeds a client secret, or receives
+database/AWS/Connector credentials. The stable subject is the existing opaque
+`UserId`, not an email address.
 
 Mail has its own public native client, signing key, resource, scope, consent,
 pending session state, and authorization-server instance:
@@ -106,11 +110,83 @@ or successful website login.
   `{sub,email,display_name}`. It does not return a credential tag, password hash,
   phone, country, mailbox list, or product entitlement.
 
-All responses are no-store. Protected POSTs keep the website's existing Origin
-and CSRF requirements. Only the two native token/revoke endpoints are exempt;
-they reject ambient browser credentials. Requests are rate limited using the
-existing shared server-side account budget store, with a separate Mail key
-namespace. Exceptions retain the sanitized account-service error policy.
+All responses are no-store. Protected website POSTs keep the existing Origin
+and CSRF requirements. The two native token/revoke endpoints and exact
+`mail_native.create_session` endpoint are exempt; each applies its own explicit
+credential and request checks. OAuth requests are rate limited using the existing
+shared server-side account budget store, with a separate Mail key namespace.
+Native password authentication instead shares the **exact website login budget**
+described below. Exceptions retain the sanitized account-service error policy.
+
+## First-party native credential sign-in
+
+Implemented in source on October 13, 2026 following the owner's explicit choice
+of an in-app credential dialog and approval to deploy the new API. The route is
+registered only when the existing Mail feature and account service are enabled;
+it uses the same dedicated Mail signing key. No new secret field, password store,
+database table, mailbox grant, or Connector permission is introduced.
+
+This is **not an OAuth password grant**, and does not claim the system-browser,
+SSO, phishing-resistance, or PKCE security properties of the browser flow. The
+first-party Windows application necessarily handles the entered password in
+memory and sends it directly to the fixed HTTPS account service. It must not
+persist, log, forward, or put that password in command lines, URLs or diagnostics.
+The server cannot attest that an arbitrary HTTP caller is the genuine app merely
+from its public client ID or absence of browser headers. Signup, verification and
+password recovery remain on the website. Existing browser/PKCE sign-in is retained.
+
+`POST https://nektron.ai/api/account/mail-native/session` accepts JSON with exactly:
+
+```json
+{
+  "email": "synthetic-user@example.com",
+  "password": "synthetic example only",
+  "client_id": "nektron-mail-windows",
+  "resource": "https://nektron.ai/mail",
+  "scope": "mail/archive.read",
+  "approve": true
+}
+```
+
+The client must show the permission being approved in the dialog. `approve` must
+be the boolean `true`; it is an explicit first-party UI acknowledgement, not a
+server-rendered OAuth consent transaction or proof of a trusted client.
+
+- Require canonical-host HTTPS, `application/json` (optional UTF-8 charset), a
+  maximum 4096-byte request body, no query fields, and no duplicate/unknown JSON
+  fields. Compressed or non-UTF-8 payloads are rejected.
+- Reject `Cookie`, `Origin`, `Authorization`, `Referer` and every `Sec-Fetch-*`
+  header, including empty-present headers. Do not expose CORS or accept browser
+  form submissions. The client must never manufacture an Origin or CSRF header.
+- `DatabaseSessions` isolates this exact path before attempting to read a cookie,
+  and never saves/deletes a browser session or emits `Set-Cookie`, including
+  rejection and failure cases. Website session and CSRF behavior is unchanged.
+- Reuse normalized email, bounded password handling and Argon2 verification,
+  including dummy-hash work for nonexistent accounts. Reuse the exact existing
+  `login:ip:` (30 per ten minutes) and `login:email:` (10 per ten minutes) budgets;
+  alternating website and native login does not double the password-attempt budget.
+- Unknown accounts, incorrect passwords, inactive or unverified accounts all
+  return the same `401 {"error":"INVALID_CREDENTIALS"}`. Other errors are
+  `400 INVALID_REQUEST`, `413 REQUEST_FAILED`, `429 TRY_LATER`, or sanitized
+  `503 ACCOUNT_UNAVAILABLE`. No account status is disclosed by this route.
+- Existing `finish_login` rechecks the account and password hash. Signing rechecks
+  the credential binding, then a transaction locks the account row and checks
+  active/verified status and the credential tag again before atomically inserting
+  a new grant family and its hashed refresh credential. Failed persistence never
+  returns either credential. Password reset uses the same account-row lock.
+
+Success returns exactly `access_token`, `refresh_token`, `expires_in` (300),
+`token_type` (`Bearer`) and `scope` (`mail/archive.read`). The access token retains
+the existing minimal Mail claims, dedicated key and five-minute lifetime. The
+native refresh family has the explicit `authentication_flow=mail-native-session-v1`
+metadata marker, without an invented callback or PKCE challenge. That marker is
+accepted only for refresh credentials, never authorization-code exchange.
+
+The existing `/api/account/mail-oauth/token`, `/revoke` and `/profile` endpoints
+are reused afterward. Thirty-day family expiry, hashed storage, atomic rotation,
+replay revocation, credential-change checks and client/resource/scope isolation
+remain in force. The new family-creation method uses the existing tables; it does
+not execute DDL. Successful native login still grants **no mailbox by itself**.
 
 ## Credentials and revocation
 

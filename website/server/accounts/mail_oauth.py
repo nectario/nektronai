@@ -2,7 +2,8 @@
 
 No mailbox ownership is inferred here. The archive API applies its own exact
 server-managed subject/account grants. Nothing in this module configures a
-Database Connector database, accepts a website password, or issues an ID token.
+Database Connector database or issues an ID token. The separate first-party
+mail_native module authenticates credentials for explicitly marked Mail sessions.
 """
 import json
 import re
@@ -22,6 +23,7 @@ from connector_oauth_store import OAuthStore
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from flask import Blueprint, jsonify, make_response, redirect, render_template_string, request, session
+from mail_native import NATIVE_FLOW, register_native_session
 
 ISSUER = 'https://nektron.ai'
 PREFIX = '/api/account/mail-oauth'
@@ -75,11 +77,11 @@ class MailUser:
 class MailCredential:
     def __init__(self, data):
         self.data = data
-        self.code_challenge = data['code_challenge']
-        self.code_challenge_method = 'S256'
+        self.code_challenge = data.get('code_challenge')
+        self.code_challenge_method = 'S256' if self.code_challenge else None
 
     def get_redirect_uri(self):
-        return self.data['redirect_uri']
+        return self.data.get('redirect_uri')
 
     def get_scope(self):
         return self.data['scope']
@@ -88,7 +90,7 @@ class MailCredential:
         return self.data['client_id'] == client.get_client_id()
 
 
-def register_mail_oauth(app, settings, accounts, oauth_store=None):
+def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limited):
     if settings.get('NEKTRON_MAIL_OAUTH_ENABLED') != 'true':
         return
     if (settings.get('NEKTRON_SITE_ORIGIN') != ISSUER
@@ -146,7 +148,15 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None):
     def consume(raw, kind, requesting_client):
         data = store.consume(raw, kind, requesting_client.get_client_id())
         if (not data or data.get('client_id') != CLIENT_ID or data.get('resource') != RESOURCE
-                or data.get('scope') != READ or not valid_callback(data.get('redirect_uri'))):
+                or data.get('scope') != READ):
+            return None
+        if 'authentication_flow' in data:
+            # Native sessions have no invented callback or PKCE proof. This marker
+            # is accepted only for refresh credentials, never authorization codes.
+            if (kind != 'refresh' or data['authentication_flow'] != NATIVE_FLOW
+                    or 'redirect_uri' in data or 'code_challenge' in data):
+                return None
+        elif not valid_callback(data.get('redirect_uri')):
             return None
         return MailCredential(data)
 
@@ -331,6 +341,19 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None):
         return response
 
     app.register_blueprint(blueprint)
+
+    def issue_native_tokens(identity):
+        user = MailUser(identity['user_id'], identity['auth_tag'])
+        access = access_token(client, 'first_party_native', user, READ)
+        refresh = secrets.token_urlsafe(48)
+        store.create_refresh_family(refresh, {
+            'user_id': user.user_id, 'auth_tag': user.auth_tag, 'client_id': CLIENT_ID,
+            'resource': RESOURCE, 'scope': READ, 'authentication_flow': NATIVE_FLOW})
+        return {'access_token': access, 'refresh_token': refresh, 'expires_in': 300,
+                'token_type': 'Bearer', 'scope': READ}
+
+    register_native_session(app, accounts, issuer=ISSUER, client_id=CLIENT_ID,
+        resource=RESOURCE, scope=READ, login_limited=login_limited, issue_tokens=issue_native_tokens)
 
 
 CONSENT = '''<!doctype html><html lang="en"><head><meta charset="utf-8">

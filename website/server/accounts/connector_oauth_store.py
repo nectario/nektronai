@@ -1,10 +1,12 @@
 """Atomic, hashed OAuth credentials in the existing Nektron account database."""
 import hashlib
+import hmac
 import json
 import secrets
 import time
 
 from authlib.oauth2.rfc6749.errors import InvalidGrantError
+from credentials import credential_tag
 
 
 def digest(raw):
@@ -33,14 +35,17 @@ class OAuthStore:
                         'AND GrantId IN ('+marks+')', (client_id, cutoff, *ids))
             return len(ids)
 
-    def create_code(self, raw, data):
+    def _maybe_purge_expired(self, client_id):
         # Bounded housekeeping during normal service use; failures do not break login.
         if time.monotonic() >= self._next_cleanup:
             self._next_cleanup = time.monotonic()+3600
             try:
-                self.purge_expired(data['client_id'])
+                self.purge_expired(client_id)
             except Exception:
                 self._next_cleanup = time.monotonic()+60
+
+    def create_code(self, raw, data):
+        self._maybe_purge_expired(data['client_id'])
         now = int(time.time())
         family = secrets.token_hex(24)
         data = dict(data, family=family)
@@ -49,6 +54,35 @@ class OAuthStore:
                         (family, data['client_id'], now + 30*86400))
             cur.execute("INSERT INTO WebsiteOAuthCredential (TokenHash,GrantId,Kind,Data,ExpiresAt,Used) "
                         "VALUES (%s,%s,'code',%s,%s,0)", (digest(raw), family, json.dumps(data), now+120))
+
+    def create_refresh_family(self, raw, data):
+        """Atomically issue a native refresh family, with an account recheck.
+
+        The existing two tables and credential consumption rules are reused.
+        No authorization code, loopback redirect, or browser session is invented.
+        """
+        self._maybe_purge_expired(data['client_id'])
+        now = int(time.time())
+        family = secrets.token_hex(24)
+        data = dict(data, family=family)
+        with self.accounts.connection() as c, c.cursor() as cur:
+            # The login/password verification happened before this transaction.
+            # Hold the same account row lock as password reset until both records
+            # are durable, preventing an intervening credential/state change.
+            cur.execute('SELECT PasswordHash,AccountStatus,EmailVerified FROM `User` '
+                        'WHERE UserId=%s FOR UPDATE', (data['user_id'],))
+            account = cur.fetchone()
+            if (not account or account['AccountStatus'] != 'active' or account['EmailVerified'] != 1
+                    or not isinstance(data.get('auth_tag'), str)
+                    or not isinstance(account['PasswordHash'], str)
+                    or not account['PasswordHash'].startswith('$argon2id$')
+                    or not hmac.compare_digest(credential_tag(account['PasswordHash']), data['auth_tag'])):
+                raise InvalidGrantError()
+            cur.execute('INSERT INTO WebsiteOAuthGrant (GrantId,ClientId,ExpiresAt,Revoked) VALUES (%s,%s,%s,0)',
+                        (family, data['client_id'], now + 30*86400))
+            cur.execute("INSERT INTO WebsiteOAuthCredential (TokenHash,GrantId,Kind,Data,ExpiresAt,Used) "
+                        "VALUES (%s,%s,'refresh',%s,%s,0)",
+                        (digest(raw), family, json.dumps(data), now + 30*86400))
 
     def consume(self, raw, kind, client_id):
         """Lock grant first, then credential. Replays revoke the whole token family."""
