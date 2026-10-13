@@ -17,7 +17,7 @@ Mail/account runtime files and account CSS/JS cache-version references. The only
 additional styling correction underlines verification-success links. Deployment
 hooks and unrelated application content were preserved.
 
-Acceptance on October 13, 2026:
+Initial browser/PKCE acceptance on October 13, 2026:
 
 - Elastic Beanstalk reports the candidate active, Ready and Green.
 - All 84 account-service tests pass against the deployment candidate.
@@ -36,13 +36,30 @@ mail sending was performed. No live signup emails, real-user password changes
 or user token exchanges were exercised by the deployment checks. Complete a
 controlled desktop sign-in before calling the end-to-end pilot validated.
 
+### Native sign-in deployment — October 13, 2026
+
+The separately approved first-party native API is now deployed and verified
+Ready/Green on candidate `nektron-mail-native-20261013-4b684069c55f`. All **115
+account-service tests** passed against the exact candidate, including 31 native
+authentication tests. Public account health, Connector discovery/JWKS and Mail
+JWKS are byte-identical to their pre-deployment responses.
+
+Public native checks used the valid field shape with empty credentials: the
+endpoint returned 401; adding Origin or Cookie returned 400. Responses included
+no session cookie or redirect and retained no-store/nosniff headers. Backend
+source paths remained 404 and unauthenticated Mail profile requests remained
+401. These checks created no real user, refresh grant or mailbox grant, and
+performed no secret, service configuration or DDL changes. Controlled real-account
+desktop login verification is **still pending**; deployment health and synthetic
+tests do not prove that end-to-end user flow.
+
 ## Product boundary
 
 The original Windows flow uses the system browser to sign into the existing
 NektronAI account. A separately implemented **first-party native sign-in** route
-now supports the owner's requested in-app email/password dialog. The source
-changes described below are not evidence of a deployed native endpoint; the
-production acceptance above covers the earlier browser/PKCE deployment only.
+now supports the owner's requested in-app email/password dialog. Its deployment
+and public checks are recorded above separately from the earlier browser/PKCE
+deployment; controlled real-account desktop sign-in remains to be verified.
 Neither flow copies browser cookies, embeds a client secret, or receives
 database/AWS/Connector credentials. The stable subject is the existing opaque
 `UserId`, not an email address.
@@ -120,8 +137,9 @@ described below. Exceptions retain the sanitized account-service error policy.
 
 ## First-party native credential sign-in
 
-Implemented in source on October 13, 2026 following the owner's explicit choice
-of an in-app credential dialog and approval to deploy the new API. The route is
+Implemented, deployed and publicly verified on October 13, 2026 following the
+owner's explicit choice of an in-app credential dialog and approval to deploy
+the new API. The route is
 registered only when the existing Mail feature and account service are enabled;
 it uses the same dedicated Mail signing key. No new secret field, password store,
 database table, mailbox grant, or Connector permission is introduced.
