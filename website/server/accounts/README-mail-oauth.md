@@ -1,8 +1,40 @@
 # Nektron Mail shared-account authorization
 
-Implemented October 12, 2026. This is source and synthetic test coverage, **not a
-production deployment or Mail enrollment**. Existing signup, verification,
-recovery, password policy, email budgets, and Database Connector stay in place.
+Implemented October 12, 2026; the shared Mail sign-in service was deployed and
+activated with explicit approval on October 13, 2026. Public endpoint checks
+passed; the controlled real-account desktop sign-in pilot remains pending.
+This is **not Mail enrollment or access to any mailbox**. Existing signup,
+verification, recovery, password policy, email budgets, and Database Connector
+stay in place.
+
+## Production deployment status
+
+The approved deployment extends the existing account service at `https://nektron.ai`.
+It uses a dedicated Mail signing key in the existing account secret, preserving
+all unrelated secret fields and the Connector signing identity. The bundle was
+built from the actual live application, overlaid only with the five reviewed
+Mail/account runtime files and account CSS/JS cache-version references. The only
+additional styling correction underlines verification-success links. Deployment
+hooks and unrelated application content were preserved.
+
+Acceptance on October 13, 2026:
+
+- Elastic Beanstalk reports the candidate active, Ready and Green.
+- All 84 account-service tests pass against the deployment candidate.
+- All three mocked browser suites pass: 36 responsive/theme checks, 24 account
+  accessibility scans, six Mail accessibility scans, native form actions, abuse
+  controls, Mail return/consent/cancellation and Connector isolation.
+- Account health is ready. Connector discovery and JWKS are byte-identical to
+  the pre-deployment responses; the Mail JWKS matches the dedicated staged key.
+- Missing/forged Mail bearer tokens return 401; an unregistered authorization
+  client returns 400 without a redirect. Privacy/security headers are present,
+  backend source routes return 404, and deployed account/consent assets match
+  the validated candidate.
+
+No schema migration, mailbox grant, archive API deployment, provider change or
+mail sending was performed. No live signup emails, real-user password changes
+or user token exchanges were exercised by the deployment checks. Complete a
+controlled desktop sign-in before calling the end-to-end pilot validated.
 
 ## Product boundary
 
@@ -115,20 +147,23 @@ New settings, loaded at process startup:
   exponent 65537. Never reuse the Connector key or put a key in Git/client code.
 - `NEKTRON_MAIL_SIGNING_KID`: distinct, 1–64 ASCII letters/digits/underscore/hyphen.
 
-Enabling this implementation, generating/provisioning a production signing key,
-updating Secrets Manager, changing a database, deploying the account service or
-archive API, and granting a real archive to a subject are **separate approvals**.
+The October 13 approval covered Mail sign-in activation, its dedicated signing
+key in the existing secret, and this account-service deployment only. Database
+changes, archive API deployment, and granting a real archive to a subject remain
+**separate approvals**. Later signing-key or production configuration changes
+also require explicit approval.
 Do not run provisioning/migration scripts as part of source validation. Preserve
 all existing secret fields and review the intended source bundle against the live
 deployment before any approved publish. Disabling Mail must leave Connector and
 website account routes working. Existing OAuth discovery remains Connector's;
 Mail uses this explicit fixed contract, not a general OIDC discovery assumption.
 
-The account pages currently reference a versioned `account.js` URL. An approved
-deployment must update that asset version or invalidate the corresponding browser
-and CDN cache before enabling Mail; serving an old script can lose the fixed
-Mail return destination. Include a warm-cache existing-account and signup return
-check in deployment acceptance. This source task does not purge production caches.
+Account pages reference versioned `account.js` and `account.css` URLs. The live
+deployment uses a new version on every referencing page and the consent stylesheet;
+the public asset bytes were verified against the candidate. Future deployments
+must preserve cache versioning; serving an old script can lose the fixed Mail
+return destination. Include warm-cache existing-account and signup return checks
+in the controlled pilot. This deployment did not purge production caches.
 
 ## Synthetic validation
 

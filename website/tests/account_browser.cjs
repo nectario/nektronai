@@ -40,6 +40,7 @@ fs.mkdirSync(out, {recursive:true});
           await page.goto(base+'/'+name+'.html'+fragment);
           await page.locator('body.atelier-nav-ready').waitFor();
           await page.evaluate(() => document.fonts.ready);
+          if (name === 'verify-email') await page.locator('[data-auth-success]').waitFor({state:'visible'});
           if (await page.locator('form:not([hidden])').count()) {
             await page.locator('form:not([hidden]) [type=submit]').waitFor({state:'visible'});
             await page.waitForFunction(() => [...document.querySelectorAll('form:not([hidden]) [type=submit]')].every(b=>!b.disabled));
