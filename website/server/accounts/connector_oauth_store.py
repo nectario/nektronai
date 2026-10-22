@@ -83,6 +83,32 @@ class OAuthStore:
             cur.execute("INSERT INTO WebsiteOAuthCredential (TokenHash,GrantId,Kind,Data,ExpiresAt,Used) "
                         "VALUES (%s,%s,'refresh',%s,%s,0)",
                         (digest(raw), family, json.dumps(data), now + 30*86400))
+        return family
+
+    def active_mail_archive_grant(self, family_id, owner, scope):
+        """Recheck live family/account/credential binding before releasing a key.
+
+        Only the new combined-scope native token carries this opaque family ID;
+        no password hash or credential tag is exposed through a JWT.
+        """
+        with self.accounts.connection() as c, c.cursor() as cur:
+            cur.execute('SELECT ClientId,ExpiresAt,Revoked FROM WebsiteOAuthGrant WHERE GrantId=%s', (family_id,))
+            family = cur.fetchone()
+            if (not family or family['ClientId'] != 'nektron-mail-windows' or family['Revoked']
+                    or family['ExpiresAt'] <= time.time()):
+                return False
+            cur.execute("SELECT Data FROM WebsiteOAuthCredential WHERE GrantId=%s AND Kind='refresh' "
+                        'AND Used=0 AND ExpiresAt>%s LIMIT 2', (family_id, int(time.time())))
+            rows = cur.fetchall()
+            if len(rows) != 1:
+                return False
+            data = json.loads(rows[0]['Data'])
+            if (data.get('user_id') != owner or data.get('scope') != scope
+                    or data.get('client_id') != 'nektron-mail-windows'
+                    or data.get('resource') != 'https://nektron.ai/mail'
+                    or data.get('authentication_flow') != 'mail-native-session-v1'):
+                return False
+            return bool(self.accounts.get_user(owner, data.get('auth_tag')))
 
     def consume(self, raw, kind, client_id):
         """Lock grant first, then credential. Replays revoke the whole token family."""

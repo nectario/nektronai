@@ -5,10 +5,12 @@ server-managed subject/account grants. Nothing in this module configures a
 Database Connector database or issues an ID token. The separate first-party
 mail_native module authenticates credentials for explicitly marked Mail sessions.
 """
+import base64
 import json
 import re
 import secrets
 import time
+import unicodedata
 from dataclasses import dataclass
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
@@ -22,8 +24,9 @@ from authlib.oauth2.rfc7636 import CodeChallenge
 from connector_oauth_store import OAuthStore
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
-from flask import Blueprint, jsonify, make_response, redirect, render_template_string, request, session
+from flask import Blueprint, g, jsonify, make_response, redirect, render_template_string, request, session
 from mail_native import NATIVE_FLOW, register_native_session
+from mail_archive_keys import KEY_SCOPE, register_archive_keys
 
 ISSUER = 'https://nektron.ai'
 PREFIX = '/api/account/mail-oauth'
@@ -43,6 +46,9 @@ def valid_callback(value):
 
 
 class MailClient(ClientMixin):
+    def __init__(self, scopes=(READ,)):
+        self.scopes = frozenset(scopes)
+
     def get_client_id(self):
         return CLIENT_ID
 
@@ -50,7 +56,7 @@ class MailClient(ClientMixin):
         return None
 
     def get_allowed_scope(self, scope):
-        return READ if scope == READ else ''
+        return scope if scope in self.scopes else ''
 
     def check_redirect_uri(self, value):
         return valid_callback(value)
@@ -72,6 +78,7 @@ class MailClient(ClientMixin):
 class MailUser:
     user_id: str
     auth_tag: str
+    grant_id: str | None = None
 
 
 class MailCredential:
@@ -115,7 +122,9 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
     public = json.loads(jwt.algorithms.RSAAlgorithm.to_jwk(key.public_key()))
     public.update(kid=kid, use='sig', alg='RS256')
     store = oauth_store or OAuthStore(accounts)
-    client = MailClient()
+    archive_keys_enabled = settings.get('NEKTRON_MAIL_ARCHIVE_KEYS_ENABLED') == 'true'
+    scopes = frozenset((READ, KEY_SCOPE) if archive_keys_enabled else (READ,))
+    client = MailClient(scopes)
     blueprint = Blueprint('mail_oauth', __name__)
 
     def current_user():
@@ -126,13 +135,18 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
 
     def access_token(client, grant_type, user, scope):
         if (not user or not isinstance(user.user_id, str) or not 1 <= len(user.user_id) <= 255
-                or scope != READ or client.get_client_id() != CLIENT_ID
+                or scope not in scopes or client.get_client_id() != CLIENT_ID
                 or not accounts.get_user(user.user_id, user.auth_tag)):
             raise InvalidGrantError()
         now = int(time.time())
-        return jwt.encode({'iss': ISSUER, 'sub': user.user_id, 'aud': RESOURCE,
+        claims = {'iss': ISSUER, 'sub': user.user_id, 'aud': RESOURCE,
             'iat': now, 'exp': now + 300, 'jti': secrets.token_urlsafe(24),
-            'client_id': CLIENT_ID, 'scope': READ}, key, algorithm='RS256',
+            'client_id': CLIENT_ID, 'scope': scope}
+        if scope == KEY_SCOPE:
+            if not isinstance(user.grant_id, str) or not re.fullmatch(r'[a-f0-9]{48}', user.grant_id):
+                raise InvalidGrantError()
+            claims['grant_id'] = user.grant_id
+        return jwt.encode(claims, key, algorithm='RS256',
             headers={'kid': kid, 'typ': 'at+jwt'})
 
     def save_token(token, req):
@@ -148,8 +162,10 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
     def consume(raw, kind, requesting_client):
         data = store.consume(raw, kind, requesting_client.get_client_id())
         if (not data or data.get('client_id') != CLIENT_ID or data.get('resource') != RESOURCE
-                or data.get('scope') != READ):
+                or data.get('scope') not in scopes):
             return None
+        if kind == 'refresh' and request.form.get('scope', data['scope']) != data['scope']:
+            return None  # Explicit scopes never upgrade or narrow a persisted grant.
         if 'authentication_flow' in data:
             # Native sessions have no invented callback or PKCE proof. This marker
             # is accepted only for refresh credentials, never authorization codes.
@@ -162,7 +178,7 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
 
     def credential_user(credential):
         data = credential.data
-        return MailUser(data['user_id'], data['auth_tag']) if accounts.get_user(data['user_id'], data['auth_tag']) else None
+        return MailUser(data['user_id'], data['auth_tag'], data.get('family')) if accounts.get_user(data['user_id'], data['auth_tag']) else None
 
     class CodeGrant(AuthorizationCodeGrant):
         TOKEN_ENDPOINT_AUTH_METHODS = ['none']
@@ -280,7 +296,7 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
                 or request.headers.get('Cookie') or request.headers.get('Authorization')
                 or kind not in {'authorization_code', 'refresh_token'} or not clean_parameters(request.form, allowed)
                 or request.form.get('resource') != RESOURCE or request.form.get('client_id') != CLIENT_ID
-                or request.form.get('scope', READ) != READ):
+                or request.form.get('scope', READ) not in scopes):
             return jsonify(error='invalid_request'), 400
         if kind == 'authorization_code' and (not valid_callback(request.form.get('redirect_uri'))
                 or not request.form.get('code')
@@ -305,33 +321,63 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
         store.revoke(request.form['token'], CLIENT_ID)
         return '', 200
 
-    @blueprint.get(PREFIX + '/profile')
-    def profile():
+    def authenticate_mail(*, required_scope=None):
         authorization = request.headers.get('Authorization', '')
         if (request.args or request.headers.get('Cookie') or not authorization.startswith('Bearer ')
                 or len(authorization) > 8192 or limited('profile', 120)):
-            return jsonify(error='invalid_token'), 401
+            return None
         try:
             raw = authorization[7:]
+            # Reject duplicate names/constants before library JSON decoding.
+            def unique_object(pairs):
+                result = {}
+                for name, value in pairs:
+                    if name in result:
+                        raise ValueError()
+                    result[name] = value
+                return result
+            def invalid_constant(value):
+                raise ValueError()
+            if not re.fullmatch(r'[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+', raw):
+                raise ValueError()
+            for part in raw.split('.')[:2]:
+                decoded = base64.b64decode(part + '=' * (-len(part) % 4), altchars=b'-_', validate=True)
+                if len(decoded) > 6144 or not isinstance(json.loads(decoded, object_pairs_hook=unique_object,
+                                                                 parse_constant=invalid_constant), dict):
+                    raise ValueError()
             header = jwt.get_unverified_header(raw)
             if header != {'alg': 'RS256', 'kid': kid, 'typ': 'at+jwt'}:
                 raise ValueError()
             claims = jwt.decode(raw, key.public_key(), algorithms=['RS256'], issuer=ISSUER, audience=RESOURCE,
                                 options={'require': ['iss', 'sub', 'aud', 'iat', 'exp', 'jti', 'client_id', 'scope'],
                                          'strict_aud': True})
-            if (claims['client_id'] != CLIENT_ID or claims['scope'] != READ
+            if (claims['client_id'] != CLIENT_ID or claims['scope'] not in scopes
+                    or (required_scope is not None and claims['scope'] != required_scope)
                     or not isinstance(claims['sub'], str) or not 1 <= len(claims['sub']) <= 255
+                    or any(unicodedata.category(c) in {'Cc', 'Cs'} for c in claims['sub'])
                     or type(claims['iat']) is not int or type(claims['exp']) is not int
                     or not 0 < claims['exp'] - claims['iat'] <= 300
                     or not isinstance(claims['jti'], str) or not 1 <= len(claims['jti']) <= 128):
                 raise ValueError()
+            if claims['scope'] == KEY_SCOPE and (not isinstance(claims.get('grant_id'), str)
+                    or not re.fullmatch(r'[a-f0-9]{48}', claims['grant_id'])):
+                raise ValueError()
             member = accounts.get_mail_profile(claims['sub'])
             if not member:
                 raise ValueError()
-        except (jwt.PyJWTError, ValueError, TypeError, KeyError):
+            g.mail_verified_profile = member
+        except (jwt.PyJWTError, ValueError, TypeError, KeyError, UnicodeError, RecursionError):
+            return None
+        return claims
+
+    @blueprint.get(PREFIX + '/profile')
+    def profile():
+        claims = authenticate_mail()
+        if claims is None:
             response = jsonify(error='invalid_token')
             response.headers['WWW-Authenticate'] = 'Bearer error="invalid_token"'
             return response, 401
+        member = g.mail_verified_profile
         return jsonify(sub=claims['sub'], email=member['email'], display_name=member['display_name'])
 
     @blueprint.get(PREFIX + '/consent.js')
@@ -342,18 +388,21 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
 
     app.register_blueprint(blueprint)
 
-    def issue_native_tokens(identity):
+    def issue_native_tokens(identity, scope=READ):
         user = MailUser(identity['user_id'], identity['auth_tag'])
-        access = access_token(client, 'first_party_native', user, READ)
         refresh = secrets.token_urlsafe(48)
-        store.create_refresh_family(refresh, {
+        family = store.create_refresh_family(refresh, {
             'user_id': user.user_id, 'auth_tag': user.auth_tag, 'client_id': CLIENT_ID,
-            'resource': RESOURCE, 'scope': READ, 'authentication_flow': NATIVE_FLOW})
+            'resource': RESOURCE, 'scope': scope, 'authentication_flow': NATIVE_FLOW})
+        user.grant_id = family
+        access = access_token(client, 'first_party_native', user, scope)
         return {'access_token': access, 'refresh_token': refresh, 'expires_in': 300,
-                'token_type': 'Bearer', 'scope': READ}
+                'token_type': 'Bearer', 'scope': scope}
 
     register_native_session(app, accounts, issuer=ISSUER, client_id=CLIENT_ID,
-        resource=RESOURCE, scope=READ, login_limited=login_limited, issue_tokens=issue_native_tokens)
+        resource=RESOURCE, scope=READ, allowed_scopes=scopes,
+        login_limited=login_limited, issue_tokens=issue_native_tokens)
+    register_archive_keys(app, settings, accounts, authenticate=authenticate_mail, grants=store)
 
 
 CONSENT = '''<!doctype html><html lang="en"><head><meta charset="utf-8">

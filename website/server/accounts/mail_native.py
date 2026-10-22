@@ -28,7 +28,8 @@ def _invalid_constant(value):
 
 
 def register_native_session(app, accounts, *, issuer, client_id, resource, scope,
-                            login_limited, issue_tokens):
+                            login_limited, issue_tokens, allowed_scopes=None):
+    scopes = frozenset(allowed_scopes or (scope,))
     blueprint = Blueprint('mail_native', __name__)
 
     @blueprint.post(NATIVE_SESSION_PATH, provide_automatic_options=False)
@@ -49,7 +50,7 @@ def register_native_session(app, accounts, *, issuer, client_id, resource, scope
             if (not isinstance(data, dict)
                     or set(data) != {'email', 'password', 'client_id', 'resource', 'scope', 'approve'}
                     or data['client_id'] != client_id or data['resource'] != resource
-                    or data['scope'] != scope or data['approve'] is not True):
+                    or not isinstance(data['scope'], str) or data['scope'] not in scopes or data['approve'] is not True):
                 return jsonify(error='INVALID_REQUEST'), 400
         except (ValueError, UnicodeError, RecursionError):
             return jsonify(error='INVALID_REQUEST'), 400
@@ -73,7 +74,7 @@ def register_native_session(app, accounts, *, issuer, client_id, resource, scope
         if not identity:
             return jsonify(error='INVALID_CREDENTIALS'), 401
         try:
-            tokens = issue_tokens(identity)
+            tokens = issue_tokens(identity, data['scope'])
         except InvalidGrantError:
             # An account/password change during issuance must not disclose status
             # or publish a token that has no durably stored refresh family.

@@ -20,6 +20,7 @@ from mail import Mailer
 from account_profile import signup_profile
 from abuse import MailAbuseGuard
 from mail_native import NATIVE_SESSION_PATH
+from mail_archive_keys import KEYS_PREFIX
 
 COOKIE = "__Host-nektron_session"
 
@@ -45,7 +46,7 @@ class DatabaseSessions(SessionInterface):
     def open_session(self, app, req):
         # The first-party native endpoint never reads ambient browser credentials,
         # including malformed/denied requests carrying an existing session cookie.
-        if req.path == NATIVE_SESSION_PATH:
+        if req.path == NATIVE_SESSION_PATH or req.path == KEYS_PREFIX or req.path.startswith(KEYS_PREFIX + '/'):
             return ServerSession(isolated=True)
         token = req.cookies.get(COOKIE, "")
         if re.fullmatch(r"[A-Za-z0-9_-]{43}", token):
@@ -108,6 +109,9 @@ def create_app(settings=None, store=None, mailer=None):
     app.config.update(MAX_CONTENT_LENGTH=4096, SECRET_KEY=secrets.token_hex(32))
     origin = settings.get("NEKTRON_SITE_ORIGIN", "https://nektron.ai").rstrip("/")
     enabled = settings.get("NEKTRON_ACCOUNT_ENABLED") == "true"
+    if (settings.get('NEKTRON_MAIL_ARCHIVE_KEYS_ENABLED') == 'true'
+            and settings.get('NEKTRON_MAIL_OAUTH_ENABLED') != 'true'):
+        raise ValueError('Archive key recovery requires enabled Mail authentication')
     if enabled and urlparse(origin).scheme != "https":
         raise ValueError("HTTPS site origin is required")
     backend = store or (Store(settings) if enabled else None)
@@ -124,7 +128,7 @@ def create_app(settings=None, store=None, mailer=None):
         # These exact native routes use explicit credentials, never browser cookies.
         # The first-party password route additionally rejects all browser context.
         if request.endpoint in {"connector_oauth.token", "connector_oauth.revoke", "mail_oauth.token", "mail_oauth.revoke",
-                                "mail_native.create_session"}:
+                                "mail_native.create_session", "mail_archive_keys.create_key"}:
             return None
         if request.method not in ("GET", "HEAD", "OPTIONS"):
             if request.headers.get("Origin") != origin:

@@ -7,6 +7,8 @@ This is **not Mail enrollment or access to any mailbox**. Existing signup,
 verification, recovery, password policy, email budgets, and Database Connector
 stay in place.
 
+**Current extension (October 21, 2026):** the separately approved [local archive key recovery service](README-mail-archive-keys.md) is deployed on `nektron-mail-archive-keys-20261022T012701Z-207b277f460a`, Ready/Green. Native clients may explicitly request `mail/archive.read mail/archive.keys` when recovery is enabled. Existing read-only and browser grants remain unchanged and cannot silently expand during refresh. The deployment and tests below document the historical initial sign-in releases; see the recovery document for current candidate hashes, validation and remaining copied-archive pilot checks.
+
 ## Production deployment status
 
 The approved deployment extends the existing account service at `https://nektron.ai`.
