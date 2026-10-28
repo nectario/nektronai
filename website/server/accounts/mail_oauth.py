@@ -33,6 +33,7 @@ PREFIX = '/api/account/mail-oauth'
 CLIENT_ID = 'nektron-mail-windows'
 RESOURCE = 'https://nektron.ai/mail'
 READ = 'mail/archive.read'
+INGEST = 'mail/archive.ingest'
 PENDING_KEY = 'mail_oauth_pending'
 CONSENT_KEY = 'mail_oauth_consent'
 
@@ -123,7 +124,11 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
     public.update(kid=kid, use='sig', alg='RS256')
     store = oauth_store or OAuthStore(accounts)
     archive_keys_enabled = settings.get('NEKTRON_MAIL_ARCHIVE_KEYS_ENABLED') == 'true'
-    scopes = frozenset((READ, KEY_SCOPE) if archive_keys_enabled else (READ,))
+    # Native database-storage approval creates its own exact-scope family.
+    # Browser authorization and existing refresh families never gain this scope.
+    ingest_enabled = settings.get('NEKTRON_MAIL_INGEST_ENABLED') == 'true'
+    scopes = frozenset(((READ, KEY_SCOPE) if archive_keys_enabled else (READ,))
+                       + ((INGEST,) if ingest_enabled else ()))
     client = MailClient(scopes)
     blueprint = Blueprint('mail_oauth', __name__)
 
@@ -298,7 +303,8 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
                 or request.form.get('resource') != RESOURCE or request.form.get('client_id') != CLIENT_ID
                 or request.form.get('scope', READ) not in scopes):
             return jsonify(error='invalid_request'), 400
-        if kind == 'authorization_code' and (not valid_callback(request.form.get('redirect_uri'))
+        if kind == 'authorization_code' and (request.form.get('scope', READ) != READ
+                or not valid_callback(request.form.get('redirect_uri'))
                 or not request.form.get('code')
                 or not re.fullmatch(r'[A-Za-z0-9._~-]{43,128}', request.form.get('code_verifier', ''))):
             return jsonify(error='invalid_request'), 400
