@@ -34,6 +34,7 @@ CLIENT_ID = 'nektron-mail-windows'
 RESOURCE = 'https://nektron.ai/mail'
 READ = 'mail/archive.read'
 INGEST = 'mail/archive.ingest'
+RULES_AUTHOR = 'mail/rules.author'
 PENDING_KEY = 'mail_oauth_pending'
 CONSENT_KEY = 'mail_oauth_consent'
 
@@ -127,8 +128,10 @@ def register_mail_oauth(app, settings, accounts, oauth_store=None, *, login_limi
     # Native database-storage approval creates its own exact-scope family.
     # Browser authorization and existing refresh families never gain this scope.
     ingest_enabled = settings.get('NEKTRON_MAIL_INGEST_ENABLED') == 'true'
+    rules_author_enabled = settings.get('NEKTRON_MAIL_RULES_AUTHOR_ENABLED') == 'true'
     scopes = frozenset(((READ, KEY_SCOPE) if archive_keys_enabled else (READ,))
-                       + ((INGEST,) if ingest_enabled else ()))
+                       + ((INGEST,) if ingest_enabled else ())
+                       + ((RULES_AUTHOR,) if rules_author_enabled else ()))
     client = MailClient(scopes)
     blueprint = Blueprint('mail_oauth', __name__)
 
