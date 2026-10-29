@@ -46,8 +46,9 @@ def merge_flag(before):
     return after,changed
 
 
-def activate_flag(client,secret_id,*,attempt_id,apply=False):
+def activate_flag(client,secret_id,*,attempt_id,apply=False,review_prefix='NektronMailIngestReview-'):
     if type(attempt_id) is not str or not re.fullmatch(r'[A-Za-z0-9-]{32,64}',attempt_id): raise RuntimeError('invalid_attempt_id')
+    if review_prefix not in ('NektronMailIngestReview-', 'NektronMailRulesReview-'): raise RuntimeError('invalid_review_prefix')
     current=client.get_secret_value(SecretId=secret_id,VersionStage='AWSCURRENT')
     old_id=current.get('VersionId'); before=parse_secret(current.get('SecretString'))
     if type(old_id) is not str or not 32<=len(old_id)<=64 or 'AWSCURRENT' not in current.get('VersionStages',[]): raise RuntimeError('current_version_unverified')
@@ -58,7 +59,7 @@ def activate_flag(client,secret_id,*,attempt_id,apply=False):
     if not apply or not changed: return result
     serialized=json.dumps(after,separators=(',',':'),ensure_ascii=False)
     if len(serialized.encode('utf-8'))>65536 or parse_secret(serialized)!=after: raise RuntimeError('invalid_merged_secret')
-    review='NektronMailIngestReview-'+attempt_id
+    review=review_prefix+attempt_id
     # VersionStages cannot be empty (API minimum is one label). This unique
     # non-current label prevents PutSecretValue from implicitly moving CURRENT.
     prepared=client.put_secret_value(SecretId=secret_id,ClientRequestToken=attempt_id,

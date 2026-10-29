@@ -35,6 +35,19 @@ class Secret:
 
 
 class IngestActivationTests(unittest.TestCase):
+    def test_rules_review_label_is_explicit_and_preserves_existing_flags(self):
+        helper = module(); helper.FLAG = 'NEKTRON_MAIL_RULES_AUTHOR_ENABLED'
+        secret = Secret(); secret.before['NEKTRON_MAIL_INGEST_ENABLED'] = 'true'
+        secret.before['NEKTRON_MAIL_ARCHIVE_KEYS_ENABLED'] = 'true'
+        secret.values[OLD] = json.dumps(secret.before)
+        result = helper.activate_flag(secret, 'synthetic-secret', attempt_id=NEW, apply=True,
+                                      review_prefix='NektronMailRulesReview-')
+        self.assertEqual(result['changed_fields'], ['NEKTRON_MAIL_RULES_AUTHOR_ENABLED'])
+        self.assertEqual(json.loads(secret.values[NEW]), {**secret.before, 'NEKTRON_MAIL_RULES_AUTHOR_ENABLED': 'true'})
+        self.assertEqual(secret.writes[0][1]['VersionStages'], ['NektronMailRulesReview-' + NEW])
+        with self.assertRaisesRegex(RuntimeError, 'invalid_review_prefix'):
+            helper.activate_flag(Secret(), 'synthetic-secret', attempt_id=NEW, apply=True, review_prefix='AWSCURRENT')
+
     def setUp(self): self.module=module()
     def test_default_is_read_only_and_reports_no_secret_fields(self):
         client=Secret(); result=self.module.activate_flag(client,'synthetic-secret-id',attempt_id=NEW)
