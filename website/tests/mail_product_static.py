@@ -56,7 +56,7 @@ class MailProductChecks(unittest.TestCase):
         self.assertIn('61,035,888 bytes',self.html)
         self.assertIn('Nektron, Inc.',self.html)
     def test_preview_and_connected_feature_limits_are_visible(self):
-        for phrase in ('Windows preview','approved Google test users','limited-access','not available for Gmail',
+        for phrase in ('Windows preview','Gmail sign-in is currently available to invited testers','limited-access','not available for Gmail',
                        'Public subscription purchasing is not available yet','attachment-content search are not active',
                        'Microsoft 365','WebView2 Runtime','does not restore missing mail files'):
             self.assertIn(phrase,self.html)
@@ -64,20 +64,25 @@ class MailProductChecks(unittest.TestCase):
     def test_first_screen_keeps_product_name_and_explains_mailbox_eligibility(self):
         self.assertEqual(self.page.text('mail-title'),'Nektron Mail')
         eligibility=self.page.text('preview-compatibility')
-        for phrase in ('Amazon WorkMail','IMAP','POP3','Exchange Server (EWS)','Gmail','Windows x64','approved Google test users','Request Gmail preview access'):
+        for phrase in ('Gmail','IMAP','Exchange Server (EWS)','POP3','Amazon WorkMail','Windows x64','invited testers','Ask about Gmail access'):
             self.assertIn(phrase,eligibility)
         self.assertLess(self.html.index('id="preview-compatibility"'),self.html.index('class="mail-hero-screen"'))
         self.assertIn('One Windows email app.',self.html)
-        self.assertLess(eligibility.index('Gmail'),eligibility.index('Amazon WorkMail'))
+        positions=[eligibility.index(provider) for provider in ('Gmail','IMAP','Exchange Server (EWS)','POP3','Amazon WorkMail')]
+        self.assertEqual(positions,sorted(positions))
+        self.assertIn('class="mail-gmail">Gmail</strong>',self.html)
+        self.assertNotIn('Gmail preview access',self.html)
+        self.assertNotIn('Gmail preview access',self.js)
+        self.assertEqual(self.html.count('Gmail, IMAP, Exchange Server (EWS), POP3 and Amazon WorkMail.'),2)
     def test_custom_provider_support_keeps_protocol_and_pilot_limits_clear(self):
-        for phrase in ('Exchange Server through HTTPS EWS','configure SMTP for sending',
+        for phrase in ('Exchange Server uses HTTPS EWS','configure SMTP for sending',
                        'Microsoft 365 / Outlook.com sign-in is not available',
                        'POP3 downloads from your provider’s Inbox and leaves copies on the server',
                        'POP3 read state stays on this PC','calendars, contacts, MAPI and ActiveSync are not included'):
             self.assertIn(phrase,self.html)
         business=self.page.text('business-archive')
         self.assertIn('Amazon WorkMail mailboxes connected through IMAP',business)
-        self.assertIn('custom IMAP, POP3 and Exchange Server connections are also outside this pilot',business)
+        self.assertIn('custom IMAP, Exchange Server and POP3 connections are also outside this pilot',business)
         self.assertNotIn('other Exchange servers, custom IMAP and POP3 are not available',self.html)
     def test_search_and_all_mailboxes_are_scoped_without_combined_inbox_claim(self):
         self.assertIn('selected mailbox',self.page.text('features'))
@@ -128,7 +133,7 @@ class MailProductChecks(unittest.TestCase):
             subject=parse_qs(target.query).get('subject',[''])[0]
             self.assertTrue(subject.startswith('Nektron Mail'))
             subjects.append(subject)
-        for purpose in ('business archiving','Gmail preview access','AI rule assistance'):
+        for purpose in ('business archiving','Gmail access','AI rule assistance'):
             self.assertTrue(any(purpose in subject for subject in subjects),purpose)
     def test_discovery_entrypoints_exist(self):
         self.assertIn('href="nektron-mail.html"',(ROOT/'index.html').read_text(encoding='utf-8'))

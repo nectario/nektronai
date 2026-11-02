@@ -32,7 +32,6 @@ body.mail-page .mail-eyebrow, .mail-page .mail-note-label, .mail-page .mail-feat
 .mail-provider-list{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
 .mail-provider-list strong{white-space:nowrap}
 .mail-provider-list .mail-gmail{display:inline-flex;align-items:center;gap:10px;font-size:19px;padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--atelier-paper)}
-.mail-gmail span{font-size:14px;font-weight:400;color:var(--muted)}
 .mail-page .mail-release{font-size:14px;flex-wrap:wrap}
 body.mail-page .button,.mail-page .mail-tour-tabs button,.mail-page .mail-text-link{font-size:15px}
 .mail-page .mail-principles{grid-template-columns:repeat(5,minmax(0,1fr));gap:24px}
