@@ -1,6 +1,6 @@
 # Nektron Mail product page rollout
 
-> **Latest publication — November 2, 2026:** The Gmail, five-benefit and readability refinement is live from website commit **32295dc**. The three-path static rollout is verified **Ready / Green**. Signed installer **0.1.131**, screenshots and service capabilities are unchanged; automatic replies are explicitly planned and unavailable in this preview. See the latest rollout record below.
+> **Latest publication — November 2, 2026:** The Gmail, five-benefit and readability refinement is live from website commit **32295dc**, with Gmail-link layout polish in **d661b5c**. The three-path rollout and one-file follow-up are verified **Ready / Green**. Signed installer **0.1.131**, screenshots and service capabilities are unchanged; automatic replies are explicitly planned and unavailable in this preview. See the latest rollout record below.
 
 Published **November 1, 2026 (America/New_York)** from website commit **4ad1faf**.
 
@@ -111,6 +111,12 @@ Automatic replies are labeled **PLANNED · NOT AVAILABLE IN THIS PREVIEW** and e
 
 Measured type sizes: desktop introductory copy **20 px**, sidebar/feature/provider text **16 px**, supporting notes **14 px**; mobile introductory copy **18 px** and notes **14 px**. The prominent product title is preserved. The five feature cards use a three-plus-two layout on desktop and stack on mobile.
 
-Validation: **12 Mail checks passed** within **29 passing website checks**, with **3 optional historical-baseline guards skipped**. JavaScript syntax, diff checks and build passed. Light/Dark layouts at **320, 390, 820 and 1440 pixels** showed no horizontal overflow or offscreen headings/controls. Final live browser proof is recorded after the release verification.
+Validation: **12 Mail checks passed** within **29 passing website checks**, with **3 optional historical-baseline guards skipped**. JavaScript syntax, diff checks and build passed. Light/Dark layouts at **320, 390, 820 and 1440 pixels** showed no horizontal overflow or offscreen headings/controls. Final live review confirmed Gmail as the first provider badge, all five feature cards, no horizontal overflow and the full Gmail access link on one visual line. The 1440×1000 live proof is retained at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-benefits-live.png`.
 
 The existing signed **0.1.131** installer remains **61,035,888 bytes**, SHA-256 **83B81A57E539A2F003F9D472878322028CD81C17DB80B66F3D15C83167D85318**. Its branded redirect and public download were verified again. Previous **0.1.125** and **0.1.126** downloads remain unchanged. No app build, installer upload or image replacement was part of this iteration.
+
+### Gmail access-link layout follow-up
+
+Commit **d661b5c** puts the Gmail preview-access link on its own line, keeping its arrow with the link text. The local 320- and 1440-pixel browser checks passed without overflow; the complete link stays on one visual line.
+
+Deployment **nektron-mail-benefits-wrap-20261102T212033Z-20ea91bc8e8e** is **Ready / Green**. It replaces only `nektron-mail.html` and preserves all **190 other entries**, all **47 protected entries**, existing permissions, images and installer downloads. Bundle SHA-256: **20EA91BC8E8ED1E735238253D6E53155BF9FC9D4499F0ADB38117FD3E13CEDDA**. The live HTML returned 200 with its exact prepared hash, and existing CSS, JavaScript, gallery, downloads and account routes verified unchanged. No backend or environment-setting changes were made.

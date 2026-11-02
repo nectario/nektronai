@@ -1,7 +1,7 @@
 # Nektron Mail sales messaging — local review
 
 **Prepared:** November 2, 2026  
-**Status:** Published and verified. The latest Gmail, five-benefit and readability refinement is from commit **32295dc**, **Ready / Green**. The initial sales review below is retained as historical evidence; see the follow-up at the end.
+**Status:** Published and verified. The latest Gmail, five-benefit and readability refinement is from commit **32295dc**, with link-layout polish in **d661b5c**, **Ready / Green**. The initial sales review below is retained as historical evidence; see the follow-up at the end.
 **Preview:** http://127.0.0.1:4180/nektron-mail.html  
 **Website baseline:** `23125ba57385f65a417fadc1208de079fe95bc25`  
 **Brief:** `C:/Development/Projects/Nektron Mail/docs/Nektron-Mail-Sales-Page-Handoff.md`
@@ -122,3 +122,7 @@ Automatic replies are shown separately as **PLANNED · NOT AVAILABLE IN THIS PRE
 The three-file deployment **nektron-mail-benefits-20261102T211623Z-ca1b2b6633c0** is verified **Ready / Green**. All changed live hashes match, with **188 entries** and **47 protected entries** unchanged. The signed 0.1.131 installer, downloads page and all image assets are preserved. Full scope and hashes are recorded in [the rollout record](NEKTRON_MAIL_PRODUCT_PAGE.md).
 
 Validation passed: **29 website tests, 3 optional skips**, including **12 Mail checks**; JavaScript, build and diff checks. Responsive Light/Dark review at 320/390/820/1440 pixels found no overflow or offscreen headings/controls. Desktop introductory text is 20 px, body/sidebar/provider text 16 px and notes 14 px; mobile introductory text is 18 px with 14 px notes. The title keeps its prominence and the five cards use three-plus-two desktop rows and a mobile stack.
+
+The Gmail access-link layout was refined in **d661b5c** and published as **nektron-mail-benefits-wrap-20261102T212033Z-20ea91bc8e8e**. This follow-up changed only the HTML page, retaining all 190 other entries and all 47 protected entries. The live hash and preserved routes passed; 320- and 1440-pixel layout checks kept the complete link on one visual line without overflow.
+
+Final live browser review passed: Gmail is the first provider badge, all five feature cards are present, no horizontal overflow is visible, and the Gmail access link remains on one visual line. The updated 1440×1000 capture is retained at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-benefits-live.png`.
