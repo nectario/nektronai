@@ -1,6 +1,6 @@
 # Nektron Mail product page rollout
 
-> **Latest publication — November 2, 2026:** The reviewed sales refinement and signed **0.1.131** search release are live. Provider compatibility, local-search capabilities and the current download facts are synchronized. The five-path static rollout is verified **Ready / Green**. See [the sales review and evidence](NEKTRON_MAIL_SALES_REVIEW.md) and the release record below.
+> **Latest publication — November 2, 2026:** The Gmail, five-benefit and readability refinement is live from website commit **32295dc**. The three-path static rollout is verified **Ready / Green**. Signed installer **0.1.131**, screenshots and service capabilities are unchanged; automatic replies are explicitly planned and unavailable in this preview. See the latest rollout record below.
 
 Published **November 1, 2026 (America/New_York)** from website commit **4ad1faf**.
 
@@ -93,3 +93,24 @@ Installer:
 - The branded download redirect works. Previous **0.1.125** and **0.1.126** installer URLs remain available with their original sizes and checksums.
 
 Validation: **28 website checks passed, 3 optional historical-baseline guards skipped**; Mail JavaScript syntax, diff checks and Vite build passed. Existing non-module homepage script warnings remain. The application signed-release pipeline reported **1,919 passed, 11 opt-in skipped**. Final browser review passed at 390-pixel width in Light and Dark without horizontal overflow. Live 0.1.131 download details were correct; the new 1180×760 search image, gallery tab, enlargement and Escape dismissal worked. Live proof is retained locally at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-sales131-live.png`.
+
+## Gmail, five benefits and readability — November 2, 2026
+
+Published the reviewed product-page refinement from website commit **32295dc**.
+
+- Live page: https://nektron.ai/nektron-mail.html
+- Deployment: **nektron-mail-benefits-20261102T211623Z-ca1b2b6633c0**, **Ready / Green**.
+- Exactly three changed static paths: `nektron-mail.html`, `assets/nektron-mail.css` and `assets/nektron-mail.js`.
+- **188 existing bundle entries** remain byte-identical, including all **47 protected backend/configuration entries**, with existing ZIP permissions preserved. Only the application version was updated; no environment settings, account permissions, authentication, database or infrastructure changes were made.
+- Candidate bundle SHA-256: **CA1B2B6633C0DDE370868F75B6CD030C637C6A033823ED94EEB985869926BE0B**. Protected-entry hash-manifest SHA-256 remains **66A37C3E24F59F1564733DF60979F8845A50269637E772DB564F96F385DD1D1F**.
+- All three changed paths returned HTTP **200** with exact candidate hashes. The downloads page, homepage, sitemap, gallery images and existing account/support routes matched the preserved source. The unauthenticated account-session GET behaved as expected; no forms were submitted.
+
+Gmail is prominent in the opening paragraph, the first provider badge and the mailbox tour, with its approved-test-user restriction visible. Five core benefits now organize the page: multiple mailboxes in one Windows workspace, integrated AI rule authoring, robust local search, intuitive design and central archiving for individuals and small businesses. The archive section keeps local storage distinct from the limited-access WorkMail IMAP database pilot. The all-mailbox sidebar is not presented as a combined inbox.
+
+Automatic replies are labeled **PLANNED · NOT AVAILABLE IN THIS PREVIEW** and explicitly distinguished from the available read-state rule assistant. No new automatic sending or service capability was activated.
+
+Measured type sizes: desktop introductory copy **20 px**, sidebar/feature/provider text **16 px**, supporting notes **14 px**; mobile introductory copy **18 px** and notes **14 px**. The prominent product title is preserved. The five feature cards use a three-plus-two layout on desktop and stack on mobile.
+
+Validation: **12 Mail checks passed** within **29 passing website checks**, with **3 optional historical-baseline guards skipped**. JavaScript syntax, diff checks and build passed. Light/Dark layouts at **320, 390, 820 and 1440 pixels** showed no horizontal overflow or offscreen headings/controls. Final live browser proof is recorded after the release verification.
+
+The existing signed **0.1.131** installer remains **61,035,888 bytes**, SHA-256 **83B81A57E539A2F003F9D472878322028CD81C17DB80B66F3D15C83167D85318**. Its branded redirect and public download were verified again. Previous **0.1.125** and **0.1.126** downloads remain unchanged. No app build, installer upload or image replacement was part of this iteration.
