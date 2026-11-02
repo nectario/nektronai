@@ -1,6 +1,6 @@
 # Nektron Mail product screenshots
 
-These images are rendered from the actual Nektron Mail **0.1.125** WPF application controls, using a separate in-memory demo and an isolated synthetic profile. They are not generated UI mockups and contain no private mail, passwords, account tokens, or real customer addresses. Names, messages, counts, mailboxes and AI availability are illustrative sample data. The `.example` addresses are deliberately fictional.
+These images are rendered from actual Nektron Mail WPF application controls, using isolated synthetic profiles. The search capture is from **0.1.131**; the other five screenshots are from **0.1.125**. They are not generated UI mockups and contain no private mail, passwords, account tokens, or real customer addresses. Names, messages, counts, mailboxes and AI availability are illustrative sample data. The `.example` addresses are deliberately fictional.
 
 The screenshots show the current Windows preview. Features that remain limited or unavailable are not hidden: search states it searched local records; the composer is shown in Email mode; the reader retains its current attachment-export notice; rule assistance shows an eligible demo account rather than implying universal/free availability.
 
@@ -9,7 +9,7 @@ The screenshots show the current Windows preview. Features that remain limited o
 | `overview-light.webp` | 1440 × 1000 | Multiple mailboxes, local message list and reading pane in Light theme. |
 | `overview-dark.webp` | 1440 × 1000 | The same native mailbox workspace in Dark theme. |
 | `compose.webp` | 1180 × 820 | A separate composition window with recipients, a labeled subject and a standard attachment; Email output is selected. |
-| `search.webp` | 1180 × 760 | Local mail search with visible From/Subject filters and a selected result. |
+| `search.webp` | 1180 × 760 | The 0.1.131 production search controls with visible From/To/Cc/Bcc/Correspondent options, sample results from several folders, date sorting and a selected-message preview. |
 | `rules.webp` | 1180 × 1060 | A client rule draft and the paid AI rule-authoring prompt, shown with eligible sample access. No live AI request was made. |
 | `downloads.webp` | 1180 × 1000 | Background Get Mail progress, per-folder workers and local download coverage. Counts are illustrative, not a performance claim. |
 
@@ -20,5 +20,7 @@ PNG captures are retained beside lossless WebP exports. Exporting does not resiz
 The earlier `icon-64.png` and `icon-128.png` files remain for compatibility with the initial 0.1.125 page and use its former **#9EC9E6** tile background. The product page now references the transparent filenames, including its favicon and closing icon.
 
 Local capture helper: `C:/Development/Projects/Nektron Mail/private/mail-site-shots/` (ignored diagnostic project, referencing the current app). It invokes the production controls with synthetic services and captures them through WPF `RenderTargetBitmap`; no Mail product source was modified.
+
+The updated search capture comes from `C:/Development/Projects/Nektron Mail/private/search131-showcase/output/search-light.png`, approved after visual review. Its source helper instantiates the production search UI with synthetic data. `search.png` is copied byte-for-byte and `search.webp` is exported losslessly at the native 1180×760 dimensions; decoded RGBA pixels are identical. The illustration's local-record count and timings are sample state, not a speed or complete-mailbox-coverage claim. Only the WebP replacement is included in the website release overlay; the PNG and this provenance record remain repository maintenance assets.
 
 Suggested page disclosure: **Screenshots show the Windows preview with sample data. Feature availability depends on the supported mailbox and account access.**

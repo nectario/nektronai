@@ -1,5 +1,7 @@
 # Nektron Mail product page rollout
 
+> **Release ready — November 2, 2026:** The owner approved the reviewed sales refinement after the Mail search fix. The signed **0.1.131** installer is now published and independently verified; page version, size, checksum and provider claims are synchronized. The five-path static website rollout is being prepared. See [the review report and screenshots](NEKTRON_MAIL_SALES_REVIEW.md). Deployment records below describe completed releases.
+
 Published **November 1, 2026 (America/New_York)** from website commit **4ad1faf**.
 
 - Product page: https://nektron.ai/nektron-mail.html
