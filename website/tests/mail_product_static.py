@@ -67,7 +67,8 @@ class MailProductChecks(unittest.TestCase):
         for phrase in ('Amazon WorkMail','IMAP','POP3','Exchange Server (EWS)','Gmail','Windows x64','approved Google test users','Request Gmail preview access'):
             self.assertIn(phrase,eligibility)
         self.assertLess(self.html.index('id="preview-compatibility"'),self.html.index('class="mail-hero-screen"'))
-        self.assertIn('Personal mail. Work mail.',self.html)
+        self.assertIn('One Windows email app.',self.html)
+        self.assertLess(eligibility.index('Gmail'),eligibility.index('Amazon WorkMail'))
     def test_custom_provider_support_keeps_protocol_and_pilot_limits_clear(self):
         for phrase in ('Exchange Server through HTTPS EWS','configure SMTP for sending',
                        'Microsoft 365 / Outlook.com sign-in is not available',
@@ -103,11 +104,20 @@ class MailProductChecks(unittest.TestCase):
                        'attachment metadata','object storage','authorization for each supported mailbox',
                        'authorized Amazon WorkMail','Gmail database archiving is not currently available',
                        'not a customer-configured database connection or built-in AI email search'):
-            self.assertIn(phrase,business)
+            self.assertIn(phrase.lower(),business.lower())
         self.assertIn('does not restore missing mail files',self.page.text('archive-recovery'))
         order=[self.html.index('id="'+region+'"') for region in ('features','ai-rules','local-archive','business-archive','download')]
         self.assertEqual(order,sorted(order))
         self.assertNotRegex(business.lower(),r'guaranteed permanence|compliance certified|immutable retention|automatic backups')
+    def test_five_benefits_and_planned_replies_do_not_overstate_current_ai(self):
+        benefits=self.page.text('features')
+        for phrase in ('YOUR MAILBOXES','INTEGRATED AI','ROBUST SEARCH','INTUITIVE DESIGN','CENTRAL ARCHIVING'):
+            self.assertIn(phrase,benefits)
+        planned=self.page.text('ai-roadmap')
+        self.assertIn('NOT AVAILABLE IN THIS PREVIEW',planned)
+        self.assertIn('does not automatically write or send replies',planned)
+        self.assertNotIn('Automatic replies',benefits)
+        self.assertIn('INDIVIDUALS',self.page.text('business-archive'))
     def test_contact_ctas_use_existing_mailto_workflow_with_specific_subjects(self):
         contacts=[a for tag,a in self.tags if tag=='a' and a.get('href','').startswith('mailto:')]
         self.assertGreaterEqual(len(contacts),3)

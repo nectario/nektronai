@@ -15,3 +15,48 @@ body.mail-page .header-inner{padding-block:12px}body.mail-page .header-inner .br
 @media(max-width:420px){body.mail-page #primary-nav a[href="#questions"]{display:none}body.mail-page .mail-hero h1{font-size:44px}}
 @media(prefers-reduced-motion:reduce){body.mail-page *,body.mail-page *::before,body.mail-page *::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 .mail-compatibility{font-size:12px;line-height:1.85;margin:20px 0 0}.mail-compatibility strong{font-weight:550;color:var(--text)}.mail-compatibility a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}.mail-page .mail-faq details[id]{scroll-margin-top:148px}
+
+/* Readable product messaging, scoped to Mail; shared site typography is untouched. */
+body.mail-page #primary-nav a, .mail-page .mail-breadcrumb{font-size:14px}
+.mail-page .mail-lockup span{font-size:16px}
+body.mail-page .mail-eyebrow, .mail-page .mail-note-label, .mail-page .mail-feature-index{font-size:13px;letter-spacing:.08em}
+.mail-page .mail-hero{grid-template-columns:minmax(0,1.35fr) minmax(320px,.75fr);gap:64px}
+.mail-page .mail-lede{font-size:20px}
+.mail-page .mail-lede strong{color:var(--text);font-weight:600}
+.mail-page .mail-hero-note>div{gap:16px;margin-top:20px}
+.mail-page .mail-hero-note p{font-size:16px;line-height:1.65}
+.mail-page .mail-hero-note strong{font-size:18px}
+.mail-page .mail-hero-note b{font-size:14px;line-height:1.8}
+.mail-page .mail-compatibility{font-size:16px;line-height:1.65}
+.mail-compatibility>p{margin:12px 0 0}
+.mail-provider-list{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
+.mail-provider-list strong{white-space:nowrap}
+.mail-provider-list .mail-gmail{display:inline-flex;align-items:center;gap:10px;font-size:19px;padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--atelier-paper)}
+.mail-gmail span{font-size:14px;font-weight:400;color:var(--muted)}
+.mail-page .mail-release{font-size:14px;flex-wrap:wrap}
+body.mail-page .button,.mail-page .mail-tour-tabs button,.mail-page .mail-text-link{font-size:15px}
+.mail-page .mail-principles{grid-template-columns:repeat(5,minmax(0,1fr));gap:24px}
+.mail-page .mail-principles strong{font-size:17px}
+.mail-page .mail-principles span{font-size:15px;line-height:1.65}
+.mail-page .mail-section-head>p,.mail-page .mail-tour-copy>p,.mail-page .mail-feature-grid p,.mail-page .mail-ai-steps p,.mail-page .mail-faq details p{font-size:16px}
+.mail-page .mail-small{font-size:14px!important}
+.mail-page .mail-hero-screen figcaption,.mail-page .mail-tour-panel figcaption{font-size:14px}
+.mail-page .mail-feature-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.mail-page .mail-feature-grid article{grid-column:span 2}
+.mail-page .mail-feature-grid article:nth-last-child(-n+2){grid-column:span 3}
+.mail-page .mail-feature-grid h3{font-size:22px}
+.mail-page .mail-ai .mail-access-note{font-size:15px!important}
+.mail-page .mail-ai-steps>div>span{font-size:14px}
+.mail-ai-roadmap{grid-column:1/-1;border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--atelier-paper)}
+.mail-ai-roadmap h3{font-size:23px;line-height:1.4;margin:0 0 12px}
+.mail-ai-roadmap>p:last-child{font-size:16px;line-height:1.85;margin:0;max-width:85ch}
+.mail-page .mail-source strong,.mail-page .mail-cloud strong{font-size:17px}
+.mail-page .mail-source>span:last-child,.mail-page .mail-local p,.mail-page .mail-cloud p{font-size:15px}
+.mail-page .mail-cloud>span{font-size:13px}
+.mail-page .mail-availability dt,.mail-page .mail-checksum summary,.mail-page .mail-checksum p,.mail-page .mail-footer p,.mail-page .mail-footer nav,.mail-page .mail-lightbox p{font-size:14px}
+.mail-page .mail-availability dd{font-size:15px}
+.mail-page .mail-checksum code{font-size:13px}
+.mail-page .mail-faq summary{font-size:17px}
+@media(max-width:1100px){.mail-page .mail-hero{gap:36px;grid-template-columns:minmax(0,1fr) minmax(280px,.7fr)}.mail-page .mail-hero-note strong{font-size:17px}}
+@media(max-width:860px){.mail-page .mail-principles{grid-template-columns:repeat(2,minmax(0,1fr))}.mail-page .mail-principles>div:last-child{grid-column:1/-1}}
+@media(max-width:760px){.mail-page .mail-hero{grid-template-columns:minmax(0,1fr)}.mail-page .mail-lede{font-size:18px}.mail-page .mail-feature-grid{grid-template-columns:1fr}.mail-page .mail-feature-grid article,.mail-page .mail-feature-grid article:nth-last-child(-n+2){grid-column:auto}.mail-page .mail-ai-roadmap{padding:22px}.mail-page .mail-availability dl>div{grid-template-columns:1fr;gap:6px}.mail-page .mail-hero-screen figcaption{font-size:14px}.mail-page .mail-tour-tabs button{font-size:15px}}
