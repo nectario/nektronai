@@ -1,6 +1,6 @@
 # Nektron Mail product page rollout
 
-> **Release ready — November 2, 2026:** The owner approved the reviewed sales refinement after the Mail search fix. The signed **0.1.131** installer is now published and independently verified; page version, size, checksum and provider claims are synchronized. The five-path static website rollout is being prepared. See [the review report and screenshots](NEKTRON_MAIL_SALES_REVIEW.md). Deployment records below describe completed releases.
+> **Latest publication — November 2, 2026:** The reviewed sales refinement and signed **0.1.131** search release are live. Provider compatibility, local-search capabilities and the current download facts are synchronized. The five-path static rollout is verified **Ready / Green**. See [the sales review and evidence](NEKTRON_MAIL_SALES_REVIEW.md) and the release record below.
 
 Published **November 1, 2026 (America/New_York)** from website commit **4ad1faf**.
 
@@ -68,3 +68,28 @@ The website now uses the same transparent, larger-envelope artwork as the signed
 - Five Mail static checks, JavaScript syntax and diff checks passed. The Windows release pipeline reported **1,804 passed, 10 opt-in checks skipped**.
 - All seven deployed paths returned HTTP 200 with candidate-matching bytes. Existing routes, gallery/old icon assets, the anonymous account endpoint and both installer versions passed read-only verification. No account forms were submitted.
 - Final live browser review passed in **Light and Dark**: the transparent icon loads, the prominent product title remains intact, and version **0.1.126** with the correct installer link is visible. A diagnostic capture is retained at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-transparent-icon-live.jpg` outside Git.
+
+## Sales refinement and signed 0.1.131 search release — November 2, 2026
+
+Published the owner-approved sales page from website commit **b05900d** after the Mail search fix in application commit **73c24e0** passed its signed release pipeline.
+
+- Live page: https://nektron.ai/nektron-mail.html
+- Deployment: **nektron-mail-sales131-20261102T202207Z-3e1ebc693360**, **Ready / Green**.
+- Exactly five changed static paths: `nektron-mail.html`, `assets/nektron-mail.css`, `assets/nektron-mail.js`, `assets/mail/search.webp`, and only the Mail section within the active `downloads.html`.
+- **186 existing bundle entries** remain byte-identical, including all **47 protected backend/configuration entries**. All existing ZIP permissions are preserved. Only the application version was updated; no environment settings, account permissions, authentication, database or infrastructure changes were made.
+- Candidate bundle SHA-256: **3E1EBC693360B5001F45935C4C7C908654AC6AA66FCF4CB0006F4F5DA34E5870**. Protected-entry hash-manifest SHA-256: **66A37C3E24F59F1564733DF60979F8845A50269637E772DB564F96F385DD1D1F**.
+- All five changed paths returned HTTP **200** with exact candidate hashes. The homepage, sitemap, remaining gallery assets, login, signup, account, Database Connector, privacy, terms and support routes retained the prior source. The unauthenticated account-session GET returned its expected response; no forms were submitted.
+
+The copy makes personal/business mailbox convenience and reviewed AI rule drafting clearer, separates durable local storage from the WorkMail IMAP database pilot, and accurately includes custom IMAP, POP3 and Exchange Server through HTTPS EWS. Microsoft 365 / Outlook.com remains unavailable, and Gmail still requires approved Google test access. Search stays local to the selected mailbox; server, AI email and attachment-content search are not advertised as active.
+
+The search illustration is an approved native **0.1.131** production-control capture with synthetic data, at **1180×760**. Its PNG is unchanged from the source, and every decoded RGBA pixel matches the lossless WebP export. No real mail appears in website images. The five other screenshots remain the 0.1.125 synthetic captures. The updated search asset has its own cache token; colors, typography and the established layout remain intact.
+
+Installer:
+
+- https://d2j3ldvioomkd6.cloudfront.net/assets/downloads/NektronMail.Setup.0.1.131.exe
+- Version **0.1.131**, file version **0.1.131.0**; **61,035,888 bytes**.
+- SHA-256: **83B81A57E539A2F003F9D472878322028CD81C17DB80B66F3D15C83167D85318**.
+- Authenticode **Valid**, **Nektron, Inc.**, trusted timestamp present. Independent local size/hash/signature checks, full-object storage checksum, public HTTP 200 metadata and range bytes passed.
+- The branded download redirect works. Previous **0.1.125** and **0.1.126** installer URLs remain available with their original sizes and checksums.
+
+Validation: **28 website checks passed, 3 optional historical-baseline guards skipped**; Mail JavaScript syntax, diff checks and Vite build passed. Existing non-module homepage script warnings remain. The application signed-release pipeline reported **1,919 passed, 11 opt-in skipped**. Final browser review passed at 390-pixel width in Light and Dark without horizontal overflow. Live 0.1.131 download details were correct; the new 1180×760 search image, gallery tab, enlargement and Escape dismissal worked. Live proof is retained locally at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-sales131-live.png`.

@@ -1,7 +1,7 @@
 # Nektron Mail sales messaging — local review
 
 **Prepared:** November 2, 2026  
-**Status:** Owner-approved 0.1.131 installer published and verified; website changes validated and ready for static deployment.  
+**Status:** Published and verified on November 2, 2026, from website commit **b05900d**; deployment **Ready / Green**.
 **Preview:** http://127.0.0.1:4180/nektron-mail.html  
 **Website baseline:** `23125ba57385f65a417fadc1208de079fe95bc25`  
 **Brief:** `C:/Development/Projects/Nektron Mail/docs/Nektron-Mail-Sales-Page-Handoff.md`
@@ -86,13 +86,13 @@ The numeric responsive checks are retained in [responsive-checks.json](review/ma
 - `tests/mail_product_static.py`: five additional checks and strengthened existing checks.
 - `docs/NEKTRON_MAIL_SALES_REVIEW.md`, `docs/NEKTRON_MAIL_PRODUCT_PAGE.md`, and `docs/review/mail-sales-20261102/*`: review evidence.
 
-**Publication is authorized.** The signed 0.1.131 installer has been uploaded and independently verified; the validated website changes are ready for commit, push and the scoped static deployment. The initial screenshot review above predates the expanded provider copy; final live browser verification follows deployment.
+**Published.** The signed 0.1.131 installer and the five-path static website rollout are live and independently verified. Website implementation commit **b05900d** is on `main`. The original before/after captures above document the initial sales refinement; the new native search capture and exact final download facts are documented below and in the rollout record.
 
 ## 0.1.131 publication preparation
 
-The current live source was captured read-only and remains **Ready / Green**, version `nektron-mail-icon-20261102T061225Z-65e5c8f59721`. The planned overlay replaces exactly five static paths: `nektron-mail.html`, `assets/nektron-mail.css`, `assets/nektron-mail.js`, the reviewed `assets/mail/search.webp`, and only the Mail section within the active `downloads.html`. It preserves the remaining 186 bundle entries, including 47 protected backend/configuration entries, and all existing ZIP permissions. No account, permission, environment-setting or infrastructure changes are planned.
+The prior live source was captured read-only at **Ready / Green**, version `nektron-mail-icon-20261102T061225Z-65e5c8f59721`. The published overlay changed exactly five static paths: `nektron-mail.html`, `assets/nektron-mail.css`, `assets/nektron-mail.js`, the reviewed `assets/mail/search.webp`, and only the Mail section within the active `downloads.html`. It preserves the remaining 186 bundle entries, including 47 protected backend/configuration entries, and all existing ZIP permissions. No account, permission, environment-setting or infrastructure changes are planned.
 
-The staged provider update passes **11 Mail static checks**, JavaScript syntax validation and `git diff --check`. The search screenshot has been replaced with the approved native 0.1.131 synthetic capture at **1180×760**, and its lossless WebP export was verified against every decoded RGBA pixel. Other screenshots, icons and shared site styles/scripts are unchanged. The gallery URL uses a new cache token for this replacement. The signed installer and public download checks passed. The final website suites passed **28 tests with 3 optional historical-baseline skips**; JavaScript syntax, diff checks and Vite build passed. The only build warnings were the existing non-module homepage scripts. The static rollout is next; no backend or account changes are included.
+The staged provider update passes **11 Mail static checks**, JavaScript syntax validation and `git diff --check`. The search screenshot has been replaced with the approved native 0.1.131 synthetic capture at **1180×760**, and its lossless WebP export was verified against every decoded RGBA pixel. Other screenshots, icons and shared site styles/scripts are unchanged. The gallery URL uses a new cache token for this replacement. The signed installer and public download checks passed. The final website suites passed **28 tests with 3 optional historical-baseline skips**; JavaScript syntax, diff checks and Vite build passed. The only build warnings were the existing non-module homepage scripts. The static rollout passed all live hash, route and health checks; no backend or account changes were included.
 
 ## Verified 0.1.131 installer
 
@@ -101,3 +101,14 @@ The staged provider update passes **11 Mail static checks**, JavaScript syntax v
 - SHA-256: **83B81A57E539A2F003F9D472878322028CD81C17DB80B66F3D15C83167D85318**.
 - Authenticode **Valid**, publisher **Nektron, Inc.**, trusted timestamp present.
 - Public HTTP **200**, exact byte count and SHA metadata, full-object storage checksum and public range bytes verified. The new version is immutable; previous releases remain available.
+
+## Publication result
+
+- Live URL: https://nektron.ai/nektron-mail.html
+- Website implementation commit: **b05900d**, pushed to `main`.
+- Deployment: **nektron-mail-sales131-20261102T202207Z-3e1ebc693360**, **Ready / Green**.
+- Exactly five static paths changed, **186 existing entries** and all **47 protected entries** unchanged; existing permissions preserved. No account forms were submitted or environment settings changed.
+- All changed live files matched their prepared SHA-256 values. Existing page/account routes, the branded download redirect and both prior signed installer versions were verified.
+- Full release evidence is in [the product-page rollout record](NEKTRON_MAIL_PRODUCT_PAGE.md).
+
+Final browser review passed: local 390-pixel Light/Dark layouts had no horizontal overflow; the live page showed the verified 0.1.131 download, new native search screenshot, working gallery selection, enlargement and Escape dismissal. Local live proof: `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-sales131-live.png`. Mail application commit **73c24e0** is also pushed to its `main` branch.
