@@ -1,7 +1,7 @@
 # Nektron Mail sales messaging — local review
 
 **Prepared:** November 2, 2026  
-**Status:** Published and verified. The latest Gmail, five-benefit and readability refinement is from commit **32295dc**, with link-layout polish in **d661b5c**, **Ready / Green**. The initial sales review below is retained as historical evidence; see the follow-up at the end.
+**Status:** Published and verified. The latest provider-order and Gmail-label update is from commit **2d5bace**, **Ready / Green**. Earlier sales, benefits and readability reviews below are retained as historical evidence; see the follow-up at the end.
 **Preview:** http://127.0.0.1:4180/nektron-mail.html  
 **Website baseline:** `23125ba57385f65a417fadc1208de079fe95bc25`  
 **Brief:** `C:/Development/Projects/Nektron Mail/docs/Nektron-Mail-Sales-Page-Handoff.md`
@@ -126,3 +126,11 @@ Validation passed: **29 website tests, 3 optional skips**, including **12 Mail c
 The Gmail access-link layout was refined in **d661b5c** and published as **nektron-mail-benefits-wrap-20261102T212033Z-20ea91bc8e8e**. This follow-up changed only the HTML page, retaining all 190 other entries and all 47 protected entries. The live hash and preserved routes passed; 320- and 1440-pixel layout checks kept the complete link on one visual line without overflow.
 
 Final live browser review passed: Gmail is the first provider badge, all five feature cards are present, no horizontal overflow is visible, and the Gmail access link remains on one visual line. The updated 1440×1000 capture is retained at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-benefits-live.png`.
+
+## Follow-up: provider order and Gmail naming
+
+Commit **2d5bace** changes the parallel provider lists to **Gmail, IMAP, Exchange Server (EWS), POP3, Amazon WorkMail**. Gmail is no longer given a Preview badge or a Gmail-preview-access label. The note **Gmail sign-in is currently available to invited testers** and **Ask about Gmail access** contact preserve the actual invitation requirement. The Windows preview label and signed 0.1.131 download remain unchanged.
+
+The three-path deployment **nektron-mail-providers-20261102T215015Z-4fcb5000a3d1** is **Ready / Green**, with 188 other entries and all 47 protected entries preserved. Live file hashes, account routes, image assets and current/previous download checks passed. No Google Console, authorization, backend or installer changes were made. All 12 Mail checks, JavaScript syntax and diff checks passed; browser review confirmed the order, labels and absence of overflow. Full release hashes are in [the rollout record](NEKTRON_MAIL_PRODUCT_PAGE.md).
+
+Final live browser proof confirmed the exact provider order, plain Gmail badge, invited-tester note, unchanged 0.1.131 download and no horizontal overflow. The CTA/provider/version crop is retained at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-providers-live.png`.

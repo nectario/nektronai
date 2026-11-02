@@ -1,6 +1,6 @@
 # Nektron Mail product page rollout
 
-> **Latest publication — November 2, 2026:** The Gmail, five-benefit and readability refinement is live from website commit **32295dc**, with Gmail-link layout polish in **d661b5c**. The three-path rollout and one-file follow-up are verified **Ready / Green**. Signed installer **0.1.131**, screenshots and service capabilities are unchanged; automatic replies are explicitly planned and unavailable in this preview. See the latest rollout record below.
+> **Latest publication — November 2, 2026:** Provider order and Gmail access wording are live from website commit **2d5bace**, verified **Ready / Green**. Gmail is labeled plainly; the invited-tester access note remains accurate. The Windows preview designation, signed **0.1.131** installer, screenshots and service capabilities are unchanged.
 
 Published **November 1, 2026 (America/New_York)** from website commit **4ad1faf**.
 
@@ -120,3 +120,20 @@ The existing signed **0.1.131** installer remains **61,035,888 bytes**, SHA-256 
 Commit **d661b5c** puts the Gmail preview-access link on its own line, keeping its arrow with the link text. The local 320- and 1440-pixel browser checks passed without overflow; the complete link stays on one visual line.
 
 Deployment **nektron-mail-benefits-wrap-20261102T212033Z-20ea91bc8e8e** is **Ready / Green**. It replaces only `nektron-mail.html` and preserves all **190 other entries**, all **47 protected entries**, existing permissions, images and installer downloads. Bundle SHA-256: **20EA91BC8E8ED1E735238253D6E53155BF9FC9D4499F0ADB38117FD3E13CEDDA**. The live HTML returned 200 with its exact prepared hash, and existing CSS, JavaScript, gallery, downloads and account routes verified unchanged. No backend or environment-setting changes were made.
+
+## Provider order and Gmail access wording — November 2, 2026
+
+Published from website commit **2d5bace**. The hero badges, download compatibility and services FAQ now use this order: **Gmail → IMAP → Exchange Server (EWS) → POP3 → Amazon WorkMail**. Gmail is labeled **Gmail**, without a separate Preview badge. Page metadata, tour text and contact links use the same ordinary product name, with **Ask about Gmail access** as the contact label.
+
+The visible access note reads: **Gmail sign-in is currently available to invited testers.** This preserves the real Google authorization boundary while the owner distributes the app to invited users. The Windows product remains labeled as a preview. Google Console configuration, authentication, account permissions and provider capabilities were not changed. Automatic replies remain planned and unavailable.
+
+- Live page: https://nektron.ai/nektron-mail.html
+- Deployment: **nektron-mail-providers-20261102T215015Z-4fcb5000a3d1**, **Ready / Green**.
+- Exactly three static paths changed: `nektron-mail.html`, `assets/nektron-mail.css`, `assets/nektron-mail.js`.
+- **188 other entries** and all **47 protected backend/configuration entries** remain byte-identical, with existing ZIP permissions preserved. No environment settings or backend changes were included.
+- Candidate bundle SHA-256: **4FCB5000A3D130827D0AB219C99FB94E64D8AA95CB54731C121A92B62DABC030**. The protected-entry hash manifest remains **66A37C3E24F59F1564733DF60979F8845A50269637E772DB564F96F385DD1D1F**.
+- All three live files returned 200 with exact candidate hashes. Existing pages, gallery images, downloads and account routes were verified against the preserved source; no account forms were submitted.
+- **12 Mail static checks**, JavaScript syntax and diff checks passed. Root browser review confirmed the exact provider order, plain Gmail label, unchanged Windows preview/download facts and no overflow.
+- The **0.1.131** installer remains **61,035,888 bytes**, SHA-256 **83B81A57E539A2F003F9D472878322028CD81C17DB80B66F3D15C83167D85318**. Its public download and branded redirect, plus prior 0.1.125/0.1.126 downloads, were verified unchanged. No installer was rebuilt or uploaded.
+
+Final live browser proof confirmed the exact provider order, plain Gmail badge, invited-tester note, unchanged 0.1.131 download and no horizontal overflow. The CTA/provider/version crop is retained at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-providers-live.png`.
