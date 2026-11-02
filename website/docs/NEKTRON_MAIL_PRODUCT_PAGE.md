@@ -40,3 +40,13 @@ Candidate source ZIP SHA-256: **cdb5e0d682dc8bd35f34a2d25709f3d1bf81c1951b58d2d6
 - The site's existing `noindex` policy was preserved. Publication does not imply search-engine indexing.
 
 Do not deploy this change using a broad S3 `--delete` or by replacing the active account-service bundle with an unreviewed local checkout. Future static updates should retain the same allowlist/content/permission verification approach.
+
+## Title prominence refinement — November 2, 2026
+
+Published from commit **164569b**. `Nektron Mail` is now the prominent H1, with the tagline visually subordinate. Local review confirmed the larger title in both themes and at 320 pixels without horizontal overflow; five Mail static checks and JavaScript syntax checks passed.
+
+- Changed only **`nektron-mail.html`** and **`assets/nektron-mail.css`**, with cache token **20261102-title1**.
+- Preserved **185 other entries**, including all **47 protected runtime/configuration entries**, and every existing ZIP permission. Installer, screenshot assets, JavaScript and environment settings were unchanged.
+- Version-only deployment label: **nektron-mail-title-20261102T052357Z-61d9df91b8df**. Final health: **Ready / Green**.
+- Live H1 verified as **Nektron Mail**. Both changed files returned HTTP 200 and matched the candidate hashes; existing routes, screenshots/icons and the signed installer passed read-only verification.
+- Candidate SHA-256: **61d9df91b8df18120988701159d1184179bd62c02750e65df690bcc2e942ca2a**.
