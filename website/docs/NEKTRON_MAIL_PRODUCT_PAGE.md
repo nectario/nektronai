@@ -50,3 +50,19 @@ Published from commit **164569b**. `Nektron Mail` is now the prominent H1, with 
 - Version-only deployment label: **nektron-mail-title-20261102T052357Z-61d9df91b8df**. Final health: **Ready / Green**.
 - Live H1 verified as **Nektron Mail**. Both changed files returned HTTP 200 and matched the candidate hashes; existing routes, screenshots/icons and the signed installer passed read-only verification.
 - Candidate SHA-256: **61d9df91b8df18120988701159d1184179bd62c02750e65df690bcc2e942ca2a**.
+
+## Transparent application icon and 0.1.126 download — November 2, 2026
+
+The website now uses the same transparent, larger-envelope artwork as the signed **Nektron Mail 0.1.126** Windows release (Mail commit **f565686**). Authored 16/32-pixel PNGs supply the favicons; 64/128-pixel PNGs supply the page artwork. All four website files match the native exports byte-for-byte and have transparent corners. The 64-pixel page display size is retained; icon-only CSS corner clipping was removed. Fresh filenames and CSS cache token **20261102-icon1** prevent reuse of the former opaque tile.
+
+- Current installer: https://nektron.ai/assets/downloads/NektronMail.Setup.0.1.126.exe
+- Direct download: https://d2j3ldvioomkd6.cloudfront.net/assets/downloads/NektronMail.Setup.0.1.126.exe
+- Size: **60,979,688 bytes**.
+- SHA-256: **359ED42CACDBD714979D18669998DDE4BE9E32D5C6F42FDDFB51188CFFE3F8F2**.
+- Signature independently verified as **Valid**, **Nektron, Inc.**, with a trusted timestamp. S3 full-object checksum, public checksum metadata and a public range response were verified after immutable upload. The previous **0.1.125** download remains unchanged and available.
+- Deployment changed **seven static paths**: product HTML/CSS, the Mail-only downloads section and four new transparent PNGs. **184 existing entries**, including all **47 protected runtime/configuration entries**, and all existing ZIP permissions were preserved. Gallery images, JavaScript, old icons, backend code and environment options were unchanged.
+- Version-only deployment: **nektron-mail-icon-20261102T061225Z-65e5c8f59721**. Final state: **Ready / Green**.
+- Candidate SHA-256: **65e5c8f5972172b05338eb188b601978352c78859d112134ebb8a5dc6b32e8ae**.
+- Five Mail static checks, JavaScript syntax and diff checks passed. The Windows release pipeline reported **1,804 passed, 10 opt-in checks skipped**.
+- All seven deployed paths returned HTTP 200 with candidate-matching bytes. Existing routes, gallery/old icon assets, the anonymous account endpoint and both installer versions passed read-only verification. No account forms were submitted.
+- Final live browser review passed in **Light and Dark**: the transparent icon loads, the prominent product title remains intact, and version **0.1.126** with the correct installer link is visible. A diagnostic capture is retained at `C:/Users/nektarios/AppData/Local/Temp/nektron-mail-transparent-icon-live.jpg` outside Git.

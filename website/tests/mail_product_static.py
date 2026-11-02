@@ -36,8 +36,8 @@ class MailProductChecks(unittest.TestCase):
             self.assertIn(name+'.webp',self.js)
     def test_download_is_the_verified_versioned_release(self):
         link=next(a for _,a in self.tags if a.get('id')=='installer-download')
-        self.assertEqual(link['href'],'https://d2j3ldvioomkd6.cloudfront.net/assets/downloads/NektronMail.Setup.0.1.125.exe')
-        self.assertIn('955261D59DA1A4FE170A432E2D09641C5908E96A3CE30B8F733445FD79649F0D',self.html)
+        self.assertEqual(link['href'],'https://d2j3ldvioomkd6.cloudfront.net/assets/downloads/NektronMail.Setup.0.1.126.exe')
+        self.assertIn('359ED42CACDBD714979D18669998DDE4BE9E32D5C6F42FDDFB51188CFFE3F8F2',self.html)
         self.assertIn('Nektron, Inc.',self.html)
     def test_preview_and_connected_feature_limits_are_visible(self):
         for phrase in ('Windows preview','approved Google test users','limited-access','not available for Gmail',
