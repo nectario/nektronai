@@ -94,7 +94,7 @@ class VisionChecks(unittest.TestCase):
                             'https://www.interviewhelper.ai', 'https://tagmyspend.com'):
             self.assertIn(destination, anchors)
         family = self.html.split('data-added-products="nektron-family">', 1)[1].split('<div class="callout home-product-note"', 1)[0]
-        self.assertEqual(re.findall(r'href="([^"]+)"', family), ['contact.html', 'contact.html', 'contact.html'])
+        self.assertEqual(re.findall(r'href="([^"]+)"', family), ['contact.html', 'nektron-mail.html', 'contact.html'])
 
     def test_social_text_matches_the_mission_without_changing_image_or_canonical(self):
         meta = {a.get('name', a.get('property')): a.get('content') for t, a in self.page.tags if t == 'meta'}

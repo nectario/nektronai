@@ -1,4 +1,5 @@
 node_modules/
+tests/__pycache__/
 server/**/__pycache__/
 server/**/.venv/
 dist/

@@ -18,7 +18,15 @@ This is a lightweight, no-build-step site refresh intended to feel:
 - `assets/variants/*.css` – variant-specific style overrides
 - `variants/index.html` – variant landing page with links
 
-## Local preview
+## Nektron Mail product page
+
+`nektron-mail.html` is the public Windows preview page. It uses the shared Research Atelier theme plus scoped `assets/nektron-mail.css` and the keyboard-accessible screenshot tour in `assets/nektron-mail.js`. Six real WPF captures use synthetic sample data; provenance is in `assets/mail/README.md`. PNG sources are retained for maintenance; the page serves lossless WebP versions and native product icons.
+
+The versioned 0.1.125 installer is on the existing downloads CDN. When updating the release, verify Authenticode, size and SHA-256, publish a new immutable object, and update the page's version/link/checksum together. Do not use the GrowNet-only release updater for Mail. Keep Gmail testing restrictions and AI/database access limits aligned with current product capabilities.
+
+Checks: `python -X utf8 -m unittest discover -s tests -p '*static.py'`, `python -X utf8 -m unittest discover -s tests -p 'homepage_vision.py'`, and `node --check assets/nektron-mail.js`. Review desktop/mobile layouts, both themes, tabs/keyboard controls, image enlargement and download links in a browser. The static source is deployed as an allowlisted overlay on the active EB bundle; the default Vite build is index-only and is not the complete deployed site.
+
+## Local preview commands
 1. Install dependencies:
    ```bash
    npm install
