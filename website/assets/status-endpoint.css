@@ -1,0 +1,39 @@
+/* Status Endpoint additions. Database Connector supplies the shared product theme. */
+body.se-page h1 { font-size:clamp(38px,4.2vw,58px); margin-bottom:16px; }
+body.se-page .se-tagline { font-family:'Nektron Connector Sora',var(--font-sans); font-size:clamp(27px,2.6vw,36px); letter-spacing:-.04em; line-height:1.3; color:var(--text); margin:0 0 24px; }
+body.se-page .se-tagline span { color:var(--accent); }
+body.se-page .se-example-controls { display:flex; gap:8px; padding:18px 22px 0; flex-wrap:wrap; }
+body.se-page .se-example-controls button { padding:9px 12px; min-height:44px; border:1px solid var(--border); border-radius:9px; color:var(--muted); background:transparent; font-size:12px; }
+body.se-page .se-example-controls button[aria-pressed="true"] { color:var(--text); background:var(--dc-selected); }
+body.se-page .se-example-body { padding:20px 22px; }
+body.se-page .se-work-row { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:17px 0; border-bottom:1px solid var(--border2); font-size:12px; }
+body.se-page .se-work-row strong { display:block; font-size:13px; margin-bottom:4px; }
+body.se-page .se-work-row div>span { color:var(--muted); }
+body.se-page .se-stage { flex:none; color:var(--accent); font:500 10px/1.6 var(--font-mono); border:1px solid var(--border); border-radius:6px; padding:5px 8px; }
+body.se-page .se-result { margin-top:22px; padding:20px; border:1px solid var(--border2); border-radius:12px; background:var(--atelier-paper); min-height:174px; }
+body.se-page .se-result h3 { font-size:20px; margin:8px 0; letter-spacing:-.03em; }
+body.se-page .se-result p { font-size:13px; line-height:1.8; margin:0; }
+body.se-page .se-guide { list-style:none; counter-reset:guide; padding:0; margin:0; }
+body.se-page .se-guide>li { counter-increment:guide; position:relative; border-top:1px solid var(--border2); padding:30px 0 30px 58px; }
+body.se-page .se-guide>li::before { content:counter(guide,decimal-leading-zero); position:absolute; left:0; top:31px; font:500 13px/1.6 var(--font-mono); color:var(--accent); }
+body.se-page .se-guide h3 { font-size:21px; letter-spacing:-.025em; margin:0 0 15px; }
+body.se-page .se-guide p { max-width:88ch; font-size:14px; line-height:1.9; }
+body.se-page code { font-family:var(--font-mono); font-size:.87em; overflow-wrap:anywhere; }
+body.se-page .se-code-details { margin-top:20px; border:1px solid var(--border); border-radius:12px; background:var(--atelier-paper); overflow:hidden; }
+body.se-page .se-code-details summary { cursor:pointer; padding:16px 20px; font-size:13px; font-weight:600; min-height:44px; }
+body.se-page .se-code-details>p { padding:0 20px; }
+body.se-page pre { margin:0; padding:20px; overflow:auto; background:var(--dc-muted-surface); color:var(--text); font-size:13px; line-height:1.8; border-top:1px solid var(--border2); }
+body.se-page pre code { overflow-wrap:normal; font-size:inherit; }
+body.se-page .se-note { color:var(--muted); margin-top:14px; }
+body.se-page .se-api-table { overflow:auto; border:1px solid var(--border); border-radius:12px; margin:0 0 28px; }
+body.se-page .se-api-table table { width:100%; border-collapse:collapse; margin:0; text-align:left; font-size:13px; }
+body.se-page .se-api-table caption { text-align:left; padding:18px; color:var(--accent); font-size:12px; background:var(--dc-muted-surface); }
+body.se-page .se-api-table :is(th,td) { padding:16px 18px; border:0; border-top:1px solid var(--border2); vertical-align:top; }
+body.se-page .se-api-table th { color:var(--text); font-size:12px; }
+body.se-page .se-api-table td { color:var(--muted); min-width:155px; }
+body.se-page .se-api-table td:first-child { min-width:285px; color:var(--text); }
+body.se-page .se-retry { border-left:2px solid var(--accent); padding:8px 24px; background:var(--atelier-paper); }
+body.se-page .se-retry h3 { font-size:17px; }
+body.se-page .se-retry p,body.se-page .dc-plan>p:last-child { font-size:13px; line-height:1.9; }
+@media(max-width:680px) { body.se-page .se-guide>li{padding-left:0;padding-top:56px}body.se-page .se-guide>li::before{top:23px}body.se-page .se-example-body{padding:16px}body.se-page .se-example-controls{padding:16px 16px 0}body.se-page .se-result{padding:16px}body.se-page .se-work-row{gap:8px}body.se-page .se-stage{font-size:9px;padding:4px 6px}body.se-page .dc-footer nav{flex-wrap:wrap}body.se-page pre{font-size:12px;padding:16px} }
+@media print { body.se-page .se-example-controls {display:none}body.se-page pre{white-space:pre-wrap;overflow-wrap:anywhere} }

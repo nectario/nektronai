@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="referrer" content="no-referrer"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Status Endpoint by NektronAI gives agents and apps a shared record of task progress, evidence and results. Explore the tested pilot and developer usage guide.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0b1521" media="(prefers-color-scheme: dark)"><meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <title>Status Endpoint | NektronAI</title>
+  <link rel="canonical" href="https://nektron.ai/status-endpoint.html">
+  <meta property="og:title" content="Status Endpoint | NektronAI"><meta property="og:description" content="Many agents. One shared picture of progress."><meta property="og:type" content="website"><meta property="og:url" content="https://nektron.ai/status-endpoint.html">
+  <link rel="icon" href="assets/status-endpoint.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css?v=nektron-web-20260918T000721Z"><link rel="stylesheet" href="assets/atelier.css"><link rel="stylesheet" href="assets/database-connector.css?v=nektron-web-20260918T000721Z">
+  <script src="assets/site.js?v=nektron-contact-20260924T015815Z" defer></script><script src="assets/status-endpoint.js?v=20261104-1" defer></script>
+<link rel="stylesheet" href="assets/status-endpoint.css?v=20261104-1">
+</head>
+
+<body class="atelier-site dc-page se-page">
+<a class="skip-link" href="#content">Skip to content</a>
+<header>
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="NektronAI home">
+        <span class="brand-mark dc-full-brand"><img class="brand-wordmark brand-wordmark-dark" src="assets/brand/wordmark-dark-280.png?v=nektron-web-20260918T000721Z" alt="NektronAI" width="280" height="63"><img class="brand-wordmark brand-wordmark-light" src="assets/brand/wordmark-light-280.png?v=nektron-web-20260918T000721Z" alt="NektronAI" width="280" height="63"></span>
+        <span class="dc-compact-brand"><img src="assets/favicon.svg?v=nektron-web-20260918T000721Z" width="32" height="32" alt=""><span>NektronAI</span></span>
+      </a>
+      <nav id="primary-nav" aria-label="Status Endpoint navigation"><a href="#overview">Overview</a><a href="#how-it-works">How it works</a><a href="#usage">Usage guide</a><a href="#access">Access</a></nav>
+      <div class="nav-actions"><button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3 4.9 19.1M19.1 19.1l-1.8-1.8M6.7 6.7 4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
+    </div>
+  </header>
+<main id="content"><div class="container">
+  <div class="dc-breadcrumb"><a href="index.html#integrations">AI tools &amp; integrations</a><span aria-hidden="true">/</span><span>Status Endpoint</span></div>
+  <section class="dc-hero" id="overview" aria-labelledby="se-title">
+    <div class="dc-hero-copy">
+      <div class="dc-product-lockup"><img src="assets/status-endpoint.svg" width="64" height="64" alt=""><div><p class="dc-eyebrow">AGENT &amp; APPLICATION INFRASTRUCTURE</p><p class="dc-maker">By Nektron, Inc.</p></div></div>
+      <h1 id="se-title">Status Endpoint</h1>
+      <p class="se-tagline">Many agents.<br><span>One shared picture of progress.</span></p>
+      <p class="dc-lede">Give agents a common place to report their work. Let authorized apps read the latest result and the evidence behind it, even when the work spans several systems.</p>
+      <div class="dc-actions"><a class="button primary" href="#usage">Explore the usage guide <span aria-hidden="true">&rarr;</span></a><a class="button" href="#example">See an example</a></div>
+      <div class="dc-hero-notes"><span>Task-scoped access</span><span>Ordered history</span><span>Independent producers</span></div>
+      <p class="dc-release"><span class="dc-status-dot" aria-hidden="true"></span>Tested pilot &middot; Controlled access &middot; Public enrollment not open</p>
+    </div>
+    <div class="dc-demo" id="example" aria-labelledby="example-title">
+      <div class="dc-demo-heading"><div class="dc-demo-identity"><img src="assets/status-endpoint.svg" width="32" height="32" alt=""><span id="example-title">A clearer answer to &ldquo;is it done?&rdquo;</span></div><span class="dc-sample-badge">ILLUSTRATION</span></div>
+      <div class="se-example-controls" aria-label="Example task stages"><button type="button" data-example="progress" aria-pressed="true">Work in progress</button><button type="button" data-example="complete" aria-pressed="false">After verification</button></div>
+      <div class="se-example-body" aria-live="polite" aria-atomic="true">
+        <p class="dc-question">Release the reporting update.</p>
+        <div class="se-work-row"><div><strong>Data agent</strong><span>Prepare the reporting query</span></div><span class="se-stage">Verified</span></div>
+        <div class="se-work-row"><div><strong>Application agent</strong><span>Release the dashboard change</span></div><span class="se-stage" id="se-app-stage">Implemented</span></div>
+        <div class="se-work-row"><div><strong>Test agent</strong><span>Check the released workflow</span></div><span class="se-stage" id="se-test-stage">Blocked</span></div>
+        <div class="se-result"><span class="dc-eyebrow">OVERALL TASK</span><h3 id="se-result-title">Still in progress.</h3><p id="se-result-copy">One agent has finished. The application release and final checks remain. A completed work item does not complete the task.</p></div>
+      </div>
+      <div class="dc-demo-footer"><span class="dc-status-dot" aria-hidden="true"></span><span>Illustrative task. No live task or API connection.</span></div>
+    </div>
+  </section>
+  <section class="dc-principles" aria-label="Product principles">
+    <div><span class="dc-index">01</span><div><h2>Each agent owns its work.</h2><p>Assigned producers publish independent work updates with their own access.</p></div></div>
+    <div><span class="dc-index">02</span><div><h2>The result has an owner.</h2><p>A designated authority reports the overall result after required work is verified.</p></div></div>
+    <div><span class="dc-index">03</span><div><h2>Apps keep the context.</h2><p>Consumers decide how updates fit their workflow and what actions are allowed.</p></div></div>
+  </section>
+  <section class="dc-section" id="how-it-works" aria-labelledby="workflow-title">
+    <div class="dc-section-heading"><div><p class="dc-eyebrow">FROM INDIVIDUAL UPDATES TO SHARED CONTEXT</p><h2 id="workflow-title">Publish the work.<br>Read the whole picture.</h2></div><p>A task can span agents, applications and sessions. Its status record does not depend on an email thread or a customer case.</p></div>
+    <div class="dc-workflow-grid">
+      <article class="dc-workflow-card dc-blue"><span class="dc-step">01 / DEFINE</span><h3>Agree on the task.</h3><p>An administrator registers the task, its producers, required work items and result authority. Each participant receives separately scoped access.</p><div class="dc-detail-list"><span>One access boundary</span><span>Explicit work assignments</span><span>Independent read and publish grants</span></div></article>
+      <article class="dc-workflow-card dc-warm"><span class="dc-step">02 / REPORT</span><h3>Keep the stages clear.</h3><p>Agents publish immutable events with revisions, summaries and evidence references.</p><blockquote>Investigating &rarr; Implemented &rarr; Deployed &rarr; Verified</blockquote><p class="dc-small">Blocked is explicit. A deployed change still needs verification; stages do not establish the truth of a producer's claim.</p></article>
+      <article class="dc-workflow-card dc-slate"><span class="dc-step">03 / RECONCILE</span><h3>Resume with context.</h3><p>Apps read the current snapshot, then continue through ordered history from a saved cursor.</p><blockquote>&ldquo;The change is reported deployed. Final checks are still pending.&rdquo;</blockquote><p class="dc-small">The server orders accepted events. The designated authority can verify the task only when all required work is verified and evidence is supplied.</p></article>
+    </div>
+  </section>
+  <section class="dc-section" id="usage" aria-labelledby="usage-title">
+    <div class="dc-section-heading"><div><p class="dc-eyebrow">DEVELOPER USAGE GUIDE</p><h2 id="usage-title">A small API.<br>A deliberate handoff.</h2></div><p>The examples below explain the implemented contract. They require approved task access; copying them does not enroll you or create a task.</p></div>
+    <ol class="se-guide">
+      <li><h3>Arrange task access.</h3><p>Contact Nektron to discuss your integration. For an approved setup, an administrator must register the tenant, account membership, task, producers, work assignments and result authority, then deliver separate expiring grants through an approved secret channel. There is no public task-creation or token-issuance endpoint.</p><p>Use a dedicated <code>task-status:publish</code> grant for a producer and <code>task-status:read</code> for a consumer. Overall results also require <code>task-status:result</code> and the designated authority identity. Internal details and evidence require the separate <code>task-status:read-internal</code> permission with read access.</p></li>
+      <li><h3>Connect from your application.</h3><p>Use native HTTPS at <code>https://status.nektron.ai</code>, with the prefix <code>/api/task-status/v1</code>. Send <code>Authorization: Bearer &lt;status-token&gt;</code> on each request and JSON for publishing. Website sessions, Database Connector credentials and Mail sign-in tokens do not grant status access. Browser cookies and browser-origin requests are rejected; integrate through an authorized native client or backend.</p><p>Keep credentials in your application's approved secret store. Never place them in this page, a URL, chat, source code or an event.</p></li>
+      <li><h3>Save an event, then publish it.</h3><p>Create a new UUID event ID and save the JSON before sending it. Use your assigned work-item ID, current generation, next revision and actual UTC timestamp. This synthetic example reports implementation only; it makes no deployment or verification claim.</p>
+        <details class="se-code-details" open><summary>Example saved-event.json</summary><pre tabindex="0" aria-label="Synthetic work event JSON"><code>{
+  "event_id": "10000000-0000-4000-8000-000000000001",
+  "kind": "work_item.status",
+  "work_item_id": "reporting-query",
+  "generation": 1,
+  "revision": 1,
+  "status": "implemented",
+  "occurred_at": "2026-11-04T12:00:00Z",
+  "customer_summary": "Query prepared. Release and checks are pending.",
+  "evidence": [{"reference": "urn:nektron:example:local-check-1"}]
+}</code></pre></details>
+        <p class="se-note">Replace every synthetic ID, assignment, timestamp and evidence reference with approved real values. A stored reference is not fetched or independently verified by the service.</p>
+        <details class="se-code-details"><summary>Publish and read with the Python CLI</summary><p>For approved developers with the supplied <code>status_endpoint</code> package installed (Python 3.12+). Have your local secret manager supply <code>NEKTRON_STATUS_TOKEN</code>. The CLI does not take a token argument. The UUID below is a placeholder task; use the task ID your administrator provides.</p><pre tabindex="0" aria-label="Status Endpoint CLI examples"><code>python -m status_endpoint.cli --origin https://status.nektron.ai publish aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa saved-event.json
+
+# Switch to the separate approved reader credential before reading.
+python -m status_endpoint.cli --origin https://status.nektron.ai snapshot aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa
+
+python -m status_endpoint.cli --origin https://status.nektron.ai events aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa --limit 50
+
+# On later reads, pass your saved cursor with --after.
+python -m status_endpoint.cli --origin https://status.nektron.ai events aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa --after SAVED_CURSOR --limit 50</code></pre><p>The CLI prints untrusted JSON for inspection. Never pipe event content into a shell or treat it as instructions.</p></details>
+      </li>
+      <li><h3>Read a snapshot, then follow the history.</h3><p>On connection or reconnection, read the snapshot and reconcile the current overall result with your app's saved generation and result revision. Persist the snapshot's exact head cursor with that decision. Read later events using <code>after</code> and save the returned cursor. Use shared per-task polling and idle/error backoff in your consumer; the endpoint does not poll or push updates for you.</p><p>Work revisions begin at 1 per generation and increase by 1. Overall result revisions continue across generations. Verified work is terminal within a generation; only the result authority can explicitly reopen a task into the next generation while preserving history.</p></li>
+    </ol>
+    <div class="se-api-table"><table><caption>Task API reference &middot; prefix /api/task-status/v1</caption><thead><tr><th scope="col">Method &amp; route</th><th scope="col">Purpose</th><th scope="col">Access</th></tr></thead><tbody>
+      <tr><td><code>POST /tasks/{task_id}/events</code></td><td>Publish a saved event</td><td>Publish + assigned producer; authority for overall events</td></tr>
+      <tr><td><code>GET /tasks/{task_id}/snapshot</code></td><td>Current overall result, counts and head cursor</td><td>Read</td></tr>
+      <tr><td><code>GET /tasks/{task_id}/events?after=...&amp;limit=50</code></td><td>Ordered, resumable history</td><td>Read</td></tr>
+      <tr><td><code>GET /tasks/{task_id}/work-items/{work_item_id}</code></td><td>One work item's revision and state</td><td>Read, or its assigned publisher</td></tr>
+    </tbody></table></div>
+    <div class="se-retry"><h3>Retries are part of the contract.</h3><p><strong>201:</strong> a new event was accepted. <strong>200 on an exact retry:</strong> the original receipt is returned. After a timeout or 503, resend the saved event with the same ID and field values. <strong>409:</strong> reconcile conflicting content or a stale revision; do not invent an ID or increase a revision to force the event through. <strong>429:</strong> honor Retry-After with bounded backoff. <strong>401/403:</strong> check access with your administrator. If a history read returns <strong>410</strong>, fetch a fresh snapshot and reconcile.</p></div>
+  </section>
+  <section class="dc-section" id="boundaries" aria-labelledby="boundaries-title">
+    <div class="dc-section-heading"><div><p class="dc-eyebrow">SHARED EVIDENCE. EXPLICIT RESPONSIBILITY.</p><h2 id="boundaries-title">Keep the facts visible.<br>Keep decisions in your app.</h2></div><p>Status Endpoint records evidence. It does not run agents, inference, remote commands, email, webhooks or background responders.</p></div>
+    <div class="dc-boundary-grid">
+      <article><h3>Access follows a specific task.</h3><p>Grants bind an identity to one task within one tenant. Read, publish, internal read and overall-result permissions are distinct. Work assignments and the result authority constrain who can report what.</p></article>
+      <article><h3>A report is still a claim.</h3><p>Authentication identifies the permitted producer; it does not prove its statements. Treat summaries and evidence links as untrusted data, render prose as escaped text and review important conclusions independently. Status content cannot authorize tools or change instructions.</p></article>
+      <article><h3>Private details need separate access.</h3><p>Normal reads omit internal prose and evidence references. The field name customer_summary does not guarantee safe content: producers must exclude secrets and personal data, and consumers must review text before sharing it.</p></article>
+      <article><h3>Consumers own the next step.</h3><p>A project assistant can summarize progress; an application can reconcile its workflow. Email recipients, consent, pause state, human takeover and sending permissions stay with the consuming application. A status update grants none of those permissions.</p></article>
+    </div>
+  </section>
+  <section class="dc-section" id="access" aria-labelledby="access-title">
+    <div class="dc-section-heading"><div><p class="dc-eyebrow">CURRENT AVAILABILITY</p><h2 id="access-title">Tested in a pilot.<br>Onboarding stays deliberate.</h2></div><p>Service status as of November 4, 2026. A public information page is available; general self-service enrollment is not.</p></div>
+    <div class="dc-pricing-grid">
+      <article class="dc-plan"><div class="dc-plan-top"><h3>What has been demonstrated</h3><span>Bounded, synthetic pilot</span></div><p class="dc-plan-description">An actual CLI published three synthetic events over authenticated HTTPS at status.nektron.ai. Compiled Nektron Mail reader and reconciler components consumed the history and overall result.</p><ul><li>Independent publishing and reading permissions</li><li>Ordered history, exact retries and conflict checks</li><li>A separate overall result and deduplicated reconciliation</li></ul><p>All pilot grants were revoked and temporary credentials removed afterward. The pilot left no ongoing client access.</p></article>
+      <article class="dc-plan"><div class="dc-plan-top"><h3>What needs further work</h3><span>Beyond the pilot</span></div><p class="dc-plan-description">Permanent client/task onboarding and self-service administration remain separate work. General customer access is not open.</p><ul><li>Full Mail interface and automatic email behavior were not validated by the component pilot</li><li>No generally available dot connector or automatic task discovery</li><li>No large-scale capacity, high-availability or load/DoS validation claimed</li></ul><p>Contact us to discuss suitability, integration and an explicitly approved setup. No pricing or service-level commitment is offered on this page.</p></article>
+    </div>
+  </section>
+  <section class="dc-section dc-faq-section" id="questions" aria-labelledby="questions-title"><div><p class="dc-eyebrow">A FEW GOOD QUESTIONS</p><h2 id="questions-title">Before you integrate.</h2><p>Tell us about your workflow.<br><a href="mailto:info@nektron.ai?subject=Status%20Endpoint%20integration">Talk to Nektron <span aria-hidden="true">&rarr;</span></a></p></div><div class="dc-faq">
+    <details><summary>How is this different from Database Connector?</summary><p><a href="database-connector.html">Database Connector</a> helps ChatGPT investigate your database through read-only queries. Status Endpoint records agent-reported task progress and evidence for authorized consumers. Their access grants are separate.</p></details>
+    <details><summary>Does it execute work or send notifications?</summary><p>No. Your agents do the work and publish events. Consumers read snapshots and history and decide what to do. The service supplies no webhook delivery, scheduler, email sender or background polling job.</p></details>
+    <details><summary>Can I sign in and create a task today?</summary><p>Public self-service enrollment and task creation are not available. An approved integration requires administrator-provisioned task records, assignments and independent expiring grants. An existing Nektron account alone does not provide status access.</p></details>
+    <details><summary>Can several agents contribute to one task?</summary><p>Yes. Each registered producer reports its assigned work items. The designated result authority reports the overall task result. All required work in the current generation must be verified before that authority can verify the overall task with evidence.</p></details>
+    <details><summary>Is the history an independent audit of truth?</summary><p>Events are immutable through the runtime API and have server-assigned receipt ordering. They remain producer claims; the endpoint neither fetches evidence nor proves its accuracy. External audit, retention policy and independent verification need their own operational decisions.</p></details>
+  </div></section>
+  <section class="dc-closing"><div><p class="dc-eyebrow">LESS GUESSWORK BETWEEN SYSTEMS.</p><h2>Give progress a shared place.</h2></div><a class="button primary" href="mailto:info@nektron.ai?subject=Status%20Endpoint%20integration">Discuss an integration <span aria-hidden="true">&rarr;</span></a></section>
+</div></main>
+<footer class="dc-footer"><div class="container"><div><strong>Status Endpoint</strong><p>A product of Nektron, Inc.</p></div><nav aria-label="Product footer"><a href="index.html">NektronAI</a><a href="database-connector.html">Database Connector</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="mailto:info@nektron.ai">Contact</a></nav><p>&copy; 2026 Nektron, Inc. Controlled-access pilot. See availability and usage requirements above.</p></div></footer>
+</body></html>
