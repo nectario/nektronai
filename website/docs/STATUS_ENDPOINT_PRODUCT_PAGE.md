@@ -115,3 +115,58 @@ Evidence: `status-account-package-evidence.json`, `status-account-deployment.jso
 `status-account-live-verification.json`, `status-account-candidate.zip` in the task
 workspace. No blocker remains for this public page update; live OAuth/worker
 activation is separate pending work and was not performed.
+
+## Prominent signup, larger labels and flow diagram — November 5
+
+Published the prepared changes after the owner's explicit **"Great. Please
+commit/push/deploy"** approval. The earlier public-deployment hold was superseded;
+the prior production version was checked before one approved rollout was started.
+
+- Source commit: **51fbf86**.
+- Deployment: **nektron-status-layout-20261105T155056Z-8d21728ce89e**,
+  **Ready / Green**.
+- Public URL: https://nektron.ai/status-endpoint.html
+- ZIP SHA-256: **8d21728ce89e5643f17d8f7aa64fa209d74a8573f53f4ba8661ef4e9ad88de20**.
+
+Sign Up now appears in the header and hero and links to the existing NektronAI
+signup page. The `#account` navigation and account panel remain. Small section
+and workflow labels rise two 2-pixel type-scale steps, from 10 to **14 px**;
+the product-lockup label rises from 11 to **15 px**. Mobile header refinements
+keep the existing branding, signup and theme control together on the first row.
+
+The new accessible SVG diagram explains account/task authorization, producer
+updates and evidence, ordered status storage/snapshots, authorized consumer
+reads, and designated overall-result authority. A separate vertical mobile SVG
+preserves readable text. The caption distinguishes the tested evidence flow from
+the separate ChatGPT dispatch/worker development. The diagrams make no execution
+or independent-truth claim.
+
+Exactly **four static paths** changed: `status-endpoint.html`, its scoped CSS,
+`assets/status-endpoint/how-it-works.svg` and `how-it-works-mobile.svg`.
+The approved bytes match the locally reviewed hashes. **196 existing entries**,
+including all **49 protected runtime/configuration/package entries**, remain
+byte-identical, with all existing ZIP permissions preserved. Only the website
+application version changed; unrelated account-backend working files remain intact.
+
+Validation:
+
+- Prepared change checks: **29 passed, 3 optional baseline guards skipped**;
+  existing Vite build, Git diff, HTML IDs/local assets and accessible SVG checks
+  passed. Existing non-module homepage script warnings remain.
+- Live browser review at nominal **320, 360, 390, 768, 820, 1100 and 1440 pixels**
+  in Light and Dark: Sign Up remained in the first screen, no page overflow,
+  and the example development section label measured **14 px** in all 14 checks.
+  The smallest browser override reports 321 pixels.
+- Both live diagram sources loaded with their expected 1100x550 and 360x1020
+  intrinsic dimensions. The desktop diagram was visually reviewed, and the
+  mobile source switch and retained `#account` navigation were verified.
+- **16 public static paths** returned HTTP **200** and exact candidate bytes,
+  including all four changed files and preserved product, account, legal and
+  shared-style routes. The anonymous account-session read remained unauthenticated.
+  No account form was submitted.
+
+Evidence in the task workspace: `status-layout-package-evidence.json`,
+`status-layout-deployment.json`, `status-layout-live-verification.json`,
+`status-layout-candidate.zip`, and the historical local review record
+`status-layout-local-evidence.json`. Its former publication hold is historical;
+the approved live deployment is recorded here. No blocker remains for this release.
