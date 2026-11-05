@@ -62,3 +62,56 @@ Local release evidence is retained in the November 4 task workspace:
 `status-page-deployment.json`, and `status-page-candidate.zip`.
 
 No deployment blocker, denied action or uncertain mutation remains.
+
+## Shared accounts, current local capabilities and supplied icon — November 5
+
+Published from **81028a4** to the same public URL. The page now states that users
+must sign up or sign in to **NektronAI**, using the same account system as Database
+Connector. The account panel links to the existing `signup.html` and `login.html`
+routes. No unsupported Status return destination, separate account system or
+automatic Status enrollment is implied. A shared account identifies the user;
+Status scopes, exact task grants and worker authorization remain distinct.
+
+The new development section reflects the inspected local candidate 0.5.0:
+ChatGPT/MCP reads, task creation, durable dispatch, native OAuth and the one-shot
+worker path. It explicitly states that these additions remain disabled and are
+not live. Simulated OAuth-to-worker integration and the synthetic-provider CLI
+protocol check are distinguished from real-model/worker qualification. The
+analysis-only runner limit, remaining identity/migration/hosting/registration
+decisions and worker-completion-versus-overall-verification distinction remain
+visible. Sources: StatusEndpoint's current local `docs/CHATGPT_PLUGIN.md`,
+`docs/OPERATOR_DRIVER.md`, `docs/RUNNER_READINESS.md` and
+`docs/TASK_CREATION_DISPATCH.md`; this candidate includes uncommitted work and is
+not represented as a published or deployed backend release.
+
+The blue/cyan hub with a gold checkmark is the owner-supplied icon from
+`StatusEndpoint/icon/StatusEndpoint_Icon_Package_v1_0/png/transparent`.
+The 32-, 64- and 128-pixel PNGs are byte-identical to those approved exports,
+with transparency and geometry preserved. They replace the earlier placeholder
+in the page, account panel, favicon and homepage card. The prior SVG is retained
+unchanged but is no longer referenced by those pages. Product branding is not
+presented as a live verification indicator.
+
+- Deployment: **nektron-status-account-20261105T051438Z-cc785b8f6b96**,
+  **Ready / Green**.
+- Bundle SHA-256: **cc785b8f6b961c843523b78a8c71617f763726b931b622a5ed38409577e13ae2**.
+- Six static paths changed: homepage, product page, sitemap date and three PNGs.
+  **192 existing entries**, including all **49 protected runtime/configuration/
+  package entries**, remain byte-identical. Existing ZIP permissions are preserved.
+- Only the website application version changed. No account backend, OAuth client,
+  callback, grant, database migration, worker setting or live Status route changed.
+  The native accounts worktree's unrelated in-progress implementation is preserved.
+- **29 static/homepage checks passed; 3 optional baseline guards skipped**. Build,
+  HTML IDs/local links/srcsets, icon provenance, no-credential-form and Git checks
+  passed. The Vite build has its existing non-module script warnings.
+- Light/Dark browser checks at nominal 320/390/820/1440 widths showed no page
+  overflow, with all icons loaded. The new development disclosure and account links
+  worked; the live account panel and keyboard focus were visually reviewed.
+- All **18 live static paths** returned **200** and exact candidate bytes. Existing
+  account/product/legal/theme files remained intact; the anonymous session read
+  returned its expected unauthenticated response. No account form was submitted.
+
+Evidence: `status-account-package-evidence.json`, `status-account-deployment.json`,
+`status-account-live-verification.json`, `status-account-candidate.zip` in the task
+workspace. No blocker remains for this public page update; live OAuth/worker
+activation is separate pending work and was not performed.
