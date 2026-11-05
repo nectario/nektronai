@@ -229,3 +229,59 @@ Task-workspace evidence: `status-graph-package-evidence.json`,
 `status-graph-browser-verification.json`, and `status-graph-candidate.zip`.
 The initial rollout records are retained with the `status-graph-initial-` prefix.
 No publication blocker remains.
+
+## Readable typography and JSON syntax colors - November 5
+
+Published after the owner's explicit "Yes please!" approval to commit, push
+and deploy the prepared typography and JSON changes.
+
+- Source commit: **061442e**.
+- Deployment: **nektron-status-readability-20261105T190229Z-a9348e6fddd4**,
+  **Ready / Green**.
+- Public URL: https://nektron.ai/status-endpoint.html#usage
+- ZIP SHA-256: **a9348e6fddd4a61cc2e6da3c8c6fef0cf434e1ab8a57116b5a1926996f36b5b2**.
+
+The guide now uses **16px** text, **15.2px** inline code and **15px** code blocks
+on desktop and mobile. Status badges rise from 10px (9px mobile) to **14px**;
+small supporting copy, table text and disclosures also increase. The previous
+**14px section labels** and **15px product label** remain. The graph update had
+not reduced these labels; existing mobile overrides had made code and badges
+smaller. All changes are scoped to Status Endpoint.
+
+JSON keys, strings, numbers and punctuation now have distinct theme-specific
+syntax colors. Static spans preserve the exact selected text, indentation,
+line breaks and values without another script or dependency. Forced-color and
+print fallbacks are included. Both the JSON and CLI sample text remain exactly
+equal to the previous version, as do all page prose, IDs and script attributes.
+The CSS URL is versioned to refresh existing visitors' caches.
+
+Validation:
+
+- Prepared tests: **29 passed, 3 optional historical baseline guards skipped**.
+  Existing Vite build and Git diff check passed. The existing non-module
+  homepage script warnings remain.
+- All ten syntax palette/background pairs exceeded 4.5:1 contrast; minimum
+  **5.72:1**. Prepared layouts passed eight width/theme checks at nominal
+  320, 390, 820 and 1440px, with no horizontal page overflow.
+- Live browser screenshots were visually reviewed at **1281px desktop** and
+  **390px mobile**, in Light and Dark. All four checks confirmed guide 16px,
+  inline code 15.2px, block code 15px and section label 14px, correct syntax
+  colors and backgrounds, and no horizontal page overflow. Code retains its
+  own horizontal scrolling on narrow screens. Viewport override was reset.
+- **21 public URL checks** returned HTTP **200** and exact candidate bytes,
+  including the changed files, versioned stylesheet, all four preserved graph
+  URLs, account/product/legal routes and shared assets. The anonymous account
+  session read remained unauthenticated. No form was submitted.
+
+Only `status-endpoint.html` and `assets/status-endpoint.css` changed in the
+deployed bundle. All **200 other entries**, including **49 protected runtime,
+configuration and package entries**, remain byte-identical with permissions
+preserved. The separate original checkout was not synchronized; all eight
+unrelated backend working files still matched their saved hashes. No runtime
+feature or security setting was changed.
+
+Evidence in the task workspace: `status-readability-local-evidence.json`,
+`status-readability-package-evidence.json`, `status-readability-deployment.json`,
+`status-readability-live-verification.json`,
+`status-readability-browser-verification.json`, and
+`status-readability-candidate.zip`. No blocker remains for this release.
