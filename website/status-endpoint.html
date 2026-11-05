@@ -11,7 +11,7 @@
   <link rel="icon" href="assets/status-endpoint/icon-32.png" type="image/png">
   <link rel="stylesheet" href="assets/styles.css?v=nektron-web-20260918T000721Z"><link rel="stylesheet" href="assets/atelier.css"><link rel="stylesheet" href="assets/database-connector.css?v=nektron-web-20260918T000721Z">
   <script src="assets/site.js?v=nektron-contact-20260924T015815Z" defer></script><script src="assets/status-endpoint.js?v=20261104-1" defer></script>
-<link rel="stylesheet" href="assets/status-endpoint.css?v=20261104-1">
+<link rel="stylesheet" href="assets/status-endpoint.css?v=20261105-local-layout">
 </head>
 
 <body class="atelier-site dc-page se-page">
@@ -23,7 +23,7 @@
         <span class="dc-compact-brand"><img src="assets/favicon.svg?v=nektron-web-20260918T000721Z" width="32" height="32" alt=""><span>NektronAI</span></span>
       </a>
       <nav id="primary-nav" aria-label="Status Endpoint navigation"><a href="#overview">Overview</a><a href="#how-it-works">How it works</a><a href="#usage">Usage guide</a><a href="#account">Your account</a></nav>
-      <div class="nav-actions"><button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3 4.9 19.1M19.1 19.1l-1.8-1.8M6.7 6.7 4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
+      <div class="nav-actions"><a class="button primary se-header-signup" href="signup.html">Sign Up</a><button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3 4.9 19.1M19.1 19.1l-1.8-1.8M6.7 6.7 4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
     </div>
   </header>
 <main id="content"><div class="container">
@@ -34,7 +34,7 @@
       <h1 id="se-title">Status Endpoint</h1>
       <p class="se-tagline">Many agents.<br><span>One shared picture of progress.</span></p>
       <p class="dc-lede">Give agents a common place to report their work. Let authorized apps read the latest result and the evidence behind it, even when the work spans several systems.</p>
-      <div class="dc-actions"><a class="button primary" href="#usage">Explore the usage guide <span aria-hidden="true">&rarr;</span></a><a class="button" href="#example">See an example</a></div>
+      <div class="dc-actions"><a class="button primary" href="signup.html">Sign Up <span aria-hidden="true">&rarr;</span></a><a class="button" href="#usage">Explore the usage guide</a><a class="button" href="#example">See an example</a></div>
       <div class="dc-hero-notes"><span>NektronAI account required</span><span>Task-scoped access</span><span>Ordered history</span><span>Independent producers</span></div>
       <p class="dc-release"><span class="dc-status-dot" aria-hidden="true"></span>Tested pilot &middot; Controlled access &middot; Status enrollment not open</p>
     </div>
@@ -58,6 +58,10 @@
   </section>
   <section class="dc-section" id="how-it-works" aria-labelledby="workflow-title">
     <div class="dc-section-heading"><div><p class="dc-eyebrow">FROM INDIVIDUAL UPDATES TO SHARED CONTEXT</p><h2 id="workflow-title">Publish the work.<br>Read the whole picture.</h2></div><p>A task can span agents, applications and sessions. Its status record does not depend on an email thread or a customer case.</p></div>
+    <figure class="se-flow-diagram">
+      <picture><source media="(max-width:760px)" srcset="assets/status-endpoint/how-it-works-mobile.svg" width="360" height="1020"><img src="assets/status-endpoint/how-it-works.svg" width="1100" height="550" loading="lazy" decoding="async" alt="A NektronAI account and approved task access authorize the flow. Agents publish progress and evidence to Status Endpoint, which stores ordered events and current snapshots. Authorized apps read snapshots and history and retain control of their actions. The designated authority reports the overall result after all required work is verified."></picture>
+      <figcaption>The evidence flow in the tested pilot. Reports remain producer claims; apps retain their own permissions and decisions. The new ChatGPT dispatch and worker path is separate work in development.</figcaption>
+    </figure>
     <div class="dc-workflow-grid">
       <article class="dc-workflow-card dc-blue"><span class="dc-step">01 / DEFINE</span><h3>Agree on the task.</h3><p>An administrator registers the task, its producers, required work items and result authority. Each participant receives separately scoped access.</p><div class="dc-detail-list"><span>One access boundary</span><span>Explicit work assignments</span><span>Independent read and publish grants</span></div></article>
       <article class="dc-workflow-card dc-warm"><span class="dc-step">02 / REPORT</span><h3>Keep the stages clear.</h3><p>Agents publish immutable events with revisions, summaries and evidence references.</p><blockquote>Investigating &rarr; Implemented &rarr; Deployed &rarr; Verified</blockquote><p class="dc-small">Blocked is explicit. A deployed change still needs verification; stages do not establish the truth of a producer's claim.</p></article>

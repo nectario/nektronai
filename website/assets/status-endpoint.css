@@ -35,5 +35,14 @@ body.se-page .se-api-table td:first-child { min-width:285px; color:var(--text); 
 body.se-page .se-retry { border-left:2px solid var(--accent); padding:8px 24px; background:var(--atelier-paper); }
 body.se-page .se-retry h3 { font-size:17px; }
 body.se-page .se-retry p,body.se-page .dc-plan>p:last-child { font-size:13px; line-height:1.9; }
+/* Two type-scale steps for the small section and workflow labels: 10 -> 12 -> 14px. */
+body.se-page .dc-eyebrow,body.se-page .dc-step { font-size:14px; }
+body.se-page .dc-product-lockup .dc-eyebrow { font-size:15px; }
+body.se-page .dc-index { font-size:14px; }
+body.se-page .nav-actions .se-header-signup { min-height:44px; padding:10px 16px; font-size:14px; white-space:nowrap; }
+body.se-page .se-flow-diagram { margin:0 0 32px; padding:16px; border:1px solid var(--border); border-radius:18px; background:linear-gradient(135deg,var(--atelier-pearl-start),var(--atelier-pearl-end)); }
+body.se-page .se-flow-diagram picture,body.se-page .se-flow-diagram img { display:block; width:100%; height:auto; }
+body.se-page .se-flow-diagram figcaption { margin:15px 8px 4px; color:var(--muted); font-size:14px; line-height:1.85; max-width:95ch; }
+@media(max-width:680px) { body.se-page .header-inner .brand-wordmark{width:min(180px,42vw);height:auto}body.se-page .dc-compact-brand{font-size:16px}body.se-page .nav-actions{gap:8px}body.se-page .nav-actions .se-header-signup{padding:9px 12px}body.se-page .dc-product-lockup{align-items:flex-start}body.se-page .se-flow-diagram{padding:10px}body.se-page .se-flow-diagram figcaption{margin-inline:5px} }
 @media(max-width:680px) { body.se-page .se-guide>li{padding-left:0;padding-top:56px}body.se-page .se-guide>li::before{top:23px}body.se-page .se-example-body{padding:16px}body.se-page .se-example-controls{padding:16px 16px 0}body.se-page .se-result{padding:16px}body.se-page .se-work-row{gap:8px}body.se-page .se-stage{font-size:9px;padding:4px 6px}body.se-page .dc-footer nav{flex-wrap:wrap}body.se-page pre{font-size:12px;padding:16px} }
 @media print { body.se-page .se-example-controls {display:none}body.se-page pre{white-space:pre-wrap;overflow-wrap:anywhere} }

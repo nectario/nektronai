@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="550" viewBox="0 0 1100 550" role="img" aria-labelledby="title desc">
+<title id="title">How Status Endpoint shares task progress</title><desc id="desc">A NektronAI account and task permissions authorize access. Producers publish evidence to Status Endpoint. Apps read snapshots and ordered history. The result authority reports overall verification after required work is verified.</desc>
+<defs><linearGradient id="panel" x2="1" y2="1"><stop stop-color="#183c54"/><stop offset="1" stop-color="#102737"/></linearGradient><linearGradient id="core" x2="1" y2="1"><stop stop-color="#27657f"/><stop offset="1" stop-color="#193f58"/></linearGradient><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1 9 5 1 9" fill="none" stroke="#93c8da" stroke-width="1.5" stroke-linejoin="round"/></marker></defs>
+<rect x="1" y="1" width="1098" height="548" rx="20" fill="#0e2232" stroke="#648b9e"/>
+<g font-family="Arial, sans-serif" text-anchor="middle" fill="#eaf4f9">
+<rect x="335" y="25" width="430" height="102" rx="15" fill="url(#panel)" stroke="#7ba4b7"/>
+<text x="550" y="64" font-size="25" font-weight="700">Your NektronAI account</text><text x="550" y="99" font-size="20" fill="#c5dce8">Sign in + approved task access</text>
+<path d="M550 128V180" stroke="#93c8da" stroke-width="2.5" stroke-dasharray="5 5" marker-end="url(#arrow)"/>
+<rect x="30" y="194" width="300" height="215" rx="16" fill="url(#panel)" stroke="#648b9e"/>
+<text x="180" y="234" font-size="24" font-weight="700">Agents &amp; producers</text><text x="180" y="281" font-size="20">Do their assigned work</text><text x="180" y="318" font-size="20">Publish progress updates</text><text x="180" y="355" font-size="20">Attach evidence references</text>
+<rect x="400" y="194" width="300" height="215" rx="16" fill="url(#core)" stroke="#9bcadb" stroke-width="1.5"/>
+<text x="550" y="234" font-size="25" font-weight="700">Status Endpoint</text><text x="550" y="281" font-size="20">Checks task-scoped access</text><text x="550" y="318" font-size="20">Stores ordered events</text><text x="550" y="355" font-size="20">Provides current snapshots</text>
+<rect x="770" y="194" width="300" height="215" rx="16" fill="url(#panel)" stroke="#648b9e"/>
+<text x="920" y="234" font-size="24" font-weight="700">Authorized apps</text><text x="920" y="281" font-size="20">Read snapshots + history</text><text x="920" y="318" font-size="20">Reconcile their workflow</text><text x="920" y="355" font-size="20">Keep control of actions</text>
+<path d="M337 303H389" stroke="#93c8da" stroke-width="2.5" marker-end="url(#arrow)"/><path d="M707 303H759" stroke="#93c8da" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="30" y="440" width="1040" height="80" rx="13" fill="#233849" stroke="#9d9271"/>
+<text x="550" y="471" font-size="22" font-weight="700" fill="#f0d59d">The overall result has a designated authority.</text><text x="550" y="501" font-size="20">It can report verified only after all required work is verified, with evidence.</text>
+</g></svg>
