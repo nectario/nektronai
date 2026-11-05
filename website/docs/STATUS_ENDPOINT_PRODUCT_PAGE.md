@@ -170,3 +170,62 @@ Evidence in the task workspace: `status-layout-package-evidence.json`,
 `status-layout-candidate.zip`, and the historical local review record
 `status-layout-local-evidence.json`. Its former publication hold is historical;
 the approved live deployment is recorded here. No blocker remains for this release.
+
+## Shared-goal graph in light and dark themes - November 5
+
+Published the graph after the owner's explicit "Yes please!" approval to commit,
+push and deploy the prepared diagram. The initial rollout revealed that a returning
+browser could retain the former dark SVG. Versioned URLs now refresh all four
+diagram assets without requiring visitors to clear their cache.
+
+- Graph source commit: **97c0b1d**; asset-cache correction: **e1e0da1**.
+- Final deployment: **nektron-status-graph-20261105T170652Z-580358d89730**,
+  **Ready / Green**.
+- Public URL: https://nektron.ai/status-endpoint.html#how-it-works
+- ZIP SHA-256: **580358d89730cc637577466c8e6a995f510ec598b207a589fc0c2b9478654f1c**.
+
+One shared goal contains three agent branches. Each agent has an assigned task and
+one or more status updates. Solid arrows carry reports into Status Endpoint;
+dashed arrows carry results back to agents polling with separately authorized read
+access. The legend and caption explicitly distinguish polling from server push.
+The conceptual goal maps to an API task and each assignment to a work item; the
+example does not impose a one-work-item-per-producer API restriction. The goal
+remains in progress while release and verification work remain incomplete.
+
+Separate desktop and vertical mobile SVGs use matching geometry and wording in
+light and dark palettes. The site's existing theme toggle selects exactly one
+picture; the vertical layout applies through the 950px breakpoint and is capped
+at 440px for tablet legibility. Signup placement and enlarged labels remain.
+
+Validation:
+
+- Static/homepage suites: **29 passed, 3 optional baseline guards skipped**.
+  HTML IDs/local asset references, SVG XML/accessibility, arrow counts, theme
+  geometry/wording parity and Git diff checks passed. Sampled text contrast was
+  at least **4.52:1**.
+- Prepared layouts were reviewed locally at nominal **320, 390, 820, 1100 and
+  1440px**, both themes. The final live page loaded the versioned mobile source
+  at **390px** and desktop source at **1281px**, in both themes, with exactly one
+  visible picture, correct intrinsic dimensions and no horizontal page overflow.
+- All four final live SVGs were visually reviewed, including the three inward
+  converging report arrows and outward polling-result branches. The default
+  desktop page was also visually reviewed in both themes. Screenshot capture
+  under a browser viewport override was unavailable; live responsive source and
+  overflow checks used DOM measurements, supplemented by the local mobile review
+  and full live vertical SVG screenshots.
+- **22 public URL checks** returned HTTP **200** and exact candidate bytes:
+  six changed paths, twelve preserved routes/assets, and four versioned SVG URLs.
+  The anonymous account-session read remained unauthenticated. No forms were
+  submitted and no pilot access was recreated.
+
+Exactly six static paths differ from the previous layout release. All **196 other
+existing bundle entries**, including **49 runtime/configuration/package entries**,
+remain byte-identical; existing ZIP permissions are preserved. No runtime feature
+was activated or environment setting changed. Unrelated account-backend work was
+preserved.
+
+Task-workspace evidence: `status-graph-package-evidence.json`,
+`status-graph-deployment.json`, `status-graph-live-verification.json`,
+`status-graph-browser-verification.json`, and `status-graph-candidate.zip`.
+The initial rollout records are retained with the `status-graph-initial-` prefix.
+No publication blocker remains.
