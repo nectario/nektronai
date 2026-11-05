@@ -285,3 +285,58 @@ Evidence in the task workspace: `status-readability-local-evidence.json`,
 `status-readability-live-verification.json`,
 `status-readability-browser-verification.json`, and
 `status-readability-candidate.zip`. No blocker remains for this release.
+
+## Simple agent overview and task terminology - November 5
+
+Published after the owner's explicit "Yes, please commit, push, and deploy."
+approval for the prepared simplified overview and corrected detailed diagram.
+
+- Source commit: **bdd9948**.
+- Deployment: **nektron-status-overview-20261105T193041Z-25f93f54ffa9**,
+  **Ready / Green**.
+- Public URL: https://nektron.ai/status-endpoint.html#how-it-works
+- ZIP SHA-256: **25f93f54ffa9967131cee2dc9b9ec2dc340edd31e98178d2893cdc8e21acc885**.
+
+The first visual now explains the core message in plain language: agents report
+their status for a task to Status Endpoint. Four colored agent circles surround
+the central endpoint. Solid coral arrows emphasize reports sent inward; thinner
+dashed green arrows represent replies when authorized agents check for updates.
+The key and caption distinguish the two directions without implying server push.
+Separate light/dark and desktop/mobile SVGs fit the existing product theme.
+
+The existing detailed diagram remains below an optional "See a detailed task
+example" disclosure. Goal labels now say task, and assignment labels say assigned
+work. Source review confirmed tasks, work items, producers and events, with no
+separate goal entity; project correlation remains consumer-owned. Diagram geometry
+is preserved. Guide/account content, larger typography and JSON styling remain.
+
+Validation:
+
+- Prepared website checks: **29 passed, 3 optional historical guards skipped**.
+  Vite build and Git diff whitespace checks passed. Existing non-module homepage
+  script warnings remain.
+- Accessible SVG/XML, HTML IDs/local references, arrow counts/directions, theme
+  geometry/wording parity and detailed geometry preservation checks passed.
+  New diagram text contrast is at least **5.72:1**; arrow contrast is at least
+  **4.92:1**. Eight local width/theme combinations passed.
+- Live browser review at **1440px desktop** and **390px mobile**, both Light and
+  Dark: correct overview and detailed sources loaded, exactly one themed picture
+  per diagram, no horizontal page overflow, and working disclosure open/close.
+  Overview visuals and the corrected desktop detail were inspected. Guide text
+  remains **16px**, code **15px**, and section labels **14px**. Viewport reset.
+- **33 public URL checks** returned HTTP **200** and exact candidate bytes,
+  covering ten changed paths, preserved site routes/assets, the versioned CSS
+  and all eight versioned SVG URLs. Anonymous account-session access remained
+  unauthenticated. No account form was submitted.
+
+Ten static paths changed (including four added overview SVGs). All **196 other
+existing entries**, including **49 protected runtime/configuration/package
+entries**, remain byte-identical with permissions preserved. All eight unrelated
+backend working files in the separate original checkout still matched their
+saved hashes; that checkout was not synchronized. No runtime or access settings
+were changed, and no pilot access was recreated.
+
+Task-workspace evidence: `status-overview-local-evidence.json`,
+`status-overview-package-evidence.json`, `status-overview-deployment.json`,
+`status-overview-live-verification.json`, `status-overview-browser-verification.json`
+and `status-overview-candidate.zip`. No publication blocker remains.
