@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="640" viewBox="0 0 360 640" role="img" aria-labelledby="title desc"><title id="title">Agents report task status to Status Endpoint</title><desc id="desc">Four agents send progress reports for one task inward to Status Endpoint. Solid coral arrows show reports sent in. Dashed green arrows point back to the agents and show replies when they check for updates with read permission. These replies are agent-initiated reads, not server push. This is an illustration, not live task data.</desc>
+<defs><linearGradient id="hub" x2="1" y2="1"><stop stop-color="#214e68"/><stop offset="1" stop-color="#17354a"/></linearGradient><marker id="report-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 11 6 1 11 4 6Z" fill="#f0a49b"/></marker><marker id="read-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 11 6 1 11" fill="none" stroke="#92ccb4" stroke-width="1.8" stroke-linejoin="round"/></marker></defs>
+<rect x="1" y="1" width="358" height="638" rx="20" fill="#102331" stroke="#536f83"/>
+<g fill="none" stroke-linecap="round">
+<path class="read-reply" d="M110 294C50 270 24 210 46 114" stroke="#92ccb4" stroke-width="2" stroke-dasharray="7 7" marker-end="url(#read-arrow)"/>
+<path class="read-reply" d="M250 294C310 270 336 210 314 114" stroke="#92ccb4" stroke-width="2" stroke-dasharray="7 7" marker-end="url(#read-arrow)"/>
+<path class="read-reply" d="M110 346C50 370 24 430 46 526" stroke="#92ccb4" stroke-width="2" stroke-dasharray="7 7" marker-end="url(#read-arrow)"/>
+<path class="read-reply" d="M250 346C310 370 336 430 314 526" stroke="#92ccb4" stroke-width="2" stroke-dasharray="7 7" marker-end="url(#read-arrow)"/>
+<path class="status-report" d="M102 132C120 180 120 218 145 253" stroke="#f0a49b" stroke-width="3.4" marker-end="url(#report-arrow)"/>
+<path class="status-report" d="M258 132C240 180 240 218 215 253" stroke="#f0a49b" stroke-width="3.4" marker-end="url(#report-arrow)"/>
+<path class="status-report" d="M102 508C120 460 120 422 145 387" stroke="#f0a49b" stroke-width="3.4" marker-end="url(#report-arrow)"/>
+<path class="status-report" d="M258 508C240 460 240 422 215 387" stroke="#f0a49b" stroke-width="3.4" marker-end="url(#report-arrow)"/>
+</g><g font-family="Arial, sans-serif" text-anchor="middle" fill="#eaf4fb">
+<g class="agent"><circle cx="85" cy="85" r="49" fill="#193647" stroke="#536f83" stroke-width="1.4"/>
+<path d="M73 56h24a7 7 0 0 1 7 7v11a7 7 0 0 1-7 7h-8l-9 7v-7h-7a7 7 0 0 1-7-7V63a7 7 0 0 1 7-7Z" fill="none" stroke="#bfd2e1" stroke-width="1.5"/>
+<circle cx="77" cy="68" r="2" fill="#bfd2e1"/>
+<circle cx="85" cy="68" r="2" fill="#bfd2e1"/>
+<circle cx="93" cy="68" r="2" fill="#bfd2e1"/>
+<text x="85" y="109" font-size="20" font-weight="700">Agent 1</text></g>
+<g class="agent"><circle cx="275" cy="85" r="49" fill="#3d3131" stroke="#536f83" stroke-width="1.4"/>
+<path d="M263 56h24a7 7 0 0 1 7 7v11a7 7 0 0 1-7 7h-8l-9 7v-7h-7a7 7 0 0 1-7-7V63a7 7 0 0 1 7-7Z" fill="none" stroke="#bfd2e1" stroke-width="1.5"/>
+<circle cx="267" cy="68" r="2" fill="#bfd2e1"/>
+<circle cx="275" cy="68" r="2" fill="#bfd2e1"/>
+<circle cx="283" cy="68" r="2" fill="#bfd2e1"/>
+<text x="275" y="109" font-size="20" font-weight="700">Agent 2</text></g>
+<g class="agent"><circle cx="85" cy="555" r="49" fill="#30314a" stroke="#536f83" stroke-width="1.4"/>
+<path d="M73 526h24a7 7 0 0 1 7 7v11a7 7 0 0 1-7 7h-8l-9 7v-7h-7a7 7 0 0 1-7-7V533a7 7 0 0 1 7-7Z" fill="none" stroke="#bfd2e1" stroke-width="1.5"/>
+<circle cx="77" cy="538" r="2" fill="#bfd2e1"/>
+<circle cx="85" cy="538" r="2" fill="#bfd2e1"/>
+<circle cx="93" cy="538" r="2" fill="#bfd2e1"/>
+<text x="85" y="579" font-size="20" font-weight="700">Agent 3</text></g>
+<g class="agent"><circle cx="275" cy="555" r="49" fill="#203c36" stroke="#536f83" stroke-width="1.4"/>
+<path d="M263 526h24a7 7 0 0 1 7 7v11a7 7 0 0 1-7 7h-8l-9 7v-7h-7a7 7 0 0 1-7-7V533a7 7 0 0 1 7-7Z" fill="none" stroke="#bfd2e1" stroke-width="1.5"/>
+<circle cx="267" cy="538" r="2" fill="#bfd2e1"/>
+<circle cx="275" cy="538" r="2" fill="#bfd2e1"/>
+<circle cx="283" cy="538" r="2" fill="#bfd2e1"/>
+<text x="275" y="579" font-size="20" font-weight="700">Agent 4</text></g>
+<circle cx="180" cy="320" r="75" fill="url(#hub)" stroke="#8fb5c8" stroke-width="1.8"/>
+<text x="180" y="306" font-size="22" font-weight="700">Status</text>
+<text x="180" y="333" font-size="22" font-weight="700">Endpoint</text>
+<text x="180" y="362" font-size="20" fill="#bfd2e1">Task updates</text>
+</g></svg>

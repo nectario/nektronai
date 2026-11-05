@@ -1,15 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="660" viewBox="0 0 1300 660" role="img" aria-labelledby="title desc"><title id="title">One shared goal, independent agent tasks and status reports</title><desc id="desc">Within one example goal, each of three agents has one assigned task and publishes one or more status updates. Solid arrows point inward to Status Endpoint. Dashed arrows point back to agents and represent responses to agent-initiated polling with separate read permission. The endpoint does not push updates. This is a conceptual example, not live task data.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="660" viewBox="0 0 1300 660" role="img" aria-labelledby="title desc"><title id="title">One task, independent agent work items and status reports</title><desc id="desc">Within one example task, each of three agents has one assigned work item and publishes one or more status updates. Solid arrows point inward to Status Endpoint. Dashed arrows point back to agents and represent responses to agent-initiated polling with separate read permission. The endpoint does not push updates. This is a conceptual example, not live task data.</desc>
 <defs><linearGradient id="panel" x2="1" y2="1"><stop stop-color="#f8fbfe"/><stop offset="1" stop-color="#e7f1f7"/></linearGradient><linearGradient id="core" x2="1" y2="1"><stop stop-color="#d9edf7"/><stop offset="1" stop-color="#e9f4fa"/></linearGradient><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#386d85" stroke-width="1.5" stroke-linejoin="round"/></marker><marker id="pollarrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#86601f" stroke-width="1.5" stroke-linejoin="round"/></marker></defs><style>.edge{fill:none;stroke:#386d85;stroke-width:2.5;marker-end:url(#arrow)}.pollbus,.poll{fill:none;stroke:#86601f;stroke-width:2.2;stroke-dasharray:7 5}.poll{marker-end:url(#pollarrow)}</style>
 <rect x="1" y="1" width="1298" height="658" rx="20" fill="#f1f6fa" stroke="#b4cbd8"/>
 <g font-family="Arial, sans-serif" fill="#193e53">
-<text x="35" y="39" font-size="17" font-weight="700" fill="#345c72">ONE SHARED GOAL · CONCEPTUAL EXAMPLE</text>
+<text x="35" y="39" font-size="17" font-weight="700" fill="#345c72">ONE TASK · CONCEPTUAL EXAMPLE</text>
 <text x="35" y="80" font-size="29" font-weight="700">Release the reporting update</text><text x="910" y="39" font-size="18" fill="#386d85">→ Status reports</text><text x="910" y="76" font-size="18" fill="#86601f">← Agent polling · results</text>
 <path d="M35 110H1265" stroke="#b4cbd8"/>
 <g transform="translate(35 0)"><rect x="35" y="165" width="180" height="85" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
 <text x="125" y="199" text-anchor="middle" font-size="21" font-weight="700">Data agent</text><text x="125" y="229" text-anchor="middle" font-size="17" fill="#345c72">Agent 01</text>
 <path d="M223 207H260" class="edge"/>
 <rect x="270" y="155" width="230" height="105" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
-<text x="290" y="189" font-size="17" fill="#345c72">Assigned task</text><text x="290" y="226" font-size="20" font-weight="700">Prepare query</text>
+<text x="290" y="189" font-size="17" fill="#345c72">Assigned work</text><text x="290" y="226" font-size="20" font-weight="700">Prepare query</text>
 <path d="M508 207H544" class="edge"/>
 <rect x="555" y="150" width="250" height="115" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
 <text x="575" y="180" font-size="17" fill="#345c72">Status updates</text>
@@ -19,7 +19,7 @@
 <text x="125" y="359" text-anchor="middle" font-size="19" font-weight="700">Application agent</text><text x="125" y="389" text-anchor="middle" font-size="17" fill="#345c72">Agent 02</text>
 <path d="M223 367H260" class="edge"/>
 <rect x="270" y="315" width="230" height="105" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
-<text x="290" y="349" font-size="17" fill="#345c72">Assigned task</text><text x="290" y="386" font-size="20" font-weight="700">Release dashboard</text>
+<text x="290" y="349" font-size="17" fill="#345c72">Assigned work</text><text x="290" y="386" font-size="20" font-weight="700">Release dashboard</text>
 <path d="M508 367H544" class="edge"/>
 <rect x="555" y="310" width="250" height="115" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
 <text x="575" y="340" font-size="17" fill="#345c72">Status updates</text>
@@ -29,13 +29,13 @@
 <text x="125" y="519" text-anchor="middle" font-size="21" font-weight="700">Test agent</text><text x="125" y="549" text-anchor="middle" font-size="17" fill="#345c72">Agent 03</text>
 <path d="M223 527H260" class="edge"/>
 <rect x="270" y="475" width="230" height="105" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
-<text x="290" y="509" font-size="17" fill="#345c72">Assigned task</text><text x="290" y="546" font-size="20" font-weight="700">Check workflow</text>
+<text x="290" y="509" font-size="17" fill="#345c72">Assigned work</text><text x="290" y="546" font-size="20" font-weight="700">Check workflow</text>
 <path d="M508 527H544" class="edge"/>
 <rect x="555" y="470" width="250" height="115" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
 <text x="575" y="500" font-size="17" fill="#345c72">Status updates</text>
 <text x="575" y="534" font-size="20">1  Blocked</text>
 <rect x="930" y="270" width="235" height="194" rx="18" fill="url(#core)" stroke="#6c9fb9" stroke-width="1.5"/>
-<g text-anchor="middle"><text x="1047.5" y="314" font-size="25" font-weight="700">Status Endpoint</text><text x="1047.5" y="357" font-size="20">Ordered updates</text><text x="1047.5" y="391" font-size="20">Shared task snapshot</text><text x="1047.5" y="433" font-size="20" font-weight="700" fill="#644913">Goal still in progress</text></g>
+<g text-anchor="middle"><text x="1047.5" y="314" font-size="25" font-weight="700">Status Endpoint</text><text x="1047.5" y="357" font-size="20">Ordered updates</text><text x="1047.5" y="391" font-size="20">Shared task snapshot</text><text x="1047.5" y="433" font-size="20" font-weight="700" fill="#644913">Task still in progress</text></g>
 <path d="M805 207H845Q875 207 875 237V307Q875 327 895 327H918" class="edge"/>
 <path d="M805 367H918" class="edge"/>
 <path d="M805 527H845Q875 527 875 497V427Q875 407 895 407H918" class="edge"/>
