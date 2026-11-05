@@ -3,38 +3,38 @@ body.se-page h1 { font-size:clamp(38px,4.2vw,58px); margin-bottom:16px; }
 body.se-page .se-tagline { font-family:'Nektron Connector Sora',var(--font-sans); font-size:clamp(27px,2.6vw,36px); letter-spacing:-.04em; line-height:1.3; color:var(--text); margin:0 0 24px; }
 body.se-page .se-tagline span { color:var(--accent); }
 body.se-page .se-example-controls { display:flex; gap:8px; padding:18px 22px 0; flex-wrap:wrap; }
-body.se-page .se-example-controls button { padding:9px 12px; min-height:44px; border:1px solid var(--border); border-radius:9px; color:var(--muted); background:transparent; font-size:12px; }
+body.se-page .se-example-controls button { padding:9px 12px; min-height:44px; border:1px solid var(--border); border-radius:9px; color:var(--muted); background:transparent; font-size:14px; }
 body.se-page .se-example-controls button[aria-pressed="true"] { color:var(--text); background:var(--dc-selected); }
 body.se-page .se-example-body { padding:20px 22px; }
-body.se-page .se-work-row { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:17px 0; border-bottom:1px solid var(--border2); font-size:12px; }
-body.se-page .se-work-row strong { display:block; font-size:13px; margin-bottom:4px; }
+body.se-page .se-work-row { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:17px 0; border-bottom:1px solid var(--border2); font-size:14px; }
+body.se-page .se-work-row strong { display:block; font-size:15px; margin-bottom:4px; }
 body.se-page .se-work-row div>span { color:var(--muted); }
-body.se-page .se-stage { flex:none; color:var(--accent); font:500 10px/1.6 var(--font-mono); border:1px solid var(--border); border-radius:6px; padding:5px 8px; }
+body.se-page .se-stage { flex:none; color:var(--accent); font:500 14px/1.6 var(--font-mono); border:1px solid var(--border); border-radius:6px; padding:5px 8px; }
 body.se-page .se-result { margin-top:22px; padding:20px; border:1px solid var(--border2); border-radius:12px; background:var(--atelier-paper); min-height:174px; }
 body.se-page .se-result h3 { font-size:20px; margin:8px 0; letter-spacing:-.03em; }
-body.se-page .se-result p { font-size:13px; line-height:1.8; margin:0; }
+body.se-page .se-result p { font-size:15px; line-height:1.8; margin:0; }
 body.se-page .se-guide { list-style:none; counter-reset:guide; padding:0; margin:0; }
 body.se-page .se-guide>li { counter-increment:guide; position:relative; border-top:1px solid var(--border2); padding:30px 0 30px 58px; }
 body.se-page .se-guide>li::before { content:counter(guide,decimal-leading-zero); position:absolute; left:0; top:31px; font:500 13px/1.6 var(--font-mono); color:var(--accent); }
 body.se-page .se-guide h3 { font-size:21px; letter-spacing:-.025em; margin:0 0 15px; }
-body.se-page .se-guide p { max-width:88ch; font-size:14px; line-height:1.9; }
-body.se-page code { font-family:var(--font-mono); font-size:.87em; overflow-wrap:anywhere; }
+body.se-page .se-guide p { max-width:82ch; font-size:16px; line-height:1.9; }
+body.se-page code { font-family:var(--font-mono); font-size:max(14px,.95em); overflow-wrap:anywhere; }
 body.se-page .se-code-details { margin-top:20px; border:1px solid var(--border); border-radius:12px; background:var(--atelier-paper); overflow:hidden; }
-body.se-page .se-code-details summary { cursor:pointer; padding:16px 20px; font-size:13px; font-weight:600; min-height:44px; }
+body.se-page .se-code-details summary { cursor:pointer; padding:16px 20px; font-size:15px; font-weight:600; min-height:44px; }
 body.se-page .se-code-details>p { padding:0 20px; }
-body.se-page pre { margin:0; padding:20px; overflow:auto; background:var(--dc-muted-surface); color:var(--text); font-size:13px; line-height:1.8; border-top:1px solid var(--border2); }
+body.se-page pre { margin:0; padding:20px; overflow:auto; background:var(--dc-muted-surface); color:var(--text); font-size:15px; line-height:1.8; border-top:1px solid var(--border2); }
 body.se-page pre code { overflow-wrap:normal; font-size:inherit; }
 body.se-page .se-note { color:var(--muted); margin-top:14px; }
 body.se-page .se-api-table { overflow:auto; border:1px solid var(--border); border-radius:12px; margin:0 0 28px; }
-body.se-page .se-api-table table { width:100%; border-collapse:collapse; margin:0; text-align:left; font-size:13px; }
-body.se-page .se-api-table caption { text-align:left; padding:18px; color:var(--accent); font-size:12px; background:var(--dc-muted-surface); }
+body.se-page .se-api-table table { width:100%; border-collapse:collapse; margin:0; text-align:left; font-size:15px; }
+body.se-page .se-api-table caption { text-align:left; padding:18px; color:var(--accent); font-size:14px; background:var(--dc-muted-surface); }
 body.se-page .se-api-table :is(th,td) { padding:16px 18px; border:0; border-top:1px solid var(--border2); vertical-align:top; }
-body.se-page .se-api-table th { color:var(--text); font-size:12px; }
+body.se-page .se-api-table th { color:var(--text); font-size:14px; }
 body.se-page .se-api-table td { color:var(--muted); min-width:155px; }
 body.se-page .se-api-table td:first-child { min-width:285px; color:var(--text); }
 body.se-page .se-retry { border-left:2px solid var(--accent); padding:8px 24px; background:var(--atelier-paper); }
 body.se-page .se-retry h3 { font-size:17px; }
-body.se-page .se-retry p,body.se-page .dc-plan>p:last-child { font-size:13px; line-height:1.9; }
+body.se-page .se-retry p,body.se-page .dc-plan>p:last-child { font-size:15px; line-height:1.9; }
 /* Two type-scale steps for the small section and workflow labels: 10 -> 12 -> 14px. */
 body.se-page .dc-eyebrow,body.se-page .dc-step { font-size:14px; }
 body.se-page .dc-product-lockup .dc-eyebrow { font-size:15px; }
@@ -46,7 +46,45 @@ body.se-page .se-flow-diagram .se-flow-light { display:none; }
 .theme-light body.se-page .se-flow-diagram .se-flow-dark { display:none; }
 .theme-light body.se-page .se-flow-diagram .se-flow-light { display:block; }
 @media(max-width:950px) { body.se-page .se-flow-diagram picture { max-width:440px; margin-inline:auto; } }
-body.se-page .se-flow-diagram figcaption { margin:15px 8px 4px; color:var(--muted); font-size:14px; line-height:1.85; max-width:95ch; }
+body.se-page .se-flow-diagram figcaption { margin:15px 8px 4px; color:var(--muted); font-size:15px; line-height:1.85; max-width:95ch; }
 @media(max-width:680px) { body.se-page .header-inner .brand-wordmark{width:min(180px,42vw);height:auto}body.se-page .dc-compact-brand{font-size:16px}body.se-page .nav-actions{gap:8px}body.se-page .nav-actions .se-header-signup{padding:9px 12px}body.se-page .dc-product-lockup{align-items:flex-start}body.se-page .se-flow-diagram{padding:10px}body.se-page .se-flow-diagram figcaption{margin-inline:5px} }
-@media(max-width:680px) { body.se-page .se-guide>li{padding-left:0;padding-top:56px}body.se-page .se-guide>li::before{top:23px}body.se-page .se-example-body{padding:16px}body.se-page .se-example-controls{padding:16px 16px 0}body.se-page .se-result{padding:16px}body.se-page .se-work-row{gap:8px}body.se-page .se-stage{font-size:9px;padding:4px 6px}body.se-page .dc-footer nav{flex-wrap:wrap}body.se-page pre{font-size:12px;padding:16px} }
+@media(max-width:680px) { body.se-page .se-guide>li{padding-left:0;padding-top:56px}body.se-page .se-guide>li::before{top:23px}body.se-page .se-example-body{padding:16px}body.se-page .se-example-controls{padding:16px 16px 0}body.se-page .se-result{padding:16px}body.se-page .se-work-row{gap:8px}body.se-page .se-stage{font-size:14px;padding:4px 6px}body.se-page .dc-footer nav{flex-wrap:wrap}body.se-page pre{font-size:15px;padding:16px} }
 @media print { body.se-page .se-example-controls {display:none}body.se-page pre{white-space:pre-wrap;overflow-wrap:anywhere} }
+
+/* Readable supporting copy, scoped to this product; retain 14/15px section labels. */
+body.se-page :is(.dc-breadcrumb,.dc-maker,.dc-hero-notes,.dc-release,.dc-demo-identity,.dc-demo-footer,.dc-detail-list span,.dc-small,.dc-plan-top span,.dc-account-card-header p,.dc-footer p,.dc-footer nav a) { font-size:14px; }
+body.se-page .dc-sample-badge { font-size:12px; }
+body.se-page .dc-demo-heading { flex-wrap:wrap; }
+body.se-page .dc-demo-identity { min-width:0; }
+body.se-page .dc-principles h2 { font-size:16px; }
+body.se-page :is(.dc-principles p,.dc-section-heading>p,.dc-workflow-card p,.dc-boundary-grid p,.dc-plan-description,.dc-plan li,.dc-faq details p,.dc-account-card-header h3,.dc-footer strong) { font-size:15px; }
+body.se-page p.dc-small { font-size:14px; }
+body.se-page .dc-account-copy .dc-account-status { font-size:14px!important; }
+body.se-page .dc-faq summary { font-size:16px; }
+body.se-page :is(.dc-actions,.dc-closing,.dc-account-card) .button { font-size:14px; }
+
+/* IDE-style JSON: semantic colors keep the selectable text and whitespace intact. */
+body.se-page {
+  --se-code-bg:#132536;
+  --se-json-key:#8fcef5;
+  --se-json-string:#c0d7a0;
+  --se-json-number:#e6b685;
+  --se-json-literal:#cfb7f3;
+  --se-json-punctuation:#c8cfe0;
+}
+.theme-light body.se-page {
+  --se-code-bg:#f1f6fa;
+  --se-json-key:#075a85;
+  --se-json-string:#34602b;
+  --se-json-number:#92500f;
+  --se-json-literal:#704e9d;
+  --se-json-punctuation:#40546c;
+}
+body.se-page pre { background:var(--se-code-bg); tab-size:2; }
+body.se-page .se-json-key { color:var(--se-json-key); }
+body.se-page .se-json-string { color:var(--se-json-string); }
+body.se-page .se-json-number { color:var(--se-json-number); }
+body.se-page .se-json-literal { color:var(--se-json-literal); }
+body.se-page .se-json-punctuation { color:var(--se-json-punctuation); }
+@media(forced-colors:active) { body.se-page pre { background:Canvas; color:CanvasText; } body.se-page .se-json span { color:CanvasText; } }
+@media print { body.se-page pre { background:#fff; color:#142a40; } body.se-page .se-json span { color:inherit; } }

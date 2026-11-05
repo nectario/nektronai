@@ -11,7 +11,7 @@
   <link rel="icon" href="assets/status-endpoint/icon-32.png" type="image/png">
   <link rel="stylesheet" href="assets/styles.css?v=nektron-web-20260918T000721Z"><link rel="stylesheet" href="assets/atelier.css"><link rel="stylesheet" href="assets/database-connector.css?v=nektron-web-20260918T000721Z">
   <script src="assets/site.js?v=nektron-contact-20260924T015815Z" defer></script><script src="assets/status-endpoint.js?v=20261104-1" defer></script>
-<link rel="stylesheet" href="assets/status-endpoint.css?v=20261105-diagram-theme1">
+<link rel="stylesheet" href="assets/status-endpoint.css?v=20261105-readable-json1">
 </head>
 
 <body class="atelier-site dc-page se-page">
@@ -75,17 +75,17 @@
       <li><h3>Sign up or sign in to NektronAI.</h3><p>Status Endpoint is part of the NektronAI ecosystem and requires a NektronAI account, using the same account system as Database Connector. <a href="signup.html">Create your NektronAI account</a>, or <a href="login.html">sign in with your existing account</a>. You do not need a separate Status Endpoint account.</p><p>Account registration is the first step; it does not automatically enable Status Endpoint or grant access to any task. Self-service Status authorization is still in development. Contact Nektron to discuss your integration. For an approved setup, an administrator must register the tenant, account membership, task, producers, work assignments and result authority, then deliver separate expiring grants through an approved secret channel. The deployed evidence API currently has no public task-creation or token-issuance endpoint.</p><p>Use a dedicated <code>task-status:publish</code> grant for a producer and <code>task-status:read</code> for a consumer. Overall results also require <code>task-status:result</code> and the designated authority identity. Internal details and evidence require the separate <code>task-status:read-internal</code> permission with read access.</p></li>
       <li><h3>Connect from your application.</h3><p>Use native HTTPS at <code>https://status.nektron.ai</code>, with the prefix <code>/api/task-status/v1</code>. Send <code>Authorization: Bearer &lt;status-token&gt;</code> on each request and JSON for publishing. Your shared NektronAI account establishes your identity. A website session, Database Connector credential or Mail sign-in token alone does not authorize Status API requests; Status Endpoint uses its own approved scopes and task grants. Browser cookies and browser-origin requests are rejected; integrate through an authorized native client or backend.</p><p>Keep credentials in your application's approved secret store. Never place them in this page, a URL, chat, source code or an event.</p></li>
       <li><h3>Save an event, then publish it.</h3><p>Create a new UUID event ID and save the JSON before sending it. Use your assigned work-item ID, current generation, next revision and actual UTC timestamp. This synthetic example reports implementation only; it makes no deployment or verification claim.</p>
-        <details class="se-code-details" open><summary>Example saved-event.json</summary><pre tabindex="0" aria-label="Synthetic work event JSON"><code>{
-  "event_id": "10000000-0000-4000-8000-000000000001",
-  "kind": "work_item.status",
-  "work_item_id": "reporting-query",
-  "generation": 1,
-  "revision": 1,
-  "status": "implemented",
-  "occurred_at": "2026-11-04T12:00:00Z",
-  "customer_summary": "Query prepared. Release and checks are pending.",
-  "evidence": [{"reference": "urn:nektron:example:local-check-1"}]
-}</code></pre></details>
+        <details class="se-code-details" open><summary>Example saved-event.json</summary><pre tabindex="0" aria-label="Synthetic work event JSON"><code class="se-json language-json"><span class="se-json-punctuation">{</span>
+  <span class="se-json-key">"event_id"</span><span class="se-json-punctuation">:</span> <span class="se-json-string">"10000000-0000-4000-8000-000000000001"</span><span class="se-json-punctuation">,</span>
+  <span class="se-json-key">"kind"</span><span class="se-json-punctuation">:</span> <span class="se-json-string">"work_item.status"</span><span class="se-json-punctuation">,</span>
+  <span class="se-json-key">"work_item_id"</span><span class="se-json-punctuation">:</span> <span class="se-json-string">"reporting-query"</span><span class="se-json-punctuation">,</span>
+  <span class="se-json-key">"generation"</span><span class="se-json-punctuation">:</span> <span class="se-json-number">1</span><span class="se-json-punctuation">,</span>
+  <span class="se-json-key">"revision"</span><span class="se-json-punctuation">:</span> <span class="se-json-number">1</span><span class="se-json-punctuation">,</span>
+  <span class="se-json-key">"status"</span><span class="se-json-punctuation">:</span> <span class="se-json-string">"implemented"</span><span class="se-json-punctuation">,</span>
+  <span class="se-json-key">"occurred_at"</span><span class="se-json-punctuation">:</span> <span class="se-json-string">"2026-11-04T12:00:00Z"</span><span class="se-json-punctuation">,</span>
+  <span class="se-json-key">"customer_summary"</span><span class="se-json-punctuation">:</span> <span class="se-json-string">"Query prepared. Release and checks are pending."</span><span class="se-json-punctuation">,</span>
+  <span class="se-json-key">"evidence"</span><span class="se-json-punctuation">:</span> <span class="se-json-punctuation">[</span><span class="se-json-punctuation">{</span><span class="se-json-key">"reference"</span><span class="se-json-punctuation">:</span> <span class="se-json-string">"urn:nektron:example:local-check-1"</span><span class="se-json-punctuation">}</span><span class="se-json-punctuation">]</span>
+<span class="se-json-punctuation">}</span></code></pre></details>
         <p class="se-note">Replace every synthetic ID, assignment, timestamp and evidence reference with approved real values. A stored reference is not fetched or independently verified by the service.</p>
         <details class="se-code-details"><summary>Publish and read with the Python CLI</summary><p>For approved developers with the supplied <code>status_endpoint</code> package installed (Python 3.12+). Have your local secret manager supply <code>NEKTRON_STATUS_TOKEN</code>. The CLI does not take a token argument. The UUID below is a placeholder task; use the task ID your administrator provides.</p><pre tabindex="0" aria-label="Status Endpoint CLI examples"><code>python -m status_endpoint.cli --origin https://status.nektron.ai publish aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa saved-event.json
 
