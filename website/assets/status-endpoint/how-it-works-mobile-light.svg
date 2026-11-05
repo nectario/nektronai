@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="1180" viewBox="0 0 360 1180" role="img" aria-labelledby="title desc"><title id="title">One shared goal, independent agent tasks and status reports</title><desc id="desc">Within one example goal, each of three agents has one assigned task and publishes one or more status updates. Solid arrows point inward to Status Endpoint. Dashed arrows point back to agents and represent responses to agent-initiated polling with separate read permission. The endpoint does not push updates. This is a conceptual example, not live task data.</desc>
+<defs><linearGradient id="panel" x2="1" y2="1"><stop stop-color="#f8fbfe"/><stop offset="1" stop-color="#e7f1f7"/></linearGradient><linearGradient id="core" x2="1" y2="1"><stop stop-color="#d9edf7"/><stop offset="1" stop-color="#e9f4fa"/></linearGradient><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#386d85" stroke-width="1.5" stroke-linejoin="round"/></marker><marker id="pollarrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#86601f" stroke-width="1.5" stroke-linejoin="round"/></marker></defs><style>.edge{fill:none;stroke:#386d85;stroke-width:2.5;marker-end:url(#arrow)}.pollbus,.poll{fill:none;stroke:#86601f;stroke-width:2.2;stroke-dasharray:7 5}.poll{marker-end:url(#pollarrow)}</style>
+<rect x="1" y="1" width="358" height="1178" rx="18" fill="#f1f6fa" stroke="#b4cbd8"/>
+<g font-family="Arial, sans-serif" fill="#193e53">
+<text x="20" y="35" font-size="20" font-weight="700" fill="#345c72">ONE SHARED GOAL · EXAMPLE</text>
+<text x="20" y="72" font-size="23" font-weight="700">Release reporting update</text><text x="20" y="100" font-size="18" fill="#345c72">Solid: reports · Dashed: polling</text>
+<rect x="34" y="115" width="256" height="215" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
+<text x="52" y="150" font-size="23" font-weight="700">Data agent</text>
+<path d="M52 168H272" stroke="#b4cbd8"/>
+<text x="52" y="197" font-size="20" fill="#345c72">Assigned task</text><text x="52" y="226" font-size="20" font-weight="700">Prepare query</text>
+<text x="52" y="260" font-size="20" fill="#345c72">Status updates</text>
+<text x="52" y="290" font-size="20">1  Implemented</text>
+<text x="52" y="316" font-size="20">2  Verified</text>
+<rect x="34" y="365" width="256" height="215" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
+<text x="52" y="400" font-size="23" font-weight="700">Application agent</text>
+<path d="M52 418H272" stroke="#b4cbd8"/>
+<text x="52" y="447" font-size="20" fill="#345c72">Assigned task</text><text x="52" y="476" font-size="20" font-weight="700">Release dashboard</text>
+<text x="52" y="510" font-size="20" fill="#345c72">Status updates</text>
+<text x="52" y="540" font-size="20">1  Implemented</text>
+<text x="52" y="566" font-size="20">2  Deployed</text>
+<rect x="34" y="615" width="256" height="215" rx="14" fill="url(#panel)" stroke="#b4cbd8"/>
+<text x="52" y="650" font-size="23" font-weight="700">Test agent</text>
+<path d="M52 668H272" stroke="#b4cbd8"/>
+<text x="52" y="697" font-size="20" fill="#345c72">Assigned task</text><text x="52" y="726" font-size="20" font-weight="700">Check workflow</text>
+<text x="52" y="760" font-size="20" fill="#345c72">Status updates</text>
+<text x="52" y="790" font-size="20">1  Blocked</text>
+<path d="M290 215H338V920Q338 935 323 935H315Q300 935 300 948" class="edge"/>
+<path d="M290 465H320V895Q320 905 310 905H190Q180 905 180 920V948" class="edge"/>
+<path d="M290 715H302V865Q302 875 292 875H70Q60 875 60 890V948" class="edge"/>
+<path d="M20 1085H12V215" class="pollbus"/><path d="M12 215H24" class="poll"/><path d="M12 465H24" class="poll"/><path d="M12 715H24" class="poll"/><rect x="20" y="960" width="320" height="192" rx="16" fill="url(#core)" stroke="#6c9fb9" stroke-width="1.5"/>
+<g text-anchor="middle"><text x="180" y="1002" font-size="25" font-weight="700">Status Endpoint</text><text x="180" y="1042" font-size="20">Ordered updates</text><text x="180" y="1075" font-size="20">Shared task snapshot</text><text x="180" y="1118" font-size="20" font-weight="700" fill="#644913">Goal still in progress</text></g>
+</g></svg>

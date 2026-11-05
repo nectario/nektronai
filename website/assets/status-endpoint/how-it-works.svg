@@ -1,18 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="550" viewBox="0 0 1100 550" role="img" aria-labelledby="title desc">
-<title id="title">How Status Endpoint shares task progress</title><desc id="desc">A NektronAI account and task permissions authorize access. Producers publish evidence to Status Endpoint. Apps read snapshots and ordered history. The result authority reports overall verification after required work is verified.</desc>
-<defs><linearGradient id="panel" x2="1" y2="1"><stop stop-color="#183c54"/><stop offset="1" stop-color="#102737"/></linearGradient><linearGradient id="core" x2="1" y2="1"><stop stop-color="#27657f"/><stop offset="1" stop-color="#193f58"/></linearGradient><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1 9 5 1 9" fill="none" stroke="#93c8da" stroke-width="1.5" stroke-linejoin="round"/></marker></defs>
-<rect x="1" y="1" width="1098" height="548" rx="20" fill="#0e2232" stroke="#648b9e"/>
-<g font-family="Arial, sans-serif" text-anchor="middle" fill="#eaf4f9">
-<rect x="335" y="25" width="430" height="102" rx="15" fill="url(#panel)" stroke="#7ba4b7"/>
-<text x="550" y="64" font-size="25" font-weight="700">Your NektronAI account</text><text x="550" y="99" font-size="20" fill="#c5dce8">Sign in + approved task access</text>
-<path d="M550 128V180" stroke="#93c8da" stroke-width="2.5" stroke-dasharray="5 5" marker-end="url(#arrow)"/>
-<rect x="30" y="194" width="300" height="215" rx="16" fill="url(#panel)" stroke="#648b9e"/>
-<text x="180" y="234" font-size="24" font-weight="700">Agents &amp; producers</text><text x="180" y="281" font-size="20">Do their assigned work</text><text x="180" y="318" font-size="20">Publish progress updates</text><text x="180" y="355" font-size="20">Attach evidence references</text>
-<rect x="400" y="194" width="300" height="215" rx="16" fill="url(#core)" stroke="#9bcadb" stroke-width="1.5"/>
-<text x="550" y="234" font-size="25" font-weight="700">Status Endpoint</text><text x="550" y="281" font-size="20">Checks task-scoped access</text><text x="550" y="318" font-size="20">Stores ordered events</text><text x="550" y="355" font-size="20">Provides current snapshots</text>
-<rect x="770" y="194" width="300" height="215" rx="16" fill="url(#panel)" stroke="#648b9e"/>
-<text x="920" y="234" font-size="24" font-weight="700">Authorized apps</text><text x="920" y="281" font-size="20">Read snapshots + history</text><text x="920" y="318" font-size="20">Reconcile their workflow</text><text x="920" y="355" font-size="20">Keep control of actions</text>
-<path d="M337 303H389" stroke="#93c8da" stroke-width="2.5" marker-end="url(#arrow)"/><path d="M707 303H759" stroke="#93c8da" stroke-width="2.5" marker-end="url(#arrow)"/>
-<rect x="30" y="440" width="1040" height="80" rx="13" fill="#233849" stroke="#9d9271"/>
-<text x="550" y="471" font-size="22" font-weight="700" fill="#f0d59d">The overall result has a designated authority.</text><text x="550" y="501" font-size="20">It can report verified only after all required work is verified, with evidence.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="660" viewBox="0 0 1300 660" role="img" aria-labelledby="title desc"><title id="title">One shared goal, independent agent tasks and status reports</title><desc id="desc">Within one example goal, each of three agents has one assigned task and publishes one or more status updates. Solid arrows point inward to Status Endpoint. Dashed arrows point back to agents and represent responses to agent-initiated polling with separate read permission. The endpoint does not push updates. This is a conceptual example, not live task data.</desc>
+<defs><linearGradient id="panel" x2="1" y2="1"><stop stop-color="#183c54"/><stop offset="1" stop-color="#102737"/></linearGradient><linearGradient id="core" x2="1" y2="1"><stop stop-color="#27657f"/><stop offset="1" stop-color="#193f58"/></linearGradient><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#93c8da" stroke-width="1.5" stroke-linejoin="round"/></marker><marker id="pollarrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#e0c38e" stroke-width="1.5" stroke-linejoin="round"/></marker></defs><style>.edge{fill:none;stroke:#93c8da;stroke-width:2.5;marker-end:url(#arrow)}.pollbus,.poll{fill:none;stroke:#e0c38e;stroke-width:2.2;stroke-dasharray:7 5}.poll{marker-end:url(#pollarrow)}</style>
+<rect x="1" y="1" width="1298" height="658" rx="20" fill="#0e2232" stroke="#648b9e"/>
+<g font-family="Arial, sans-serif" fill="#eaf4f9">
+<text x="35" y="39" font-size="17" font-weight="700" fill="#c5dce8">ONE SHARED GOAL · CONCEPTUAL EXAMPLE</text>
+<text x="35" y="80" font-size="29" font-weight="700">Release the reporting update</text><text x="910" y="39" font-size="18" fill="#93c8da">→ Status reports</text><text x="910" y="76" font-size="18" fill="#e0c38e">← Agent polling · results</text>
+<path d="M35 110H1265" stroke="#648b9e"/>
+<g transform="translate(35 0)"><rect x="35" y="165" width="180" height="85" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="125" y="199" text-anchor="middle" font-size="21" font-weight="700">Data agent</text><text x="125" y="229" text-anchor="middle" font-size="17" fill="#c5dce8">Agent 01</text>
+<path d="M223 207H260" class="edge"/>
+<rect x="270" y="155" width="230" height="105" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="290" y="189" font-size="17" fill="#c5dce8">Assigned task</text><text x="290" y="226" font-size="20" font-weight="700">Prepare query</text>
+<path d="M508 207H544" class="edge"/>
+<rect x="555" y="150" width="250" height="115" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="575" y="180" font-size="17" fill="#c5dce8">Status updates</text>
+<text x="575" y="214" font-size="20">1  Implemented</text>
+<text x="575" y="243" font-size="20">2  Verified</text>
+<rect x="35" y="325" width="180" height="85" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="125" y="359" text-anchor="middle" font-size="19" font-weight="700">Application agent</text><text x="125" y="389" text-anchor="middle" font-size="17" fill="#c5dce8">Agent 02</text>
+<path d="M223 367H260" class="edge"/>
+<rect x="270" y="315" width="230" height="105" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="290" y="349" font-size="17" fill="#c5dce8">Assigned task</text><text x="290" y="386" font-size="20" font-weight="700">Release dashboard</text>
+<path d="M508 367H544" class="edge"/>
+<rect x="555" y="310" width="250" height="115" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="575" y="340" font-size="17" fill="#c5dce8">Status updates</text>
+<text x="575" y="374" font-size="20">1  Implemented</text>
+<text x="575" y="403" font-size="20">2  Deployed</text>
+<rect x="35" y="485" width="180" height="85" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="125" y="519" text-anchor="middle" font-size="21" font-weight="700">Test agent</text><text x="125" y="549" text-anchor="middle" font-size="17" fill="#c5dce8">Agent 03</text>
+<path d="M223 527H260" class="edge"/>
+<rect x="270" y="475" width="230" height="105" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="290" y="509" font-size="17" fill="#c5dce8">Assigned task</text><text x="290" y="546" font-size="20" font-weight="700">Check workflow</text>
+<path d="M508 527H544" class="edge"/>
+<rect x="555" y="470" width="250" height="115" rx="14" fill="url(#panel)" stroke="#648b9e"/>
+<text x="575" y="500" font-size="17" fill="#c5dce8">Status updates</text>
+<text x="575" y="534" font-size="20">1  Blocked</text>
+<rect x="930" y="270" width="235" height="194" rx="18" fill="url(#core)" stroke="#9bcadb" stroke-width="1.5"/>
+<g text-anchor="middle"><text x="1047.5" y="314" font-size="25" font-weight="700">Status Endpoint</text><text x="1047.5" y="357" font-size="20">Ordered updates</text><text x="1047.5" y="391" font-size="20">Shared task snapshot</text><text x="1047.5" y="433" font-size="20" font-weight="700" fill="#f0d59d">Goal still in progress</text></g>
+<path d="M805 207H845Q875 207 875 237V307Q875 327 895 327H918" class="edge"/>
+<path d="M805 367H918" class="edge"/>
+<path d="M805 527H845Q875 527 875 497V427Q875 407 895 407H918" class="edge"/>
+</g><path d="M1082.5 270V130H12V527" class="pollbus"/><path d="M12 207H58" class="poll"/><path d="M12 367H58" class="poll"/><path d="M12 527H58" class="poll"/><rect x="35" y="598" width="1230" height="39" rx="9" fill="#233849"/>
+<text x="650" y="624" text-anchor="middle" font-size="19">Each agent reports its own work. Status Endpoint brings the reports together.</text>
 </g></svg>
