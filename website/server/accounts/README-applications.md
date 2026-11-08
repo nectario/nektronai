@@ -2,12 +2,13 @@
 
 ## Scope and current activation state
 
-This is an additive, local-only foundation for one NektronAI identity across
+This is an additive, dormant foundation for one NektronAI identity across
 Database Connector and Status Endpoint. It adds a product catalog and explicit
-per-user product records. It is **not wired into account signup, login, OAuth,
-Status, Connector, or a public API**. It does not enable any product or client,
-grant a user access, or require a new database table for the current Status
-plugin rollout. No production migration or deployment has been performed.
+per-user product records. The production schema and source were deployed on
+2026-11-08. It is **not wired into account signup, login, OAuth, Status,
+Connector, or a public API**. The migration enrolled zero users. Catalog entries
+do not enable OAuth clients or grant product access; Status activation and
+consumer integration remain separate reviewed work.
 
 The existing `User` remains the global identity. Existing website sessions,
 `WebsiteOAuthGrant`, and `WebsiteOAuthCredential` remain unchanged. Product
@@ -199,3 +200,46 @@ those state checks and a no-op duplicate-key insert for enrollment. The final
 runs verified column-limited entitlement updates and no identity/catalog writes,
 while preserving concurrent enrollment and optimistic-version behavior. This is
 local validation only, not a production migration or activation result.
+
+
+### Verified production foundation release, 2026-11-08
+
+Source commit: `ee4af02a54f733e567b47dbbe31806b7e556ad9d`.
+Production version: `nektron-shared-apps-20261108T015506Z-ee4af02a54`.
+The existing website is **Ready / Green**. This is a dormant foundation deployment,
+not activation of shared entitlements or Status OAuth.
+
+- MySQL **8.4.5** read-only preflight passed. A fresh manual recovery snapshot,
+  `deeptrading-pre-shared-apps-20261108`, was available before applying DDL.
+  Automated backup retention remains unchanged at zero. The snapshot is tagged
+  for review after 2026-11-15; no snapshots were deleted and no backup policy changed.
+- Added `Application`, `ApplicationOAuthClient` and `UserApplication`. Verified
+  exactly two product rows, four client metadata associations and **zero user
+  entitlements**. Existing User/OAuth schema and runtime grants are unchanged.
+- The matching disposable MySQL 8.4.5 rehearsal passed **16 tests**. The Python
+  account/OAuth suite passed **213 tests**, login-return scenarios **26 tests**,
+  and static/homepage checks **29 tests** with three optional historical skips.
+  Source-commit GitHub CI passed. No real user was created or emailed.
+- The release overlaid only the reviewed account sources and account script onto
+  the active bundle; existing account-script URL query values were refreshed.
+  All 183 other entries and existing ZIP permissions were preserved. The three
+  new runtime/schema files use regular mode 0644. No environment option, signing
+  identity, secret, runtime grant or Status flag changed.
+- Live checks confirmed 13 static files match the candidate, healthy account
+  endpoints, unchanged Connector metadata and Connector/Mail JWKS, protected
+  new source paths (404), and Secure/HttpOnly/SameSite account cookies.
+- No live account sign-in, credential issuance, entitlement consumption or
+  organization inheritance was claimed or tested. Existing synthetic account,
+  Connector and Mail tests passed. Future activation still needs exact bindings,
+  reviewed grants, approved users and consumer integration.
+
+AWS's Ohio MySQL backup rate is $0.095 per billable GB-month above the free
+allowance. The snapshot's incremental changed-block size is not exposed by the
+snapshot API. A conservative full 450-GiB allocated-size calculation is about
+$42.75 per month (about $10 per week); actual incremental charges may be lower.
+Do not delete the recovery snapshot without review.
+
+Rollback of the dormant source uses the previous application version,
+`nektron-status-overview-20261105T193041Z-25f93f54ffa9`, while leaving the
+new tables unreferenced and preserving their data. No automatic table deletion,
+permission revocation, or whole-database restore is part of rollback.

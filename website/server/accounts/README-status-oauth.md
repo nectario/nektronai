@@ -1,8 +1,10 @@
-# Status Endpoint OAuth extension: disabled local candidate
+# Status Endpoint OAuth extension: deployed, disabled
 
-2026-11-05. This extends the existing native issuer implementation locally. It
-does not register a live client, enable a flag, create a signing key, enroll an
-agent/worker, issue a live credential or deploy a website version.
+Built initially on 2026-11-05 and deployed on 2026-11-08, this extends the
+existing native issuer with both Status flags disabled. The release did not
+register a live client, enable a flag, create a signing key, enroll an agent or
+worker, or issue a live credential. Existing Connector and Mail configuration
+and public signing keys were verified unchanged after deployment.
 
 ## Reuse and compatibility
 
@@ -94,7 +96,7 @@ No temporary pilot grants or deleted launchers are restored.
 
 ## Validation
 
-All 188 native accounts tests passed. Synthetic tests cover scope/resource/
+All 213 native account/application/OAuth tests passed for the released source. Synthetic tests cover scope/resource/
 client/callback isolation, native-account
 revocation, nonce scope changes, worker no-refresh behavior, bounded SQL intent,
 and unchanged Connector flows. The full accounts suite includes existing Mail
@@ -105,7 +107,10 @@ is used by those tests.
 
 ## In Simple Terms
 
-**Built now:** Disabled Status clients in the shared native issuer. **Not built:**
-Live client registration or application access grants. **Live now:** Existing
-deployments are unchanged. **Next:** Review the exact bindings and hosting plan
-before any activation, credential issuance or real task.
+**Built and deployed:** Disabled Status clients in the shared native issuer.
+**Not activated:** Live Status client registration or application access grants.
+**Live now:** Existing Connector and Mail behavior; both Status flags remain off.
+**Next:** Review exact bindings and application grants before any activation,
+credential issuance or real task. Source commit: `ee4af02`.
+The verified production release, migration and rollback details are recorded in
+[shared application accounts](README-applications.md#verified-production-foundation-release-2026-11-08).
