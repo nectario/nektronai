@@ -159,3 +159,10 @@ delivery using its mailbox simulator. Do not email real users during tests.
 After deployment check health, secure cookies, forms on mobile and desktop, SES
 acceptance, and login/logout. Monitor account_email_delivery_failed and 5xx rates;
 a generic accepted response alone is not proof that an email was delivered.
+
+## Optional Status Endpoint OAuth clients
+
+The disabled native Status clients reuse this issuer with exact client/resource/
+scope binding. They do not require a Database Connector database or enroll any
+application grant. See [Status OAuth review](README-status-oauth.md). No client,
+credential or new production access is registered by this source change.

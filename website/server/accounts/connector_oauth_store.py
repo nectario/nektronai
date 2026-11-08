@@ -51,7 +51,7 @@ class OAuthStore:
         data = dict(data, family=family)
         with self.accounts.connection() as c, c.cursor() as cur:
             cur.execute("INSERT INTO WebsiteOAuthGrant (GrantId,ClientId,ExpiresAt,Revoked) VALUES (%s,%s,%s,0)",
-                        (family, data['client_id'], now + 30*86400))
+                        (family, data['client_id'], now + (300 if data.get('refresh_allowed') is False else 30*86400)))
             cur.execute("INSERT INTO WebsiteOAuthCredential (TokenHash,GrantId,Kind,Data,ExpiresAt,Used) "
                         "VALUES (%s,%s,'code',%s,%s,0)", (digest(raw), family, json.dumps(data), now+120))
 

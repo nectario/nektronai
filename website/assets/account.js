@@ -258,12 +258,12 @@
       if (action === 'login') {
         const returnKey = sessionStorage.getItem('nektron.account.return');
         sessionStorage.removeItem('nektron.account.return');
-        const fallback = result.redirect === accountDestinations['mail-authorize']
-          ? accountDestinations['mail-authorize'] : 'account.html';
-        // A fresh server-side Mail request also survives verification in a new tab.
+        const fallback = [accountDestinations['connector-authorize'], accountDestinations['mail-authorize']].includes(result.redirect)
+          ? result.redirect : 'account.html';
+        // Fresh server-side Status and Mail requests survive verification in a new tab.
         // An explicit URL destination still wins; stale unrelated local journey
-        // state cannot override the server's fixed, validated Mail fallback.
-        location.assign(fallback === accountDestinations['mail-authorize'] && !Object.hasOwn(accountDestinations, requestedReturn)
+        // state cannot override either fixed, validated OAuth fallback.
+        location.assign(fallback !== 'account.html' && !Object.hasOwn(accountDestinations, requestedReturn)
           ? fallback : Object.hasOwn(accountDestinations, returnKey) ? accountDestinations[returnKey] : fallback);
         return;
       }

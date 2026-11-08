@@ -20,6 +20,7 @@ from authlib.oauth2.rfc6749.grants import AuthorizationCodeGrant, RefreshTokenGr
 from authlib.oauth2.rfc6750 import BearerTokenGenerator
 from authlib.oauth2.rfc7636 import CodeChallenge
 from connector_oauth_store import OAuthStore
+from status_oauth_clients import (STATUS_FLOW, WORKER_CLIENT, STATUS_CONSENT, SCOPE_DESCRIPTIONS, configured_status_clients)
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from flask import Blueprint, jsonify, make_response, redirect, render_template_string, request, session
 
@@ -105,19 +106,21 @@ class Credential:
         return self.data['redirect_uri']
 
     def get_scope(self):
-        return READ
+        return READ if self.data['client_id']==CHATGPT_CLIENT else self.data['scope']
 
     def check_client(self, client):
         return self.data['client_id'] == client.get_client_id()
 
 
 def register_connector_oauth(app, settings, accounts, oauth_store=None):
-    if settings.get('NEKTRON_CONNECTOR_OAUTH_ENABLED') != 'true':
+    connector_enabled=settings.get('NEKTRON_CONNECTOR_OAUTH_ENABLED')=='true'
+    clients=configured_status_clients(settings)
+    if not connector_enabled and not clients:
         return
     if settings.get('NEKTRON_SITE_ORIGIN') != ISSUER:
         raise ValueError('Native connector OAuth requires the canonical Nektron origin')
-    callbacks = (settings['NEKTRON_CONNECTOR_CHATGPT_CALLBACK'],
-                 'https://chatgpt.com/connector/oauth/kVjP5GNmpRmp')
+    callbacks = ((settings['NEKTRON_CONNECTOR_CHATGPT_CALLBACK'],
+                 'https://chatgpt.com/connector/oauth/kVjP5GNmpRmp') if connector_enabled else ())
     if not all(re.fullmatch(r'https://chatgpt\.com/(connector/oauth/[A-Za-z0-9_-]+|connector_platform_oauth_redirect)', value) for value in callbacks):
         raise ValueError('Use the exact callback shown by ChatGPT')
     key = load_pem_private_key(settings['NEKTRON_CONNECTOR_SIGNING_PEM'].encode(), password=None)
@@ -129,7 +132,8 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
         raise ValueError('Invalid signing key identifier')
     public.update(kid=kid, use='sig', alg='RS256')
     store = oauth_store or OAuthStore(accounts)
-    client = Client(callbacks)
+    if connector_enabled:
+        clients[CHATGPT_CLIENT]=Client(callbacks)
     blueprint = Blueprint('connector_oauth', __name__)
 
     def current_user():
@@ -142,14 +146,24 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
         if not user or not accounts.get_user(user.user_id, user.auth_tag):
             raise InvalidGrantError()
         now = int(time.time())
-        return jwt.encode({'iss': ISSUER, 'sub': user.user_id, 'aud': RESOURCE,
-            'iat': now, 'exp': now+300, 'jti': secrets.token_urlsafe(24),
-            'client_id': client.get_client_id(), 'scope': scope, VERIFIED: True},
-            key, algorithm='RS256', headers={'kid': kid, 'typ': 'at+jwt'})
+        resource=getattr(client,'resource',RESOURCE)
+        if client.get_client_id()!=MANAGEMENT_CLIENT and (not isinstance(scope,str) or not scope or clients.get(client.get_client_id()) is not client
+                or client.get_allowed_scope(scope)!=scope):
+            raise InvalidGrantError()
+        if client.get_client_id()==MANAGEMENT_CLIENT and (not connector_enabled or scope!=MANAGE or grant_type!='native_session'):
+            raise InvalidGrantError()
+        claims={'iss':ISSUER,'sub':user.user_id,'aud':resource,'iat':now,'exp':now+300,
+            'jti':secrets.token_urlsafe(24),'client_id':client.get_client_id(),'scope':scope}
+        if client.get_client_id() in (CHATGPT_CLIENT,MANAGEMENT_CLIENT):
+            claims[VERIFIED]=True
+        return jwt.encode(claims,key,algorithm='RS256',headers={'kid':kid,'typ':'at+jwt'})
 
     def save_token(token, req):
         credential = req.authorization_code if req.payload.grant_type == 'authorization_code' else req.refresh_token
-        store.save_refresh(token['refresh_token'], credential.data)
+        if req.client.check_grant_type('refresh_token'):
+            store.save_refresh(token['refresh_token'], credential.data)
+        elif 'refresh_token' in token:
+            raise InvalidGrantError()
 
     def database_ready(user):
         return has_connector_database(access_token(Client('', MANAGEMENT_CLIENT), 'native_session', user, MANAGE))
@@ -159,22 +173,45 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
                                               'user_id': user.user_id}
         return '/database-connector-setup.html?returnTo=connector-authorize#add'
 
-    server = AuthorizationServer(app, query_client=lambda cid: client if cid == CHATGPT_CLIENT else None,
+    server = AuthorizationServer(app, query_client=lambda cid: clients.get(cid),
                                  save_token=save_token)
     server.register_token_generator('default', BearerTokenGenerator(access_token,
         refresh_token_generator=lambda **kwargs: secrets.token_urlsafe(48), expires_generator=lambda *args: 300))
+
+    def consume(raw,kind,requesting_client):
+        cid=requesting_client.get_client_id()
+        if kind=='refresh' and not requesting_client.check_grant_type('refresh_token'):
+            return None
+        data=store.consume(raw,kind,cid)
+        if not data or data.get('client_id')!=cid:
+            return None
+        if cid!=CHATGPT_CLIENT:
+            if (data.get('authentication_flow')!=STATUS_FLOW or data.get('resource')!=requesting_client.resource
+                    or not isinstance(data.get('scope'),str) or not data['scope']
+                    or requesting_client.get_allowed_scope(data.get('scope'))!=data.get('scope')
+                    or type(data.get('refresh_allowed')) is not bool
+                    or data['refresh_allowed']!=requesting_client.check_grant_type('refresh_token')
+                    or data.get('redirect_uri') not in requesting_client.callbacks):
+                return None
+        frozen_scope=READ if cid==CHATGPT_CLIENT else data['scope']
+        if request.form.get('scope',frozen_scope)!=frozen_scope:
+            return None
+        return Credential(data)
 
     class CodeGrant(AuthorizationCodeGrant):
         TOKEN_ENDPOINT_AUTH_METHODS = ['none']
 
         def save_authorization_code(self, code, req):
-            store.create_code(code, {'user_id': req.user.user_id, 'auth_tag': req.user.auth_tag,
-                'client_id': CHATGPT_CLIENT, 'redirect_uri': req.payload.redirect_uri,
-                'code_challenge': req.payload.data['code_challenge']})
+            cid=req.client.get_client_id()
+            data={'user_id':req.user.user_id,'auth_tag':req.user.auth_tag,'client_id':cid,
+                'redirect_uri':req.payload.redirect_uri,'code_challenge':req.payload.data['code_challenge']}
+            if cid!=CHATGPT_CLIENT:
+                data.update(resource=req.client.resource,scope=req.payload.scope,
+                    authentication_flow=STATUS_FLOW,refresh_allowed=req.client.check_grant_type('refresh_token'))
+            store.create_code(code,data)
 
         def query_authorization_code(self, code, requesting_client):
-            data = store.consume(code, 'code', requesting_client.get_client_id())
-            return Credential(data) if data else None
+            return consume(code,'code',requesting_client)
 
         def delete_authorization_code(self, code):
             pass  # Atomically consumed before exchange; failures cannot replay it.
@@ -188,8 +225,7 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
         INCLUDE_NEW_REFRESH_TOKEN = True
 
         def authenticate_refresh_token(self, raw):
-            data = store.consume(raw, 'refresh', self.request.client.get_client_id())
-            return Credential(data) if data else None
+            return consume(raw,'refresh',self.request.client)
 
         def authenticate_user(self, credential):
             data = credential.data
@@ -205,7 +241,9 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
     server.register_grant(RefreshGrant)
 
     def limited(action, limit=60):
-        return not accounts.allow_request('connector:'+action+':'+(request.remote_addr or 'unknown'), limit=limit, seconds=600)
+        cid=request.args.get('client_id') or request.form.get('client_id')
+        prefix='status-oauth:'+cid if cid in clients and cid!=CHATGPT_CLIENT else 'connector'
+        return not accounts.allow_request(prefix+':'+action+':'+(request.remote_addr or 'unknown'), limit=limit, seconds=600)
 
     def clean_parameters(values, allowed):
         return (not set(values)-set(allowed) and all(len(values.getlist(k)) == 1 and
@@ -216,9 +254,9 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
         return jsonify(issuer=ISSUER, authorization_endpoint=ISSUER+PREFIX+'/authorize',
             token_endpoint=ISSUER+PREFIX+'/token', revocation_endpoint=ISSUER+PREFIX+'/revoke',
             jwks_uri=ISSUER+PREFIX+'/jwks', response_types_supported=['code'],
-            grant_types_supported=['authorization_code','refresh_token'],
+            grant_types_supported=['authorization_code']+(['refresh_token'] if any(c.check_grant_type('refresh_token') for c in clients.values()) else []),
             token_endpoint_auth_methods_supported=['none'], code_challenge_methods_supported=['S256'],
-            scopes_supported=[READ], response_modes_supported=['query'],
+            scopes_supported=sorted({scope for c in clients.values() for scope in getattr(c,'scopes',(READ,))}), response_modes_supported=['query'],
             authorization_response_iss_parameter_supported=True)
 
     @blueprint.get(PREFIX+'/jwks')
@@ -229,8 +267,10 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
     def authorize():
         params = request.args
         allowed = {'client_id','redirect_uri','response_type','scope','state','resource','code_challenge','code_challenge_method','response_mode','ui_locales'}
-        if (not clean_parameters(params, allowed) or params.get('resource') != RESOURCE
-                or params.get('scope') != READ or params.get('response_type') != 'code'
+        selected=clients.get(params.get('client_id'))
+        if (not selected or not clean_parameters(params, allowed) or params.get('resource') != getattr(selected,'resource',RESOURCE)
+                or not params.get('scope') or selected.get_allowed_scope(params['scope'])!=params['scope']
+                or params.get('response_type') != 'code'
                 or params.get('response_mode', 'query') != 'query' or not params.get('state')
                 or (params.get('ui_locales') is not None and (len(params['ui_locales']) > 64 or not re.fullmatch(r'[A-Za-z0-9-]+(?: [A-Za-z0-9-]+)*', params['ui_locales'])))
                 or params.get('code_challenge_method') != 'S256'
@@ -247,7 +287,7 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
             return redirect('/login.html?returnTo=connector-authorize')
         if request.method == 'GET':
             try:
-                ready = database_ready(user)
+                ready = database_ready(user) if selected.get_client_id()==CHATGPT_CLIENT else True
             except RuntimeError:
                 return jsonify(error='SETUP_UNAVAILABLE', message='Could not check your databases. Retry connecting from ChatGPT.'), 503
             if not ready:
@@ -255,7 +295,10 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
             session['connector_consent'] = {'nonce': secrets.token_urlsafe(32), 'params': params.to_dict(),
                                             'created': int(time.time()), 'user_id': user.user_id}
             session.setdefault('csrf', secrets.token_urlsafe(32))
-            return render_template_string(CONSENT, csrf=session['csrf'], nonce=session['connector_consent']['nonce'])
+            template=CONSENT if selected.get_client_id()==CHATGPT_CLIENT else STATUS_CONSENT
+            return render_template_string(template,csrf=session['csrf'],nonce=session['connector_consent']['nonce'],
+                display_name=getattr(selected,'display_name','Database Connector'),scopes=params['scope'].split(' '),
+                descriptions=SCOPE_DESCRIPTIONS,worker=selected.get_client_id()==WORKER_CLIENT)
         consent = session.pop('connector_consent', {})
         body = request.get_json(silent=True)
         if (not isinstance(body, dict) or set(body) != {'approve','nonce'} or type(body['approve']) is not bool
@@ -264,7 +307,7 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
             return jsonify(error='invalid_request'), 400
         if body['approve']:
             try:
-                ready = database_ready(user)
+                ready = database_ready(user) if selected.get_client_id()==CHATGPT_CLIENT else True
             except RuntimeError:
                 return jsonify(error='SETUP_UNAVAILABLE'), 503
             if not ready:
@@ -275,7 +318,7 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
             return response
         parsed = urlsplit(location)
         if (urlunsplit((parsed.scheme,parsed.netloc,parsed.path,'','')) != params.get('redirect_uri')
-                or params.get('redirect_uri') not in callbacks):
+                or params.get('redirect_uri') not in selected.callbacks):
             return jsonify(error='invalid_request'), 400
         pairs = parse_qsl(parsed.query, keep_blank_values=True)
         location = urlunsplit((parsed.scheme,parsed.netloc,parsed.path,urlencode(pairs+[('iss',ISSUER)]),''))
@@ -285,6 +328,8 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
     def resume():
         pending = session.pop('connector_oauth_pending', {})
         if not pending or not 0 <= time.time()-pending.get('created',0) <= 600:
+            if pending.get('params',{}).get('client_id') in clients and pending['params']['client_id']!=CHATGPT_CLIENT:
+                return 'This connection request expired. Return to Status Endpoint and restart authorization.',400
             return 'This connection request expired. Return to ChatGPT and connect Database Connector again.', 400
         user = current_user()
         if pending.get('user_id') and (not user or user.user_id != pending['user_id']):
@@ -294,10 +339,11 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
     @blueprint.post(PREFIX+'/token')
     def token():
         allowed = {'grant_type','client_id','code','redirect_uri','code_verifier','resource','refresh_token','scope'}
-        if (request.mimetype != 'application/x-www-form-urlencoded' or request.args
+        selected=clients.get(request.form.get('client_id'))
+        if (not selected or request.mimetype != 'application/x-www-form-urlencoded' or request.args
                 or request.headers.get('Cookie') or request.headers.get('Authorization')
-                or not clean_parameters(request.form, allowed) or request.form.get('resource') != RESOURCE
-                or request.form.get('client_id') != CHATGPT_CLIENT or limited('token', 120)):
+                or not clean_parameters(request.form, allowed) or request.form.get('resource') != getattr(selected,'resource',RESOURCE)
+                or not selected.check_grant_type(request.form.get('grant_type')) or limited('token', 120)):
             return jsonify(error='invalid_request'), 400
         return server.create_token_response()
 
@@ -310,7 +356,7 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
                 or not 0 <= time.time()-pending.get('created', 0) <= 600):
             return jsonify(error='invalid_request'), 400
         callback = pending.get('params', {}).get('redirect_uri')
-        if callback not in callbacks:
+        if pending.get('params',{}).get('client_id')!=CHATGPT_CLIENT or callback not in callbacks:
             return jsonify(error='invalid_request'), 400
         session.pop('connector_oauth_pending', None)
         return jsonify(redirect=callback+'?'+urlencode({'error':'access_denied',
@@ -320,13 +366,15 @@ def register_connector_oauth(app, settings, accounts, oauth_store=None):
     def revoke():
         if (request.mimetype != 'application/x-www-form-urlencoded' or request.args
                 or request.headers.get('Cookie') or not clean_parameters(request.form, {'client_id','token','token_type_hint'})
-                or request.form.get('client_id') != CHATGPT_CLIENT or not request.form.get('token') or limited('revoke')):
+                or request.form.get('client_id') not in clients or not request.form.get('token') or limited('revoke')):
             return jsonify(error='invalid_request'), 400
-        store.revoke(request.form['token'], CHATGPT_CLIENT)
+        store.revoke(request.form['token'], request.form['client_id'])
         return '', 200
 
     @blueprint.post('/api/account/connector-token')
     def management_token():
+        if not connector_enabled:
+            return jsonify(error='NOT_FOUND'),404
         user = current_user()
         if not user:
             return jsonify(error='AUTH_REQUIRED'), 401

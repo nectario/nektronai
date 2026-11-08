@@ -294,6 +294,10 @@ def create_app(settings=None, store=None, mailer=None):
         destination = ("/api/account/mail-oauth/resume"
                        if "mail_oauth_pending" in session and "connector_oauth_pending" not in session
                        else "/account.html")
+        pending_client=session.get("connector_oauth_pending",{}).get("params",{}).get("client_id")
+        if ((pending_client=="nektron-status-endpoint-chatgpt" and settings.get("NEKTRON_STATUS_OAUTH_ENABLED")=="true")
+                or (pending_client=="nektron-status-endpoint-worker" and settings.get("NEKTRON_STATUS_WORKER_OAUTH_ENABLED")=="true")):
+            destination="/api/account/oauth/resume"
         return jsonify(authenticated=True, redirect=destination)
 
     @app.post("/api/account/request-verification")
@@ -377,7 +381,8 @@ def create_app(settings=None, store=None, mailer=None):
     from contact import register_contact
     register_contact(app, backend, delivery)
 
-    if settings.get("NEKTRON_CONNECTOR_OAUTH_ENABLED") == "true":
+    if any(settings.get(key)=="true" for key in ("NEKTRON_CONNECTOR_OAUTH_ENABLED",
+            "NEKTRON_STATUS_OAUTH_ENABLED","NEKTRON_STATUS_WORKER_OAUTH_ENABLED")):
         from connector_oauth import register_connector_oauth
         register_connector_oauth(app, settings, backend)
     if settings.get("NEKTRON_MAIL_OAUTH_ENABLED") == "true":
